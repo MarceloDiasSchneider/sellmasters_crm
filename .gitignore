@@ -1,0 +1,4 @@
+ignore all logs *.log 
+AdminLTE
+cartella_pulita
+database_pdo_sing.php

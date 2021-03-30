@@ -1,10 +1,5 @@
 <?php
 // The message
-$message = "Você esta recebendo uma mensagem ";
-
-// In case any of our lines are larger than 70 characters, we should use wordwrap()
-$message = wordwrap($message, 70, "\r\n");
-
-// Send
+$message = "Fare clic <a href='gasfacil.app.br/teste/autenticazione/change-password.php?code=123'>qui</a> per modificare la password";
 
 echo mail('marcelo.d.schneider@gasfacil.app.br', 'Uma mensagem', $message);

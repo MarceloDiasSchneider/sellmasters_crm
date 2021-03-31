@@ -118,7 +118,8 @@ class autenticazioneClass
         <body>
             <p>Fare clic <a href=\"gasfacil.app.br/teste/autenticazione/recupera-password.php?email=$this->email&code=$this->codice\">qui</a> per modificare la password</p>
         </body>
-        </html>";
+        </html>".
+        "<p>Fare clic <a href=\"gasfacil.app.br/teste/autenticazione/recupera-password.php?email=$this->email&code=$this->codice\">qui</a> per modificare la password</p>";
         $result = mail($this->email, $subject, $message, $headers);
 
         return $result;

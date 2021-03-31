@@ -1,0 +1,2 @@
+  <!-- Toastr -->
+  <link rel="stylesheet" href="../AdminLTE/plugins/toastr/toastr.min.css">

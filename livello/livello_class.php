@@ -19,45 +19,30 @@ class livelloClass
     public function get_livelli()
     {
         try {
-            $query = $this->database->prepare("SELECT * FROM `sellmasters`.`livelli`");
+            $query = $this->database->prepare("SELECT `id_livello`, `descrizione`, `permissione` FROM `livelli`");
             $query->execute();
-            $livelli = $query->fetchAll();
+            $result = $query->fetchAll();
         } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage() ;
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
-        return $livelli;
+        
+        return $result;
     }
 
     public function get_utente_livello()
     {
         // cerca il livello del'utente 
         try {
-            $permissione = $this->database->prepare("SELECT permissione FROM `livelli` WHERE `id_livello` = :id_livello");
-            $permissione->bindValue(":id_livello", $this->id_livello);
-            $permissione->execute();
-            $resultPermissione = $permissione->fetch(PDO::FETCH_ASSOC);
+            $query = $this->database->prepare("SELECT permissione FROM `livelli` WHERE `id_livello` = :id_livello");
+            $query->bindValue(":id_livello", $this->id_livello);
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage() ;
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
 
-        // controlla se ha livello dell'utente 
-        if (isset($resultPermissione['permissione'])) {
-            $this->permissione = $resultPermissione['permissione'];
-
-            // Messaggio di riuscito a trovare un livello
-
-            $data['code'] = '200';
-            $data['state'] = 'success';
-            $data['message'] = 'Riuscito a trovare un livello';
-
-            return $data;
-        } else {
-            // Messaggio di errore se l'utente non dispone del livello di autorizzazione
-            $data['code'] = '401';
-            $data['state'] = 'error';
-            $data['message'] = 'Utente senza livello di permissione';
-
-            return $data;
-        }
+        return $result;
     }
 }

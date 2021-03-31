@@ -39,6 +39,11 @@
 							<div class="card card-primary">
 								<div class="card-header">
 									<h3 class="card-title">Nuovo utente</h3>
+									<div class="card-tools">
+										<button type="button" class="btn btn-tool" data-card-widget="collapse">
+											<i class="fas fa-minus"></i>
+										</button>
+									</div>
 								</div>
 								<!-- /.card-header -->
 								<!-- form start -->
@@ -80,7 +85,7 @@
 											<div class="col-md-4">
 												<div class="form-group">
 													<label>Livello</label>
-													<select id="livello" name="livello" class="form-control">
+													<select id="livello" name="livello" class="form-control" required>
 														<!-- <option disabled selected></option> -->
 													</select>
 												</div>

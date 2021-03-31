@@ -35,3 +35,7 @@ CREATE TABLE `accede_logs`(
 	PRIMARY KEY (`id_log`),
 	FOREIGN KEY (`id_utente`) REFERENCES utenti(`id_utente`)
 ) DEFAULT CHARSET = utf8;
+
+ALTER TABLE utenti
+ADD codice_recupera VARCHAR(15),
+ADD scadenza TIMESTAMP;

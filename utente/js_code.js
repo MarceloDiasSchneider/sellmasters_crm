@@ -16,6 +16,8 @@ $(document).ready(function () {
 					document.location.href = '../autenticazione';
 				} else if (data.state == "success") {
 					toastr.success(data.message)
+					// reload the table updated with ajax
+					$('#utenti').dataTable().api().ajax.reload(null, false);
 				} else if (data.state == "error") {
 					toastr.error(data.message)
 				} else if (data.state == "warning") {
@@ -29,38 +31,31 @@ $(document).ready(function () {
 	});
 
 	// Cerca tutti gli utenti registrato
-	$.ajax({
-		type: "POST",
-		url: "model.php",
-		data: "action=get_utenti",
-		dataType: "json",
-		async: false,
-		success: function (data) {
-			$(function () {
-				$("#utenti").DataTable({
-					data: data,
-					columns: [
-						{ title: "Nome", data: "nome" },
-						{ title: "Cognome", data: "cognome" },
-						{ title: "Email", data: "email" },
-						{ title: "Codice Fiscale", data: "codice_fiscale" },
-						{ title: "Telefono", data: "telefono" },
-						{ title: "Data", data: "data_nascita" },
-						{ title: "Livello", data: "id_livello" },
-						{ title: "Attivo", data: "attivo" },
-						{ title: "Azione", data: "azione" }
-					],
-					"responsive": true,
-					"lengthChange": false,
-					"autoWidth": false,
-					"buttons": ["copy", "csv", "excel", "pdf", "print"]
-				}).buttons().container().appendTo('#utenti_wrapper .col-md-6:eq(0)');
-			});
+	$("#utenti").DataTable({
+		'ajax': {
+			type: "POST",
+			url: "model.php",
+			data: { 'action': 'get_utenti' },
+			dataType: "json",
+			async: false,
+			dataSrc: ""
 		},
-		error: function (msg) {
-			alert("Failed: " + msg.status + ": " + msg.statusText);
-		}
-	});
+		columns: [
+			{ title: "Nome", data: "nome" },
+			{ title: "Cognome", data: "cognome" },
+			{ title: "Email", data: "email" },
+			{ title: "Codice Fiscale", data: "codice_fiscale" },
+			{ title: "Telefono", data: "telefono" },
+			{ title: "Data", data: "data_nascita" },
+			{ title: "Livello", data: "id_livello" },
+			{ title: "Attivo", data: "attivo" },
+			{ title: "Azione", data: "azione" }
+		],
+		"responsive": true,
+		"lengthChange": false,
+		"autoWidth": false,
+		"buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+	}).buttons().container().appendTo('#utenti_wrapper .col-md-6:eq(0)');
 
 	// Toggle attivare o disattivare l'utente
 	$("#utenti").on("click", ".disable_user", function () {
@@ -73,9 +68,10 @@ $(document).ready(function () {
 			dataType: "json",
 			async: false,
 			success: function (data) {
-				console.log(data);
 				if (data.state == "success") {
 					toastr.success(data.message)
+					// reload the table updated with ajax
+					$('#utenti').dataTable().api().ajax.reload(null, false);
 				}
 			},
 			error: function (msg) {
@@ -92,9 +88,14 @@ $(document).ready(function () {
 		dataType: "json",
 		async: false,
 		success: function (data) {
-			data.forEach(livello => {
-				$("#livello").append(`<option value='${livello.id_livello}'>${livello.descrizione}</option>`);
-			});
+			if (data.state == 'success'){
+				data.livelli.forEach(livello => {
+					$("#livello").append(`<option value='${livello.id_livello}'>${livello.descrizione}</option>`);
+				});
+			} else if (data.state == 'error'){
+				alert('Problema durante il caricamento delle opzioni de livello');
+				console.log(data.message);
+			}
 		},
 		error: function (msg) {
 			alert("Failed: " + msg.status + ": " + msg.statusText);
@@ -161,6 +162,10 @@ $(document).ready(function () {
 
 		// reset all input to null
 		$('#nuovo_utente').trigger("reset");
+
+		// Add the riquired to the password input
+		$('#password').prop('required', true);
+		$('#verificaPassword').prop('required', true);
 
 		// Set up the button to get back to register
 		$('#bottone_registra_utente').text('Registra');

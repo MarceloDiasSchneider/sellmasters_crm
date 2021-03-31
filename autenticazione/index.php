@@ -32,16 +32,7 @@
 						<span id="feedback"></span>
 					</div>
 					<div class="row">
-						<div class="col-8">
-							<div class="icheck-primary">
-								<input type="checkbox" id="remember">
-								<label for="remember">
-									Remember Me
-								</label>
-							</div>
-						</div>
-						<!-- /.col -->
-						<div class="col-4">
+						<div class="col-12 mb-3">
 							<button type="submit" id="bottone_autenticazione" class="btn btn-primary btn-block">Accedi</button>
 						</div>
 						<!-- /.col -->
@@ -49,7 +40,7 @@
 				</form>
 
 				<p class="mb-1">
-					<a href="#">Ho dimenticato la mia password</a>
+					<a href="recupera-password.php">Ho dimenticato la mia password</a>
 				</p>
 			</div>
 			<!-- /.card-body -->

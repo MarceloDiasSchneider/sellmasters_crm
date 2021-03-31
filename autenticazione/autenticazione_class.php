@@ -7,19 +7,23 @@ class autenticazioneClass
     public $id_utente;
     public $nome;
     public $id_livello;
-    // public $permissione;
+    public $codice;
+    public $scadenza;
 
-    /* possibilità di caratteri per generare il codice di sessione */
+    // possibility of characters to generate a code
+    // this method is used to verify the session or when user request a link to reset the passwor 
     private $possibilita = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%&*()_-\/|";
 
     public $database;
 
     function __construct()
     {
+        // Conect with the database
         include_once("../connessione/database_pdo_sing.php");
         $obj = DatabasePdoClass::getInstance();
         $this->database = $obj->creaConnessione();
 
+        // Star the session if is not started
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
         }
@@ -27,57 +31,83 @@ class autenticazioneClass
 
     public function crypt_password($password)
     {
-        /* fa la crittografia della password */
-        $salt = 'QLd9k@&l^atBpqM';
+        /* crypt the password */
+        $salt = '$2a$09$iWHICrsXJA0JvEjJdUri5p';
         $cryptPassword = crypt($password, $salt);
 
         return $cryptPassword;
     }
 
-    public function codice_sessione()
+    public function random_code()
     {
-        /* crea il codice di sessione per confrontare ogni richiesta */
-        $codice = "";
-        for ($i = 1; $i <= 10; $i++) {
-            $codice .= substr($this->possibilita, rand(1, strlen($this->possibilita)) - 1, 1);
+        // this method is used to verify the session or when user request a link to reset the passwor 
+        $code = "";
+        for ($i = 1; $i <= 15; $i++) {
+            $code .= substr($this->possibilita, rand(1, strlen($this->possibilita)) - 1, 1);
         }
-
-        return $codice;
+        $this->codice = $code;
     }
 
     public function verifica_accesso()
     {
-        /* controlla le credenziali dell'utente */
+        /* verify if user is registered */
         try {
-            $verifica = $this->database->prepare("SELECT `id_utente`, `nome`, `id_livello` FROM `utenti` WHERE `email` = :email AND `password` = :cryptedPassword AND `attivo` = :attivo");
-            $verifica->bindValue(":email", $this->email);
-            $verifica->bindValue(":cryptedPassword", $this->password);
-            $verifica->bindValue(":attivo", 1);
-            $verifica->execute();
-            $resultUtente = $verifica->fetch(PDO::FETCH_ASSOC);
+            $query = $this->database->prepare("SELECT `id_utente`, `nome`, `id_livello`, attivo FROM `utenti` WHERE `email` = :email AND `password` = :cryptedPassword");
+            $query->bindValue(":email", $this->email);
+            $query->bindValue(":cryptedPassword", $this->password);
+            // $query->bindValue(":attivo", 1);
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
+            // report a error to the user
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
 
-        /* Verifica se é trovato un utente */
-        if (isset($resultUtente['id_utente'])) {
-            $this->id_utente = $resultUtente['id_utente'];
-            $this->nome = $resultUtente['nome'];
-            $this->id_livello = $resultUtente['id_livello'];
+        return $result;
+    }
 
-            $data['code'] = '200';
-            $data['state'] = 'success';
-            $data['message'] = 'Email e password trovato';
-
-            return $data;
-        } else {
-            // Messaggio di errore se autenticazione non é riuscita
-            $data['code'] = '401';
-            $data['state'] = 'error';
-            $data['message'] = 'Email o password errate';
-
-            return $data;
+    public function check_email()
+    {
+        // check if the email is registred
+        try {
+            $query = $this->database->prepare("SELECT email FROM `utenti` WHERE email = :email");
+            $query->bindValue(":email", $this->email);
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
+            error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
+
+        return $result;
+    }
+
+    public function recover_password()
+    {
+        try {
+            $query = $this->database->prepare("UPDATE utenti 
+                SET codice_recupera = :codice_recupera, scadenza = :scadenza
+                WHERE email = :email");
+            $query->bindValue(":codice_recupera", $this->codice);
+            $query->bindValue(":scadenza", $this->scadenza);
+            $query->bindValue(":email", $this->email);
+            $result = $query->execute();
+            echo $query->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
+            error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
+        }
+    }
+
+    public function send_email()
+    {
+        // The message
+        $message = "Fare clic <a href='gasfacil.app.br/teste/autenticazione/change-password.php?code=$this->codice'>qui</a> per modificare la password";
+        $subject = 'Sell Masters - Cambia password';
+        $result = mail($this->email, $subject, $message);
+
+        return $result;
     }
 
     public function chiude_sessione()

@@ -93,11 +93,12 @@ class autenticazioneClass
             $query->bindValue(":scadenza", $this->scadenza);
             $query->bindValue(":email", $this->email);
             $result = $query->execute();
-            echo $query->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
+
+        return $result;
     }
 
     public function send_email()

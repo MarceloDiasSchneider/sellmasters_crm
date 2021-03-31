@@ -106,12 +106,12 @@ class autenticazioneClass
         $headers .= "Reply-To: marcelo.d.schneider@gasfacil.app.br\r\n";
 
         // The subject of the mail
-        $subject = 'Sell Masters - Cambia password';
+        $subject = 'Sell Masters - Recupero di password';
         // The message
         $message = "
         <html>
         <body>
-        <p>Fare clic <a href='gasfacil.app.br/teste/autenticazione/recupera-password.php?email=$this->email&code=$this->codice'>qui</a> per modificare la password</p>
+        <p>Fare clic <a href=\"gasfacil.app.br/teste/autenticazione/recupera-password.php?email=$this->email&code=$this->codice\">qui</a> per modificare la password</p>
         </body>
         </html>";
         $result = mail($this->email, $subject, $message, $headers);

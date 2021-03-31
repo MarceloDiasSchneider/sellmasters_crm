@@ -207,17 +207,11 @@ switch ($action) {
                         $data['state'] = 'error';
                         $data['code'] = '500';
                         $data['message'] = $row['catchError'];
-
-                        // $data['id'] = $autenticazione->id_utente;
-                        // $data['password'] = $autenticazione->password;
-                        // $data['email'] = $autenticazione->email;
-                        // $data['codice'] = $autenticazione->codice;
     
                         echo json_encode($data);
-                    } else if ($row == 0) {
+                    } else if ($row == 1) {
                         $data['state'] = 'success';
                         $data['code'] = '200';
-                        $data['row'] = $row;
                         $data['message'] = 'La password é aggiornata';
 
                         echo json_encode($data);

@@ -132,14 +132,14 @@ class autenticazioneClass
     {
         try {
             $query = $this->database->prepare("UPDATE `utenti` 
-            SET `password` = :password, codice_recupera = null;
+            SET `password` = :password, codice_recupera = null
             WHERE id_utente = :id_utente AND email = :email AND codice_recupera = :codice");
             $query->bindValue(":id_utente", $this->id_utente);
             $query->bindValue(":password", $this->password);
             $query->bindValue(":email", $this->email);
             $query->bindValue(":codice", $this->codice);
             $query->execute();
-            $result = $query->rowCount(); 
+            $result = $query->rowCount();
         } catch (PDOException $e) {
             $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");

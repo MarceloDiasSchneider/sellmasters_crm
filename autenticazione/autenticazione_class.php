@@ -12,7 +12,7 @@ class autenticazioneClass
 
     // possibility of characters to generate a code
     // this method is used to verify the session or when user request a link to reset the passwor 
-    private $possibilita = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@#$%&*()_-\/|";
+    private $possibilita = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@$%&*()_-\/|";
 
     public $database;
 

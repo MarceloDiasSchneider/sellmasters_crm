@@ -72,6 +72,10 @@ $(document).ready(function () {
 					toastr.warning(data.message)
 				} else if (data.state == 'success') {
 					toastr.success(data.message)
+					// set a time to redirect the user to authentication page
+					setTimeout(function(){ 
+						window.location.href = "index.php";
+					}, 1500);
 				} else if (data.state == 'error'){
 					alert('Problema, trove più tarde')
 					console.log(data.message);

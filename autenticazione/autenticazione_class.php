@@ -12,8 +12,7 @@ class autenticazioneClass
 
     // possibility of characters to generate a code
     // this method is used to verify the session or when user request a link to reset the passwor 
-    // private $possibilita = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@$%*()_-\/|";
-    private $possibilita = "!@$%*()_-\/|";
+    private $possibilita = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz!@$%*()_-\/|";
 
     public $database;
 
@@ -104,7 +103,7 @@ class autenticazioneClass
         // The headers to set some configuration
         $headers = "From: marcelo.d.schneider@gasfacil.app.br\r\n";
         $headers .= "Reply-To: marcelo.d.schneider@gasfacil.app.br\r\n";
-        // $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+        $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 
         // The subject of the mail
         $subject = 'Sell Masters - Recupero di password';

@@ -31,7 +31,7 @@ switch ($action) {
             // Use an authentication method to encrypt the password. 
             include_once('../autenticazione/model.php');
             if ($_REQUEST['password'] != '') {
-                $utente->password = $passwordCrypted;
+                $utente->password = $autenticazione->password;
             }
 
             // Check if it's have an ID to perform an update instead of insert 

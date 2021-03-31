@@ -13,7 +13,8 @@ switch ($action) {
 
         /* crittografa la password */
         $autenticazione->email = $_REQUEST['email'];
-        $autenticazione->password = $autenticazione->crypt_password($_REQUEST['password']);
+        $autenticazione->password = $_REQUEST['password'];
+        $autenticazione->crypt_password();
 
         /* Fa la verifica del e-mail e della password */
         $utente = $autenticazione->verifica_accesso();
@@ -65,6 +66,7 @@ switch ($action) {
                                     $data['state'] = 'error';
                                     $data['message'] = $accessoRegistrato['catchError'];
                                 } else {
+
                                     /* preparare la data che inizia la sessione */
                                     $timezone = new DateTimeZone('Europe/Rome');
                                     $now = new DateTime('now', $timezone);
@@ -113,43 +115,45 @@ switch ($action) {
 
         // encrypt the password when registering or updating a user 
         // this methos is called from utente/model.php
-        $passwordCrypted = $autenticazione->crypt_password($_REQUEST['password']);
+        $autenticazione->email = $_REQUEST['email'];
+        $autenticazione->password = $_REQUEST['password'];
+        $autenticazione->crypt_password();
 
         break;
 
-    case "recover_password":
+    case "forgot_password":
 
         // get the email to recovey the password
         $autenticazione->email = $_REQUEST['email'];
         $check_email = $autenticazione->check_email();
 
-        if (isset($check_email['catchError'])){
+        if (isset($check_email['catchError'])) {
             $data['state'] = 'error';
             $data['code'] = '500';
             $data['message'] = $check_email['catchError'];
 
             echo json_encode($data);
         } else {
-            if (isset($check_email['email'])){
+            if (isset($check_email['email'])) {
                 // set the deadline to change the password
                 $timezone = new DateTimeZone('Europe/Rome');
                 $now = new DateTime('tomorrow', $timezone);
                 $autenticazione->scadenza = $now->format('Y-m-d H:i:s');
-        
+
                 // draw a code to use as a key to recovery the password 
                 $autenticazione->random_code();
-        
+
                 // check if the email is registred
-                $result = $autenticazione->recover_password();
-                if (isset($result['catchError'])){
+                $result = $autenticazione->forgot_password();
+                if (isset($result['catchError'])) {
                     $data['state'] = 'error';
                     $data['code'] = '500';
                     $data['message'] = $result['catchError'];
-        
+
                     echo json_encode($data);
                 } else {
                     $result = $autenticazione->send_email();
-                    if( $result == 1){
+                    if ($result == 1) {
                         $data['state'] = 'success';
                         $data['code'] = '200';
                         $data['message'] = 'Ti abbiamo inviato una e-mail per recuperare la tua password';
@@ -162,18 +166,83 @@ switch ($action) {
 
                         echo json_encode($data);
                     }
-        
                 }
             } else {
                 $data['state'] = 'unauthorized';
                 $data['code'] = '401';
                 $data['message'] = 'Questo email non é registrato';
-    
+
                 echo json_encode($data);
             }
         }
 
+        break;
+    case "recover_password":
+        if ($_REQUEST['password'] == $_REQUEST['confirm-password']) {
+            $autenticazione->email = $_REQUEST['email'];
+            $autenticazione->codice = $_REQUEST['code'];
+            // crypt the password to update
+            $autenticazione->password = $_REQUEST['password'];
+            $autenticazione->crypt_password();
 
+            // check if the code match with the email 
+            $id_utente = $autenticazione->check_code_email();
+            if (isset($id_utente['catchError'])) {
+                $data['state'] = 'error';
+                $data['code'] = '500';
+                $data['message'] = $id_utente['catchError'];
+
+                echo json_encode($data);
+            } else if (isset($id_utente['id_utente'])) {
+                // check if the code still valid 
+                $autenticazione->id_utente = $id_utente['id_utente'];
+                // set the date timezone to work with dates
+                date_default_timezone_set('Europe/Rome');
+                $autenticazione->scadenza = new DateTime($id_utente['scadenza']);
+                $now = new DateTime('now');
+
+                if ($now < $autenticazione->scadenza) {
+                    $row = $autenticazione->update_password();
+                    if (isset($row['catchError'])) {
+                        $data['state'] = 'error';
+                        $data['code'] = '500';
+                        $data['message'] = $row['catchError'];
+
+                        // $data['id'] = $autenticazione->id_utente;
+                        // $data['password'] = $autenticazione->password;
+                        // $data['email'] = $autenticazione->email;
+                        // $data['codice'] = $autenticazione->codice;
+    
+                        echo json_encode($data);
+                    } else if ($row == 0) {
+                        $data['state'] = 'success';
+                        $data['code'] = '200';
+                        $data['row'] = $row;
+                        $data['message'] = 'La password é aggiornata';
+
+                        echo json_encode($data);
+                    }
+                } else {
+                    $data['state'] = 'unauthorized';
+                    $data['code'] = '401';
+                    $data['message'] = 'Il collegamento è scaduto';
+
+                    echo json_encode($data);
+                }
+            } else {
+                $data['state'] = 'bad request';
+                $data['code'] = '204';
+                $data['message'] = 'email e codice non validi';
+
+                echo json_encode($data);
+            }
+        } else {
+            $data['state'] = 'bad request';
+            $data['code'] = '400';
+            $data['message'] = 'Le password non corrispondono';
+
+            echo json_encode($data);
+        }
         break;
 
     default:

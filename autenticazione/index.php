@@ -40,7 +40,7 @@
 				</form>
 
 				<p class="mb-1">
-					<a href="recupera-password.php">Ho dimenticato la mia password</a>
+					<a href="dimenticato-password.php">Ho dimenticato la mia password</a>
 				</p>
 			</div>
 			<!-- /.card-body -->

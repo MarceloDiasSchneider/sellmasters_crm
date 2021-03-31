@@ -29,13 +29,11 @@ class autenticazioneClass
         }
     }
 
-    public function crypt_password($password)
+    public function crypt_password()
     {
         /* crypt the password */
         $salt = '$2a$09$iWHICrsXJA0JvEjJdUri5p';
-        $cryptPassword = crypt($password, $salt);
-
-        return $cryptPassword;
+        $this->password = crypt($this->password, $salt);
     }
 
     public function random_code()
@@ -55,7 +53,6 @@ class autenticazioneClass
             $query = $this->database->prepare("SELECT `id_utente`, `nome`, `id_livello`, attivo FROM `utenti` WHERE `email` = :email AND `password` = :cryptedPassword");
             $query->bindValue(":email", $this->email);
             $query->bindValue(":cryptedPassword", $this->password);
-            // $query->bindValue(":attivo", 1);
             $query->execute();
             $result = $query->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
@@ -83,7 +80,7 @@ class autenticazioneClass
         return $result;
     }
 
-    public function recover_password()
+    public function forgot_password()
     {
         try {
             $query = $this->database->prepare("UPDATE utenti 
@@ -104,9 +101,49 @@ class autenticazioneClass
     public function send_email()
     {
         // The message
-        $message = "Fare clic <a href='gasfacil.app.br/teste/autenticazione/change-password.php?code=$this->codice'>qui</a> per modificare la password";
+        $message = "
+        <html>
+        <p>Fare clic <a href='gasfacil.app.br/teste/autenticazione/recupera-password.php?email=$this->email'&code=$this->codice>qui</a> per modificare la password</p>
+        </html>";
         $subject = 'Sell Masters - Cambia password';
         $result = mail($this->email, $subject, $message);
+
+        return $result;
+    }
+
+    public function check_code_email()
+    {
+        try {
+            $query = $this->database->prepare("SELECT id_utente, scadenza FROM `utenti` 
+            WHERE email = :email AND codice_recupera = :codice");
+            $query->bindValue(":email", $this->email);
+            $query->bindValue(":codice", $this->codice);
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
+            error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
+        }
+
+        return $result;
+    }
+
+    public function update_password()
+    {
+        try {
+            $query = $this->database->prepare("UPDATE `utenti` 
+            SET `password` = :password, codice_recupera = null;
+            WHERE id_utente = :id_utente AND email = :email AND codice_recupera = :codice");
+            $query->bindValue(":id_utente", $this->id_utente);
+            $query->bindValue(":password", $this->password);
+            $query->bindValue(":email", $this->email);
+            $query->bindValue(":codice", $this->codice);
+            $query->execute();
+            $result = $query->rowCount(); 
+        } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
+            error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
+        }
 
         return $result;
     }

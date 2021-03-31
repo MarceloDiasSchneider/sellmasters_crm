@@ -100,13 +100,21 @@ class autenticazioneClass
 
     public function send_email()
     {
+        // The headers to set some configuration
+        $headers = "Content-Type: text/html; charset=UTF-8\r\n";
+        $headers .= "From: marcelo.d.schneider@gasfacil.app.br\r\n";
+        $headers .= "Reply-To: marcelo.d.schneider@gasfacil.app.br\r\n";
+
+        // The subject of the mail
+        $subject = 'Sell Masters - Cambia password';
         // The message
         $message = "
         <html>
+        <body>
         <p>Fare clic <a href='gasfacil.app.br/teste/autenticazione/recupera-password.php?email=$this->email&code=$this->codice'>qui</a> per modificare la password</p>
+        </body>
         </html>";
-        $subject = 'Sell Masters - Cambia password';
-        $result = mail($this->email, $subject, $message);
+        $result = mail($this->email, $subject, $message, $headers);
 
         return $result;
     }

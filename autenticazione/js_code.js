@@ -43,6 +43,7 @@ $(document).ready(function () {
 			success: function (data) {
 				if (data.state == 'success') {
 					toastr.success(data.message)
+					$('#email').text('')
 					$('#feedback').text('')
 				} else if (data.state == 'error') {
 					alert('Problema')

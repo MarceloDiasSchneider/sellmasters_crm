@@ -79,6 +79,24 @@ class merchantsClass
         return $result;
     }
 
+    public function check_nome_merchant_id_others()
+    {
+        // check if the nome and merchant_id is already used from another merchant
+        try {
+            $query = $this->database->prepare("SELECT nome, merchant_id FROM `merchants` WHERE nome = :nome AND merchant_id = :merchant_id AND id != :id");
+            $query->bindValue(":nome", $this->nome);
+            $query->bindValue(":merchant_id", $this->merchant_id);
+            $query->bindValue(":id", $this->id);
+            $query->execute();
+            $result = $query->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
+            error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
+        }
+
+        return $result;
+    }
+
     public function update_merchant()
     {
         try {

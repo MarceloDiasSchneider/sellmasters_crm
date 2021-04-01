@@ -73,69 +73,88 @@ switch ($action) {
             $merchants->attivo = $_REQUEST['attivo'];
         }
 
-        // check if nome and merchant_id is already used
-        $result = $merchants->check_nome_merchant_id();
-        if (isset($result['catchError'])) { // reporting an error on try catch
-            $data['code'] = '500';
-            $data['state'] = 'Internal server error';
-            $data['message'] = $result['catchError'];
+        // check if the ID is set to switch between insert or update the merchant
+        switch (isset($merchants->id)) {
+            case false; // Insert new merchant
+                // check if nome and merchant_id is already used
+                $result = $merchants->check_nome_merchant_id();
+                if (isset($result['catchError'])) { // reporting an error on try catch
+                    $data['code'] = '500';
+                    $data['state'] = 'Internal server error';
+                    $data['message'] = $result['catchError'];
 
-            echo json_encode($data);
-        } else if ($result != false) { // check if nome and merchant_id is already used
-            $data['code'] = '409';
-            $data['state'] = 'Conflict';
-            $data['message'] = 'Nome e Commerciante già registrato';
+                    echo json_encode($data);
+                } else if ($result != false) { // reporting that nome and merchant id is already used
+                    $data['code'] = '409';
+                    $data['state'] = 'Conflict';
+                    $data['message'] = 'Nome e Commerciante già registrato';
 
-            echo json_encode($data);
-        } else if (!isset($merchants->id)) { // insert a new merchant if the id IS NOT setted
-            $merchant = $merchants->insert_merchant();
-            if (isset($merchant['catchError'])) { // reporting an error on try catch
-                $data['code'] = '500';
-                $data['state'] = 'Internal server error';
-                $data['message'] = $merchant['catchError'];
+                    echo json_encode($data);
+                } else { // go to another check
+                    $merchant = $merchants->insert_merchant();
+                    if (isset($merchant['catchError'])) { // reporting an error on try catch
+                        $data['code'] = '500';
+                        $data['state'] = 'Internal server error';
+                        $data['message'] = $merchant['catchError'];
 
-                echo json_encode($data);
-            } else if ($merchant) { // merchant inserted
-                $data['code'] = '201';
-                $data['state'] = 'Created';
-                $data['message'] = 'Nuovo commerciante é registrato';
+                        echo json_encode($data);
+                    } else if ($merchant) { // merchant inserted
+                        $data['code'] = '201';
+                        $data['state'] = 'Created';
+                        $data['message'] = 'Nuovo commerciante é registrato';
 
-                echo json_encode($data);
-            } else { // merchant not inserted
-                $data['code'] = '500';
-                $data['state'] = 'Internal server error';
-                $data['message'] = 'The insert is not successfully';
+                        echo json_encode($data);
+                    } else { // merchant not inserted
+                        $data['code'] = '500';
+                        $data['state'] = 'Internal server error';
+                        $data['message'] = 'The insert is not successfully';
 
-                echo json_encode($data);
-            }
-        } else if (isset($merchants->id)) { // update a new merchant if the id IS setted 
-            $merchant = $merchants->update_merchant();
-            if (isset($merchant['catchError'])) { // reporting an error on try catch
-                $data['code'] = '500';
-                $data['state'] = 'Internal server error';
-                $data['message'] = $merchant['catchError'];
+                        echo json_encode($data);
+                    }
+                }
 
-                echo json_encode($data);
-            } else if ($merchant) { // merchant inserted
-                $data['code'] = '200';
-                $data['state'] = 'Success';
-                $data['message'] = 'Commerciante é aggiornato';
-                
-                $data['nome'] = $merchants->nome;
-                $data['merchant_id'] = $merchants->merchant_id;
-                $data['email'] = $merchants->email;
-                $data['mws'] = $merchants->mws;
-                
-                echo json_encode($data);
-            }else { // merchant not updated
-                $data['id'] = $merchants->id;
-                $data['rows'] = $merchant;
-                $data['code'] = '500';
-                $data['state'] = 'Internal server error';
-                $data['message'] = 'The insert is not successfully';
+                break;
 
-                echo json_encode($data);
-            }
+            case true; // update the merchant
+                // check if the nome and merchant in not used from another merchant
+                $result = $merchants->check_nome_merchant_id_others();
+                if (isset($result['catchError'])) { // reporting an error on try catch
+                    $data['code'] = '500';
+                    $data['state'] = 'Internal server error';
+                    $data['message'] = $result['catchError'];
+                    
+                    echo json_encode($data);
+                } else if ($result != false) { // reporting that nome and merchant id is already used
+                    $data['code'] = '409';
+                    $data['state'] = 'Conflict';
+                    $data['message'] = 'Nome e Commerciante già registrato';
+                    
+                    echo json_encode($data);
+                } else {
+                    $merchant = $merchants->update_merchant();
+                    if (isset($merchant['catchError'])) { // reporting an error on try catch
+                        $data['code'] = '500';
+                        $data['state'] = 'Internal server error';
+                        $data['message'] = $merchant['catchError'];
+                        
+                        echo json_encode($data);
+                    } else if ($merchant) { // merchant inserted
+                        $data['code'] = '200';
+                        $data['state'] = 'Success';
+                        $data['message'] = 'Commerciante é aggiornato';
+                        $data['test'] = 'Aprovado, Muito bem Marcelo!!!!';
+    
+                        echo json_encode($data);
+                    } else { // merchant not updated
+                        $data['code'] = '500';
+                        $data['state'] = 'Internal server error';
+                        $data['message'] = 'The insert is not successfully';
+    
+                        echo json_encode($data);
+                    }
+                }
+
+                break;
         }
 
         break;

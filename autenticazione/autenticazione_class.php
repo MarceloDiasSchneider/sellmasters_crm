@@ -103,7 +103,7 @@ class autenticazioneClass
         // The headers to set some configuration
         $headers = "From: marcelo.d.schneider@gasfacil.app.br\r\n";
         $headers .= "Reply-To: marcelo.d.schneider@gasfacil.app.br\r\n";
-        $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
+        // $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 
         // The subject of the mail
         $subject = 'Sell Masters - Recupero di password';

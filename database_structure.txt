@@ -1,8 +1,5 @@
 use sellmaster;
 
-
-
-
 CREATE TABLE `utenti`(
 	`id_utente` INT AUTO_INCREMENT,
     `nome` VARCHAR(30) NOT NULL,
@@ -17,6 +14,12 @@ CREATE TABLE `utenti`(
 	PRIMARY KEY (`id_utente`)   )
  DEFAULT CHARSET = utf8;
 
+ALTER TABLE utenti
+ADD codice_recupera VARCHAR(15),
+ADD scadenza TIMESTAMP;
+
+***
+
 CREATE TABLE `livelli`(
 	`id_livello` INT AUTO_INCREMENT,
     `descrizione` VARCHAR(20) NOT NULL,
@@ -24,6 +27,8 @@ CREATE TABLE `livelli`(
 	PRIMARY KEY (`id_livello`),
 	UNIQUE (`descrizione`)
 ) DEFAULT CHARSET = utf8;
+
+***
 
 CREATE TABLE `accede_logs`(
 	`id_log` INT AUTO_INCREMENT,
@@ -36,6 +41,25 @@ CREATE TABLE `accede_logs`(
 	FOREIGN KEY (`id_utente`) REFERENCES utenti(`id_utente`)
 ) DEFAULT CHARSET = utf8;
 
-ALTER TABLE utenti
-ADD codice_recupera VARCHAR(15),
-ADD scadenza TIMESTAMP;
+***
+
+CREATE TABLE `merchants` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+ * `nome` varchar(45) DEFAULT NULL,
+  `nome_sociale` varchar(100) DEFAULT NULL,
+ * `merchant_id` varchar(45) DEFAULT NULL,
+  `mws` varchar(450) DEFAULT NULL,
+  `interval_between_check` int(2) DEFAULT '24',
+  `nome_contatto` varchar(100) DEFAULT NULL,
+  `telefono` varchar(45) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `indirizzo` varchar(100) DEFAULT NULL,
+  `numero_civico` varchar(45) DEFAULT NULL,
+  `citta` varchar(45) DEFAULT NULL,
+  `cap` varchar(45) DEFAULT NULL,
+  `stato` varchar(45) DEFAULT NULL,
+  `provincia` varchar(45) DEFAULT NULL,
+  `attivo` int(11) DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nodouble` (`nome`,`merchant_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;

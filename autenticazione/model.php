@@ -84,7 +84,8 @@ switch ($action) {
                                     // $_SESSION['started'] = true; // deletar
 
                                     $data['state'] = 'success';
-                                    $data['code'] = '200';
+                                    $data['code'] = '201';
+                                    $data['message'] = 'Acesso registrato';
                                     $data['url'] = '../utente';
                                 }
                             }
@@ -224,8 +225,8 @@ switch ($action) {
                     echo json_encode($data);
                 }
             } else {
-                $data['state'] = 'bad request';
-                $data['code'] = '204';
+                $data['state'] = 'unauthorized';
+                $data['code'] = '401';
                 $data['message'] = 'email e codice non validi';
 
                 echo json_encode($data);

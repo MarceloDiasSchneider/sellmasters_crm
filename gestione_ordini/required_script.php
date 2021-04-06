@@ -5,7 +5,7 @@
     <!-- Bootstrap -->
     <script src="../AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE -->
-    <script src="../AdminLTE/dist/js/adminlte.js"></script>
+    <script src="../AdminLTE/dist/js/adminlte.min.js"></script>
 
     <!-- OPTIONAL SCRIPTS -->
     <script src="../AdminLTE/plugins/chart.js/Chart.min.js"></script>

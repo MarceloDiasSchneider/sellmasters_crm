@@ -51,9 +51,6 @@
 
 	<?php include_once('../common/required_script.php'); ?>
 	<?php include_once('required_script.php'); ?>
-
-	<!-- AdminLTE App -->
-	<script src="../../dist/js/adminlte.min.js"></script>
 </body>
 
 </html>

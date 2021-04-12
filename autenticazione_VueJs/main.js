@@ -6,7 +6,7 @@ const app = Vue.createApp({
 			login: true,
 			forgot_password: false,
 			password_recovery: false,
-			// variable to uopdate a new password
+			// variable to update a new password
 			email: '',
 			code: ''
 		}

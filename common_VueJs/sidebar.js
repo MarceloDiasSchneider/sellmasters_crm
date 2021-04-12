@@ -1,6 +1,9 @@
 app.component('sidebar', {
 	props: {
-
+		nome: {
+			type: String,
+			requided: true
+		}
 	},
 	template:
 	/*html*/
@@ -21,9 +24,9 @@ app.component('sidebar', {
 						<img src="../AdminLte/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
 					</div>
 					<div class="info">
-						<!-- <a href="#" class="d-block">
-							<?php echo $_SESSION['nome'] ?>
-						</a> -->
+						<a href="#" class="d-block">
+							{{ nome }}
+						</a> 
 					</div>
 				</div>
 
@@ -56,25 +59,19 @@ app.component('sidebar', {
 							</a>
 							<ul class="nav nav-treeview">
 								<li class="nav-item">
-									<a href="../gestione_ordini" class="nav-link">
-										<i class="far fa-circle nav-icon"></i>
-										<p>Gestione ordini</p>
-									</a>
-								</li>
-								<li class="nav-item">
-									<a href="../utente" class="nav-link">
+									<a href="../utente_VueJs" class="nav-link">
 										<i class="far fa-circle nav-icon"></i>
 										<p>Utenti</p>
 									</a>
 								</li>
 								<li class="nav-item">
-									<a href="../registro_accesso/" class="nav-link">
+									<a href="../registro_accesso_VueJs/" class="nav-link">
 										<i class="far fa-circle nav-icon"></i>
 										<p>Registri di accessi</p>
 									</a>
 								</li>
 								<li class="nav-item">
-									<a href="../merchants" class="nav-link">
+									<a href="../merchants_VueJs" class="nav-link">
 										<i class="far fa-circle nav-icon"></i>
 										<p>Comerciantes</p>
 									</a>

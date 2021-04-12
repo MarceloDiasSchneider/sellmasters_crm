@@ -1,74 +1,82 @@
 app.component('login', {
-	props: {
-		login: {
-			type: Boolean,
-			required: true
-		}
-	},
-	template:
-		/*html*/
-		`<!-- pagina originale pages/examples/login-v2.html -->
-		<div class="login-box" v-show="login">
-			<!-- /.login-logo -->
-			<div class="card card-outline card-primary">
-				<div class="card-header text-center">
-					<h1 class="h1">Sell Masters</h1>
-				</div>
-				<div class="card-body">
-					<p class="login-box-msg">Accedi per iniziare la tua sessione</p>
-					<form id="authentication" name="authentication" action="#" method="post">
-						<div class="input-group mb-3">
-							<input type="email" id="email" name="email" class="form-control" placeholder="Email" required>
-							<div class="input-group-append">
-								<div class="input-group-text">
-									<span class="fas fa-envelope"></span>
-								</div>
-							</div>
-						</div>
-						<div class="input-group mb-3">
-							<input type="password" id="password" name="password" class="form-control" placeholder="Password" required pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Deve contenere almeno un numero e una lettera maiuscola e minuscola e almeno 8 o più caratteri">
-							<div class="input-group-append">
-								<div class="input-group-text">
-									<span class="fas fa-lock"></span>
-								</div>
-							</div>
-						</div>
-						<div class="feedback text-red mb-3">
-							<span id="feedback">{{ message }}</span>
-						</div>
-						<div class="row">
-							<div class="col-12 mb-3">
-								<button type="submit" id="submit" class="btn btn-primary btn-block" @click.prevent="authentication">Accedi</button>
-							</div>
-							<!-- /.col -->
-						</div>
-					</form>
-					<p class="mb-1">
-						<a href="#" @click.prevent="forgot_password_clicked">Ho dimenticato la mia password</a>
-					</p>
-				</div>
-				<!-- /.card-body -->
-			</div>
-			<!-- /.card -->
-		</div>
-		<!-- /.login-box -->`,
-	data(){
-		return {
-			message: ''
-		}
-	},
-	methods: {
+    props: {
+        login: {
+            type: Boolean,
+            required: true
+        }
+    },
+    template: 
+        /*html*/
+		`<div class="login-box" v-show="login">
+            <div class="card card-outline card-primary">
+                <div class="card-header text-center">
+                    <h1 class="h1">Sell Masters</h1>
+                </div>
+                <div class="card-body">
+                    <p class="login-box-msg">Accedi per iniziare la tua sessione</p>
+
+                    <form id="authentication" name="authentication" action="#" method="post" @submit.prevent="authentication">
+                        <div class="input-group mb-3">
+                            <input type="email" id="email" name="email" class="form-control" placeholder="Email" v-model="email" required>
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-envelope"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input :type="password_type" id="password" name="password" class="form-control" placeholder="Password" required pattern="[a-zA-Z0-9]{8,20}" title="Deve contenere più di 8 caratteri" v-model="password">
+                            <div class="input-group-append">
+                                <div class="input-group-text" @click="show_password">
+                                    <span class="fas fa-lock"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="feedback text-red mb-3">
+                            <span id="feedback">{{ message }}</span>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 mb-3">
+                                <button type="submit" id="submit" class="btn btn-primary btn-block">Accedi</button>
+                            </div>
+                        </div>
+                    </form>
+                    <p class="mb-1">
+                        <a href="#" @click.prevent="forgot_password_clicked">Ho dimenticato la mia password</a>
+                    </p>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>`,
+    data() {
+        return {
+            // variable to control the layout
+			message: '',
+			password_type: 'password',
+			// variable to bind the form
+			email: null,
+			password: null
+        }
+    },
+    methods: {
 		// request the login to the backend
 		authentication() {
-			let dataForm = $("#authentication").serialize();
-			let message
-			$.ajax({
-				type: "POST",
-				url: "../autenticazione/model.php",
-				data: "action=autenticazione&" + dataForm,
-				dataType: "json",
-				async: false,
-				success: function (data) {
+			// get all data from the form 
+			const requestOptions = {
+				method: 'POST',
+				mode: 'same-origin',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({
+					'action': 'autenticazione',
+					'email': this.email,
+					'password': this.password
+				})
+			}
+			fetch('../autenticazione_VueJs/model.php', requestOptions)
+				// process the backend response
+				.then(async response => {
+					const data = await response.json()
 					switch (data.code) {
 						case '500':
 							// reporting an internal server error. ex: try catch
@@ -77,26 +85,32 @@ app.component('login', {
 							break;
 						case '401':
 							// reporting an unauthorized error. ex: email or password doesn't match 
-							console.log(data.message)
-							message = data.message
+							this.message = data.message
 							break;
 						case '201':
 							// go to the dashboard home page setted on the backend
 							document.location.href = `${data.url}_VueJs`;
 							break;
 						default:
+							break;
 					}
-				},
-				error: function (msg) {
-					alert("Failed: " + msg.status + ": " + msg.statusText);
-				}
-			});
-			// show the message to user
-			this.message = message
+				})
+				// report an error if there is
+				.catch(error => {
+					this.errorMessage = error;
+					console.log('There was an error!', error);
+				});
 		},
 		// go to the forgot password page
 		forgot_password_clicked() {
 			this.$emit('forgot-password-page')
+		},
+		show_password() {
+			if (this.password_type == 'password') {
+				this.password_type = 'text'
+			} else {
+				this.password_type = 'password'
+			}
 		}
 	}
 })

@@ -2,4 +2,4 @@
     session_start();
     session_destroy();
 
-    header("Location: ./autenticazione");
+    header("Location: ./autenticazione_VueJs");

@@ -1,13 +1,23 @@
 <?php
-/*ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);*/
+
+if (isset($_SERVER['REQUEST_METHOD'])) {
+    // get resquet body data  
+    if (!isset($requestBody)) {
+        $requestBody = json_decode(file_get_contents('php://input'), true);
+    }
+} else {
+    $data['code'] = '406';
+    $data['state'] = 'Not Acceptable';
+    $data['message'] = 'Request method not defined';
+    echo json_encode($data);
+
+    exit;
+}
 
 include_once('registro_accesso_class.php');
 $registriAccesso = new registroAccessoClass();
 
-$action = $_REQUEST['action'];
-// echo __LINE__. $action;
+$action = $requestBody['action'];
 switch ($action) {
     case "autenticazione":
 
@@ -29,15 +39,26 @@ switch ($action) {
     case "registri_accessi":
 
         // look for all login data 
-        $data = $registriAccesso->cerca_registri_accessi();
+        $result = $registriAccesso->cerca_registri_accessi();
         // check if an error occurred on try catch
-        if (isset($data['catchError'])) {
+        if (isset($result['catchError'])) {
             $data['code'] = '500';
             $data['state'] = 'error';
-            $data['message'] = $data['catchError'];
+            $data['message'] = $result['catchError'];
 
-        } 
-        echo json_encode($data);
+            echo json_encode($data);
+        } else {
+            $data['code'] = '200';
+            $data['state'] = 'success';
+            $data['message'] = 'All logs found';
+
+            // set the data as datatables needs
+            foreach ($result as $key => $value) {
+                $data['logs'][] = $value;
+            }
+            echo json_encode($data);
+        }
+
 
         break;
 

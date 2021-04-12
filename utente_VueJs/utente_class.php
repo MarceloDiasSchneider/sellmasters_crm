@@ -36,46 +36,59 @@ class utenteClass
             $query->execute();
             $result = $query->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
 
         return $result;
     }
 
-    public function update_user()
+    public function update_user_no_password()
     {
         try {
-            // check if password is setted
-            if($this->password == null){
-                $query = $this->database->prepare("UPDATE `utenti` 
+            $query = $this->database->prepare("UPDATE `utenti` 
                 SET `nome` = :nome, `cognome` = :cognome, `email` = :email, `codice_fiscale` = :codice_fiscale, `telefono` = :telefono, `data_nascita` = :data_nascita, `id_livello` = :livello 
                 WHERE (`id_utente` = :id_utente)");
-            } else {
-                $query = $this->database->prepare("UPDATE `utenti` 
-                SET `nome` = :nome, `cognome` = :cognome, `email` = :email, `codice_fiscale` = :codice_fiscale, `telefono` = :telefono, `data_nascita` = :data_nascita, `id_livello` = :livello, `password` = :password 
-                WHERE (`id_utente` = :id_utente)");
-            }
-
             $query->bindValue(":nome", $this->nome);
             $query->bindValue(":cognome", $this->cognome);
             $query->bindValue(":email", $this->email);
             $query->bindValue(":codice_fiscale", $this->codice_fiscale);
             $query->bindValue(":telefono", $this->telefono);
             $query->bindValue(":data_nascita", $this->data_nascita);
-            // check if password is setted to update 
-            if($this->password != null){
-                $query->bindValue(":password", $this->password);
-            }
             $query->bindValue(":livello", $this->livello);
             $query->bindValue(":id_utente", $this->id_utente);
-
             $query->execute();
-            $rows = $query->rowCount();
+            $result = $query->rowCount();
         } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
 
-        return $rows;
+        return $result;
+    }
+    public function update_user_with_password()
+    {
+        try {
+            $query = $this->database->prepare("UPDATE `utenti` 
+                SET `nome` = :nome, `cognome` = :cognome, `email` = :email, `codice_fiscale` = :codice_fiscale, `telefono` = :telefono, `data_nascita` = :data_nascita, `id_livello` = :livello, `password` = :password 
+                WHERE (`id_utente` = :id_utente)");
+            $query->bindValue(":nome", $this->nome);
+            $query->bindValue(":cognome", $this->cognome);
+            $query->bindValue(":email", $this->email);
+            $query->bindValue(":codice_fiscale", $this->codice_fiscale);
+            $query->bindValue(":telefono", $this->telefono);
+            $query->bindValue(":data_nascita", $this->data_nascita);
+            $query->bindValue(":password", $this->password);
+            $query->bindValue(":livello", $this->livello);
+            $query->bindValue(":id_utente", $this->id_utente);
+            $query->execute();
+            $result = $query->rowCount();
+        } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
+            error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
+        }
+
+        return $result;
     }
 
     public function check_email()
@@ -87,6 +100,7 @@ class utenteClass
             $query->execute();
             $result = $query->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
 
@@ -110,15 +124,15 @@ class utenteClass
 
             $query->execute();
             $rows = $query->rowCount();
-
         } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
 
         return $rows;
     }
 
-    public function get_utenti()
+    public function get_all_users()
     {
         // cerca tutti gli utenti
         try {
@@ -127,21 +141,22 @@ class utenteClass
             $query->setFetchMode(PDO::FETCH_ASSOC);
             $result = $query->fetchAll();
         } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
 
         return $result;
     }
-    
+
     public function get_user_data()
     {
         try {
-        $query = $this->database->prepare("SELECT `nome`, `cognome`, `email`, `codice_fiscale`, `data_nascita`, `telefono`, `id_livello` FROM `utenti` WHERE id_utente = :id_utente");
+            $query = $this->database->prepare("SELECT `nome`, `cognome`, `email`, `codice_fiscale`, `data_nascita`, `telefono`, `id_livello` FROM `utenti` WHERE id_utente = :id_utente");
             $query->bindValue(":id_utente", $this->id_utente);
             $query->execute();
             $result = $query->fetch(PDO::FETCH_ASSOC);
-
         } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
 
@@ -157,10 +172,11 @@ class utenteClass
             $query->execute();
             $result = $query->fetchColumn(0);
         } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
 
-        return $result; 
+        return $result;
     }
     public function toggle_user_attivo()
     {
@@ -170,6 +186,7 @@ class utenteClass
             $query->bindValue(":id_utente", $this->id_utente);
             $query->execute();
         } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
     }

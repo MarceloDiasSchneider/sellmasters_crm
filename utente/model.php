@@ -11,19 +11,19 @@ $action = $_REQUEST['action'];
 switch ($action) {
     case "insert_or_update_user":
 
-        // get the code session to verify if is the same 
-        $form = $_REQUEST['codiceSessione'];
-        $session = $_SESSION['codiceSessione'];
+        // // get the code session to verify if is the same 
+        // $form = $_REQUEST['codiceSessione'];
+        // $session = $_SESSION['codiceSessione'];
 
-        // if the code session does not match, unauthorized the insert or update
-        if ($form != $session) {
-            $data['state'] = 'unauthorized';
-            $data['code'] = '401';
-            $data['message'] = 'Unauthorized : session code doesn\'t match';
+        // // if the code session does not match, unauthorized the insert or update
+        // if ($form != $session) {
+        //     $data['state'] = 'Unauthorized';
+        //     $data['code'] = '406';
+        //     $data['message'] = 'Session code doesn\'t match';
 
-            echo json_encode($data);
-            exit;
-        }
+        //     echo json_encode($data);
+        //     exit;
+        // }
 
         // check if the password is not blank
         if ($_REQUEST['password'] == $_REQUEST['verificaPassword']) {
@@ -56,55 +56,56 @@ switch ($action) {
 
                 // if the email has already been used, give an error
                 if (isset($resultEmail['email'])) {
-                    $data['state'] = 'error';
-                    $data['code'] = '422';
+                    $data['state'] = 'Unauthorized';
+                    $data['code'] = '401';
                     $data['message'] = 'Email già registrato per altro utente';
                 } else {
                     $rows = $utente->update_user();
 
                     // check if the user was updated successfully
                     if ($rows > 0) {
-                        $data['state'] = 'success';
+                        $data['state'] = 'Success';
                         $data['code'] = '200';
                         $data['message'] = 'Utente aggiornato';
                     } else {
                         $data['code'] = '400';
-                        $data['state'] = 'error';
-                        $data['message'] = 'Problema! utente non aggiornato';
+                        $data['state'] = 'Bad request';
+                        $data['message'] = 'Utente non aggiornato';
                     }
                 }
             } else {
                 // check if email is already registered
                 $resultEmail = $utente->check_email();
 
-                // if the email has already been used, give an error
+                // if the email has already been used
                 if (isset($resultEmail['email'])) {
-                    $data['code'] = '422';
-                    $data['state'] = 'error';
+                    $data['code'] = '401';
+                    $data['state'] = 'Unauthorized';
                     $data['message'] = 'Email già registrato';
                 } else {
                     // insert the new user
                     $rows = $utente->insert_user();
                     if ($rows > 0) {
                         $data['code'] = '201';
-                        $data['state'] = 'success';
+                        $data['state'] = 'Success';
                         $data['message'] = 'Nuovo utente registrato';
                     } else {
                         $data['code'] = '400';
-                        $data['state'] = 'error';
+                        $data['state'] = 'Bad request';
                         $data['message'] = 'Problema!! utente non registrato';
                     }
                 }
             }
 
-            echo json_encode($data);
         } else {
+            // report a error if passwords doesn't match
             $data['code'] = '401';
-            $data['state'] = 'error';
+            $data['state'] = 'Unauthorized';
             $data['message'] = 'Le password non corrispondono';
 
-            echo json_encode($data);
         }
+        echo json_encode($data);
+
         break;
 
     case "get_utenti";
@@ -164,20 +165,25 @@ switch ($action) {
         $utente->id_utente = $_REQUEST['id_utente'];
 
         $result = $utente->get_user_data();
-
-        foreach ($result as $key => $value) {
-            if ($key == 'data_nascita') {
-                if ($value != '0000-00-00') {
+        if(isset($result['catchError'])){
+            $data['code'] = '500'; 
+            $data['state'] = 'Internal Server Error';
+            $data['message'] = $result['catchError'];
+        } else {
+            foreach ($result as $key => $value) {
+                if ($key == 'data_nascita') {
+                    if ($value != '0000-00-00') {
+                        $user[$key] = $value;
+                    }
+                } else if ($value != '') {
                     $user[$key] = $value;
                 }
-            } else if ($value != '') {
-                $user[$key] = $value;
             }
+            $data['user'] = $user;
+            $data['state'] = 'Success';
+            $data['code'] = '200';
+            $data['message'] = 'Utente pronto per essere aggiornato';
         }
-        $data['user'] = $user;
-        $data['state'] = 'success';
-        $data['code'] = 200;
-        $data['message'] = 'Utente pronto per essere aggiornato';
 
         echo json_encode($data);
 
@@ -199,8 +205,8 @@ switch ($action) {
         } else {
             $data['message'] = "L'utente è disabilitato";
         }
-        $data['state'] = 'success';
-        $data['code'] = 200;
+        $data['state'] = 'Success';
+        $data['code'] = '200';
 
         echo json_encode($data);
         break;

@@ -137,7 +137,6 @@ $(document).ready(function () {
             dataType: "json",
             async: false,
             success: function (data) {
-                console.log(data);
                 switch (data.code) {
                     case '500':
                         // reporting an internal server error. ex: try catch
@@ -163,7 +162,6 @@ $(document).ready(function () {
                         // set all inputs with the values
                         for (const [key, value] of Object.entries(data.merchant)) {
                             $(`#${key}`).val(value);
-                            console.log(`#${key} V${value}`);
                         }
                         // Append a input hidden with the id to set up to update
                         if ($('#id').length == 0) {

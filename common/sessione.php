@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 if (!$_SESSION['id_utente']){
     header('Location: ../autenticazione');
 }

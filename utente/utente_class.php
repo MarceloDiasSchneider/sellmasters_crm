@@ -140,8 +140,8 @@ class utenteClass
             $query->bindValue(":id_utente", $this->id_utente);
             $query->execute();
             $result = $query->fetch(PDO::FETCH_ASSOC);
-
         } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage() ;
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
 

@@ -1,19 +1,29 @@
 <?php
-/*ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);*/
+
+if (isset($_SERVER['REQUEST_METHOD'])) {
+    // get resquet body data  
+    if (!isset($requestBody)) {
+        $requestBody = json_decode(file_get_contents('php://input'), true);
+    }
+} else {
+    $data['code'] = '406';
+    $data['state'] = 'Not Acceptable';
+    $data['message'] = 'Request method not defined';
+    echo json_encode($data);
+
+    exit;
+}
 
 include_once('autenticazione_class.php');
 $autenticazione = new autenticazioneClass();
 
-$action = $_REQUEST['action'];
-// echo __LINE__. $action;
+$action = $requestBody['action'];
 switch ($action) {
     case "autenticazione":
 
         /* crittografa la password */
-        $autenticazione->email = $_REQUEST['email'];
-        $autenticazione->password = $_REQUEST['password'];
+        $autenticazione->email = $requestBody['email'];
+        $autenticazione->password = $requestBody['password'];
         $autenticazione->crypt_password();
 
         /* Fa la verifica del e-mail e della password */
@@ -37,7 +47,7 @@ switch ($action) {
 
                     // Se autenticazione é riuscita fa un registro di log 
                     if ($data['state'] == 'Success') {
-                        include_once('../livello/model.php');
+                        include_once('../livello_VueJs/model.php');
                         // check if an error occurred on try catch
                         if (isset($permissione['catchError'])) {
                             $data['code'] = '500';
@@ -60,7 +70,7 @@ switch ($action) {
                             }
                             // Controlla la risposta del livello 
                             if ($data['state'] == 'Success') {
-                                include_once('../registro_accesso/model.php');
+                                include_once('../registro_accesso_VueJs/model.php');
                                 if (isset($accessoRegistrato['catchError'])) {
                                     $data['code'] = '500';
                                     $data['state'] = 'Internal Server Error';
@@ -113,11 +123,9 @@ switch ($action) {
         break;
 
     case "insert_or_update_user":
-
         // encrypt the password when registering or updating a user 
         // this methos is called from utente/model.php
-        $autenticazione->email = $_REQUEST['email'];
-        $autenticazione->password = $_REQUEST['password'];
+        $autenticazione->password = $requestBody['password'];
         $autenticazione->crypt_password();
 
         break;
@@ -125,7 +133,7 @@ switch ($action) {
     case "forgot_password":
 
         // get the email to recovey the password
-        $autenticazione->email = $_REQUEST['email'];
+        $autenticazione->email = $requestBody['email'];
         $check_email = $autenticazione->check_email();
 
         if (isset($check_email['catchError'])) {
@@ -179,10 +187,11 @@ switch ($action) {
 
         break;
     case "recover_password":
-        if ($_REQUEST['password'] == $_REQUEST['confirm-password']) {
-            $autenticazione->email = $_REQUEST['email'];
-            $autenticazione->codice = $_REQUEST['code'];
-            $autenticazione->password = $_REQUEST['password'];
+        if ($requestBody['password'] == $requestBody['confirm-password']) {
+            // set the values to the variables
+            $autenticazione->email = $requestBody['email'];
+            $autenticazione->codice = $requestBody['code'];
+            $autenticazione->password = $requestBody['password'];
             // crypt the password to update
             $autenticazione->crypt_password();
 
@@ -192,8 +201,6 @@ switch ($action) {
                 $data['state'] = 'Internal Server Error';
                 $data['code'] = '500';
                 $data['message'] = $id_utente['catchError'];
-
-                echo json_encode($data);
             } else if (isset($id_utente['id_utente'])) {
                 // check if the code still valid 
                 $autenticazione->id_utente = $id_utente['id_utente'];
@@ -208,40 +215,61 @@ switch ($action) {
                         $data['state'] = 'Internal Server Error';
                         $data['code'] = '500';
                         $data['message'] = $row['catchError'];
-    
-                        echo json_encode($data);
                     } else if ($row == 1) {
                         $data['state'] = 'Success';
                         $data['code'] = '200';
                         $data['message'] = 'La password é aggiornata';
-
-                        echo json_encode($data);
                     }
                 } else {
                     $data['state'] = 'Unauthorized';
                     $data['code'] = '401';
                     $data['message'] = 'Il collegamento è scaduto';
-
-                    echo json_encode($data);
                 }
             } else {
                 $data['state'] = 'Unauthorized';
                 $data['code'] = '401';
                 $data['message'] = 'Email e codice non validi';
-
-                echo json_encode($data);
             }
         } else {
             $data['state'] = 'Bad Request';
             $data['code'] = '400';
             $data['message'] = 'Le password non corrispondono';
-
-            echo json_encode($data);
         }
+
+        $data['teste'] = 'aqui funciona';
+        echo json_encode($data);
+
+        break;
+
+    case "get_session":
+        // check if the session open
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+        // echo '<pre>';
+        // print_r($_SESSION);
+        // echo '</pre>';
+        if (!isset($_SESSION['id_utente'])) {
+            $data['code'] = '204';
+            $data['state'] = 'No Content';
+            $data['message'] = 'La sessione non è attiva, fa l\'accesso un\'altra volta';
+            $data['url'] = '../autenticazione_VueJs';
+        } else {
+            $data['code'] = '200';
+            $data['state'] = 'Success';
+            $data['message'] = 'Session is defined';
+            $data['codiceSessione'] = $_SESSION['codiceSessione'];
+            $data['id_utente'] = $_SESSION['id_utente'];
+            $data['nome'] = $_SESSION['nome'];
+            $data['permissione'] = $_SESSION['permissione'];
+            $data['data'] = $_SESSION['data'];
+        }
+        $data['teste'] = 'teste';
+        echo json_encode($data);
+
         break;
 
     default:
         # code...
-        //echo "not passing";
         break;
 }

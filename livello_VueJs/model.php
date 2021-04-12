@@ -1,24 +1,35 @@
 <?php
-/*ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);*/
+
+if (isset($_SERVER['REQUEST_METHOD'])) {
+    // get resquet body data
+    if (!isset($requestBody)) {
+        $requestBody = json_decode(file_get_contents('php://input'), true);
+    }
+} else {
+    // report an error if there is no request method
+    $data['code'] = '406';
+    $data['state'] = 'Not Acceptable';
+    $data['message'] = 'Request method not defined';
+
+    echo json_encode($data);
+    exit;
+}
 
 include_once('livello_class.php');
 $livello = new livelloClass();
 
-$action = $_REQUEST['action'];
-// echo __LINE__. $action;
-switch ($action) {
+switch ($requestBody['action']) {
     case "get_livelli":
-
         // get livello to set option on the form | called from utente/model.php
         $livelli = $livello->get_livelli();
-        if (isset($livelli['catchError'])){
-            $data['code'] = '500'; 
+        if (isset($livelli['catchError'])) {
+            // report a try catch error
+            $data['code'] = '500';
             $data['state'] = 'Internal Server Error';
             $data['message'] = $livelli['catchError'];
         } else {
-            $data['code'] = '200'; 
+            // return the data
+            $data['code'] = '200';
             $data['state'] = 'Success';
             $data['message'] = 'All options was found';
             $data['livelli'] = $livelli;
@@ -27,8 +38,7 @@ switch ($action) {
 
         break;
 
-    case "get_utenti";
-
+    case "get_all_users";
         // get livello to show description on the datatables on utente/model.php
         $livelli = $livello->get_livelli();
         break;

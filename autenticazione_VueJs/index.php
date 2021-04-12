@@ -3,12 +3,11 @@
 <!-- Import aditionals files -->
 <?php include_once('style_sheet.html'); ?>
 
-<body class="hold-transition sidebar-mini">
+<body class="hold-transition login-page">
 	<div id="app">
-		<navbar></navbar>
-		<sidebar :nome="nome"></sidebar>
-		<content_wrapper :codice_sessione="codice_sessione" :nome="nome"></content_wrapper>
-		<footer_bottom></footer_bottom>
+		<login :login="login" @forgot-password-page="forgotPasswordPage"></login>
+		<forgot-password :forgot_password="forgot_password" @login-page="loginPage"></forgot-password>
+		<password-recovery :password_recovery="password_recovery" :email="email" :code="code" @login-page="loginPage"></password-recovery>
 	</div>
 
 	<!-- Import commons files -->

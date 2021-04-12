@@ -12,10 +12,10 @@ $(document).ready(function () {
 			dataType: "json",
 			async: false,
 			success: function (data) {
-				if (data.state == 'success') {
+				if (data.state == 'Success') {
 					// reindirizza la pagina se la autenticazione é riuscida, 
 					document.location.href = data.url;
-				} else if (data.state == 'unauthorized') {
+				} else if (data.state == 'Unauthorized') {
 					// mostra il messaggio di errore se la autenticazione non é riuscida, 
 					$('#feedback').text(data.message)
 				} else if (data.state == 'error') {

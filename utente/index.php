@@ -115,12 +115,11 @@
 										</div>
 										<input type="hidden" id="attivo" name="attivo" value="1">
 										<input type="hidden" id="codiceSessione" name="codiceSessione" value="<?php echo $_SESSION['codiceSessione'] ?>">
-										<!-- /.card-body -->
-										<div class="card-footer">
-											<button type="submit" id="bottone_registra_utente" class="btn btn-primary">Registra</button>
-											<button type="submit" id="bottone_nuovo_utente" class="btn btn-primary d-none">Indietro a nuovo utente</button>
-										</div>
+										<button type="submit" id="bottone_registra_utente" class="btn btn-primary">Registra</button>
+										<button type="submit" id="bottone_nuovo_utente" class="btn btn-primary d-none">Indietro a nuovo utente</button>
 									</form>
+								</div><!-- /.card-body -->
+								<div class="card-footer">
 								</div>
 							</div>
 							<!-- /.card -->

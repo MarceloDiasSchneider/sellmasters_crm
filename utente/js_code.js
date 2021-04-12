@@ -68,7 +68,7 @@ $(document).ready(function () {
 			dataType: "json",
 			async: false,
 			success: function (data) {
-				if (data.state == "success") {
+				if (data.state == "Success") {
 					toastr.success(data.message)
 					// reload the table updated with ajax
 					$('#utenti').dataTable().api().ajax.reload(null, false);
@@ -88,11 +88,11 @@ $(document).ready(function () {
 		dataType: "json",
 		async: false,
 		success: function (data) {
-			if (data.state == 'success'){
+			if (data.code == '200'){
 				data.livelli.forEach(livello => {
 					$("#livello").append(`<option value='${livello.id_livello}'>${livello.descrizione}</option>`);
 				});
-			} else if (data.state == 'error'){
+			} else if (data.code == '500'){
 				alert('Problema durante il caricamento delle opzioni de livello');
 				console.log(data.message);
 			}
@@ -114,7 +114,7 @@ $(document).ready(function () {
 			dataType: "json",
 			async: false,
 			success: function (data) {
-				if (data.state == 'success') {
+				if (data.state == 'Success') {
 
 					// reset all input to null
 					$('#nuovo_utente').trigger("reset");

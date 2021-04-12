@@ -14,8 +14,7 @@ app.component('forgot-password', {
                 </div>
                 <div class="card-body">
                     <p class="login-box-msg">Hai dimenticato la password? Qui puoi recuperare facilmente una nuova password.</p>
-                    
-                    <form action="recover-password.html"id='forgot-password' name='forgot-password' method="post" @submit.prevent="forgot_password_clicked">
+                    <form action="recover-password.html" id='forgot-password' name='forgot-password' method="post" @submit.prevent="forgot_password_clicked">
                         <div class="input-group mb-3">
                             <input type="email" id="email" name="email" class="form-control" placeholder="Email" v-model="email" required>
                             <div class="input-group-append">

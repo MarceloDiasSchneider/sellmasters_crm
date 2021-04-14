@@ -3,6 +3,7 @@
 //
 
 @import "mixins/animations";
+@import "mixins/scrollbar";
 @import "mixins/cards";
 @import "mixins/sidebar";
 @import "mixins/navbar";
@@ -11,4 +12,5 @@
 @import "mixins/backgrounds";
 @import "mixins/direct-chat";
 @import "mixins/toasts";
+@import "mixins/touch-support";
 @import "mixins/miscellaneous";

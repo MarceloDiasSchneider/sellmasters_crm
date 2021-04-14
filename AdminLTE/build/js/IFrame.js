@@ -23,12 +23,14 @@ const SELECTOR_DATA_TOGGLE_SCROLL_RIGHT = '[data-widget="iframe-scrollright"]'
 const SELECTOR_DATA_TOGGLE_FULLSCREEN = '[data-widget="iframe-fullscreen"]'
 const SELECTOR_CONTENT_WRAPPER = '.content-wrapper'
 const SELECTOR_CONTENT_IFRAME = `${SELECTOR_CONTENT_WRAPPER} iframe`
-const SELECTOR_TAB_NAV = `${SELECTOR_DATA_TOGGLE}.iframe-mode .nav`
-const SELECTOR_TAB_NAVBAR_NAV = `${SELECTOR_DATA_TOGGLE}.iframe-mode .navbar-nav`
+const SELECTOR_TAB_NAV = `${SELECTOR_CONTENT_WRAPPER}.iframe-mode .nav`
+const SELECTOR_TAB_NAVBAR_NAV = `${SELECTOR_CONTENT_WRAPPER}.iframe-mode .navbar-nav`
 const SELECTOR_TAB_NAVBAR_NAV_ITEM = `${SELECTOR_TAB_NAVBAR_NAV} .nav-item`
-const SELECTOR_TAB_CONTENT = `${SELECTOR_DATA_TOGGLE}.iframe-mode .tab-content`
+const SELECTOR_TAB_NAVBAR_NAV_LINK = `${SELECTOR_TAB_NAVBAR_NAV} .nav-link`
+const SELECTOR_TAB_CONTENT = `${SELECTOR_CONTENT_WRAPPER}.iframe-mode .tab-content`
 const SELECTOR_TAB_EMPTY = `${SELECTOR_TAB_CONTENT} .tab-empty`
 const SELECTOR_TAB_LOADING = `${SELECTOR_TAB_CONTENT} .tab-loading`
+const SELECTOR_TAB_PANE = `${SELECTOR_TAB_CONTENT} .tab-pane`
 const SELECTOR_SIDEBAR_MENU_ITEM = '.main-sidebar .nav-item > a.nav-link'
 const SELECTOR_SIDEBAR_SEARCH_ITEM = '.sidebar-search-results .list-group-item'
 const SELECTOR_HEADER_MENU_ITEM = '.main-header .nav-item a.nav-link'
@@ -49,6 +51,7 @@ const Default = {
   autoIframeMode: true,
   autoItemActive: true,
   autoShowNewTab: true,
+  allowDuplicates: false,
   loadingScreen: true,
   useNavbarItems: true,
   scrollOffset: 40,
@@ -85,10 +88,15 @@ class IFrame {
   }
 
   createTab(title, link, uniqueName, autoOpen) {
-    const tabId = `panel-${uniqueName}-${Math.floor(Math.random() * 1000)}`
-    const navId = `tab-${uniqueName}-${Math.floor(Math.random() * 1000)}`
+    let tabId = `panel-${uniqueName}`
+    let navId = `tab-${uniqueName}`
 
-    const newNavItem = `<li class="nav-item" role="presentation"><a class="nav-link" data-toggle="row" id="${navId}" href="#${tabId}" role="tab" aria-controls="${tabId}" aria-selected="false">${title}</a></li>`
+    if (this._config.allowDuplicates) {
+      tabId += `-${Math.floor(Math.random() * 1000)}`
+      navId += `-${Math.floor(Math.random() * 1000)}`
+    }
+
+    const newNavItem = `<li class="nav-item" role="presentation"><a href="#" class="btn-iframe-close" data-widget="iframe-close" data-type="only-this"><i class="fas fa-times"></i></a><a class="nav-link" data-toggle="row" id="${navId}" href="#${tabId}" role="tab" aria-controls="${tabId}" aria-selected="false">${title}</a></li>`
     $(SELECTOR_TAB_NAVBAR_NAV).append(unescape(escape(newNavItem)))
 
     const newTabItem = `<div class="tab-pane fade" id="${tabId}" role="tabpanel" aria-labelledby="${navId}"><iframe src="${link}"></iframe></div>`
@@ -100,12 +108,12 @@ class IFrame {
         $loadingScreen.fadeIn()
         $(`${tabId} iframe`).ready(() => {
           if (typeof this._config.loadingScreen === 'number') {
-            this.switchTab(`#${navId}`, this._config.loadingScreen)
+            this.switchTab(`#${navId}`)
             setTimeout(() => {
               $loadingScreen.fadeOut()
             }, this._config.loadingScreen)
           } else {
-            this.switchTab(`#${navId}`, this._config.loadingScreen)
+            this.switchTab(`#${navId}`)
             $loadingScreen.fadeOut()
           }
         })
@@ -134,7 +142,16 @@ class IFrame {
       return
     }
 
-    this.createTab(title, link, link.replace('.html', '').replace('./', '').replace(/["&'./=?[\]]/gi, '-').replace(/(--)/gi, ''), autoOpen)
+    const uniqueName = link.replace('./', '').replace(/["&'./:=?[\]]/gi, '-').replace(/(--)/gi, '')
+    const navId = `tab-${uniqueName}`
+
+    if (!this._config.allowDuplicates && $(`#${navId}`).length > 0) {
+      return this.switchTab(`#${navId}`)
+    }
+
+    if ((!this._config.allowDuplicates && $(`#${navId}`).length === 0) || this._config.allowDuplicates) {
+      this.createTab(title, link, uniqueName, autoOpen)
+    }
   }
 
   switchTab(item) {
@@ -154,18 +171,40 @@ class IFrame {
     }
   }
 
-  removeActiveTab() {
-    const $navItem = $(`${SELECTOR_TAB_NAVBAR_NAV_ITEM}.active`)
-    const $navItemParent = $navItem.parent()
-    const navItemIndex = $navItem.index()
-    $navItem.remove()
-    $('.tab-pane.active').remove()
-
-    if ($(SELECTOR_TAB_CONTENT).children().length == $(`${SELECTOR_TAB_EMPTY}, ${SELECTOR_TAB_LOADING}`).length) {
+  removeActiveTab(type, element) {
+    if (type == 'all') {
+      $(SELECTOR_TAB_NAVBAR_NAV_ITEM).remove()
+      $(SELECTOR_TAB_PANE).remove()
       $(SELECTOR_TAB_EMPTY).show()
+    } else if (type == 'all-other') {
+      $(`${SELECTOR_TAB_NAVBAR_NAV_ITEM}:not(.active)`).remove()
+      $(`${SELECTOR_TAB_PANE}:not(.active)`).remove()
+    } else if (type == 'only-this') {
+      const $navClose = $(element)
+      const $navItem = $navClose.parent('.nav-item')
+      const $navItemParent = $navItem.parent()
+      const navItemIndex = $navItem.index()
+      const tabId = $navClose.siblings('.nav-link').attr('aria-controls')
+      $navItem.remove()
+      $(`#${tabId}`).remove()
+      if ($(SELECTOR_TAB_CONTENT).children().length == $(`${SELECTOR_TAB_EMPTY}, ${SELECTOR_TAB_LOADING}`).length) {
+        $(SELECTOR_TAB_EMPTY).show()
+      } else {
+        const prevNavItemIndex = navItemIndex - 1
+        this.switchTab($navItemParent.children().eq(prevNavItemIndex).find('a.nav-link'))
+      }
     } else {
-      const prevNavItemIndex = navItemIndex - 1
-      this.switchTab($navItemParent.children().eq(prevNavItemIndex).find('a'))
+      const $navItem = $(`${SELECTOR_TAB_NAVBAR_NAV_ITEM}.active`)
+      const $navItemParent = $navItem.parent()
+      const navItemIndex = $navItem.index()
+      $navItem.remove()
+      $(`${SELECTOR_TAB_PANE}.active`).remove()
+      if ($(SELECTOR_TAB_CONTENT).children().length == $(`${SELECTOR_TAB_EMPTY}, ${SELECTOR_TAB_LOADING}`).length) {
+        $(SELECTOR_TAB_EMPTY).show()
+      } else {
+        const prevNavItemIndex = navItemIndex - 1
+        this.switchTab($navItemParent.children().eq(prevNavItemIndex).find('a.nav-link'))
+      }
     }
   }
 
@@ -173,9 +212,9 @@ class IFrame {
     if ($('body').hasClass(CLASS_NAME_FULLSCREEN_MODE)) {
       $(`${SELECTOR_DATA_TOGGLE_FULLSCREEN} i`).removeClass(this._config.iconMinimize).addClass(this._config.iconMaximize)
       $('body').removeClass(CLASS_NAME_FULLSCREEN_MODE)
-      $(`${SELECTOR_TAB_EMPTY}, ${SELECTOR_TAB_LOADING}`).height('auto')
-      $(SELECTOR_CONTENT_WRAPPER).height('auto')
-      $(SELECTOR_CONTENT_IFRAME).height('auto')
+      $(`${SELECTOR_TAB_EMPTY}, ${SELECTOR_TAB_LOADING}`).height('100%')
+      $(SELECTOR_CONTENT_WRAPPER).height('100%')
+      $(SELECTOR_CONTENT_IFRAME).height('100%')
     } else {
       $(`${SELECTOR_DATA_TOGGLE_FULLSCREEN} i`).removeClass(this._config.iconMaximize).addClass(this._config.iconMinimize)
       $('body').addClass(CLASS_NAME_FULLSCREEN_MODE)
@@ -188,11 +227,19 @@ class IFrame {
   // Private
 
   _init() {
+    if ($(SELECTOR_TAB_CONTENT).children().length > 2) {
+      const $el = $(`${SELECTOR_TAB_PANE}:first-child`)
+      $el.show()
+      this._setItemActive($el.find('iframe').attr('src'))
+    }
+
+    this._setupListeners()
+    this._fixHeight(true)
+  }
+
+  _initFrameElement() {
     if (window.frameElement && this._config.autoIframeMode) {
       $('body').addClass(CLASS_NAME_IFRAME_MODE)
-    } else if ($(SELECTOR_CONTENT_WRAPPER).hasClass(CLASS_NAME_IFRAME_MODE)) {
-      this._setupListeners()
-      this._fixHeight(true)
     }
   }
 
@@ -219,14 +266,25 @@ class IFrame {
       })
     }
 
-    $(document).on('click', SELECTOR_TAB_NAVBAR_NAV_ITEM, e => {
+    $(document).on('click', SELECTOR_TAB_NAVBAR_NAV_LINK, e => {
+      e.preventDefault()
+      this.onTabClick(e.target)
+      this.switchTab(e.target)
+    })
+    $(document).on('click', SELECTOR_TAB_NAVBAR_NAV_LINK, e => {
       e.preventDefault()
       this.onTabClick(e.target)
       this.switchTab(e.target)
     })
     $(document).on('click', SELECTOR_DATA_TOGGLE_CLOSE, e => {
       e.preventDefault()
-      this.removeActiveTab()
+      let { target } = e
+
+      if (target.nodeName == 'I') {
+        target = e.target.offsetParent
+      }
+
+      this.removeActiveTab(target.attributes['data-type'] ? target.attributes['data-type'].nodeValue : null, target)
     })
     $(document).on('click', SELECTOR_DATA_TOGGLE_FULLSCREEN, e => {
       e.preventDefault()
@@ -300,9 +358,9 @@ class IFrame {
   _fixHeight(tabEmpty = false) {
     if ($('body').hasClass(CLASS_NAME_FULLSCREEN_MODE)) {
       const windowHeight = $(window).height()
-      $(`${SELECTOR_TAB_EMPTY}, ${SELECTOR_TAB_LOADING}`).height(windowHeight)
+      const navbarHeight = $(SELECTOR_TAB_NAV).outerHeight()
+      $(`${SELECTOR_TAB_EMPTY}, ${SELECTOR_TAB_LOADING}, ${SELECTOR_CONTENT_IFRAME}`).height(windowHeight - navbarHeight)
       $(SELECTOR_CONTENT_WRAPPER).height(windowHeight)
-      $(SELECTOR_CONTENT_IFRAME).height(windowHeight)
     } else {
       const contentWrapperHeight = parseFloat($(SELECTOR_CONTENT_WRAPPER).css('height'))
       const navbarHeight = $(SELECTOR_TAB_NAV).outerHeight()
@@ -318,17 +376,24 @@ class IFrame {
 
   // Static
 
-  static _jQueryInterface(operation, ...args) {
-    let data = $(this).data(DATA_KEY)
-    const _options = $.extend({}, Default, $(this).data())
+  static _jQueryInterface(config) {
+    if ($(SELECTOR_DATA_TOGGLE).length > 0) {
+      let data = $(this).data(DATA_KEY)
 
-    if (!data) {
-      data = new IFrame(this, _options)
-      $(this).data(DATA_KEY, data)
-    }
+      if (!data) {
+        data = $(this).data()
+      }
 
-    if (typeof operation === 'string' && /createTab|openTabSidebar|switchTab|removeActiveTab/.test(operation)) {
-      data[operation](...args)
+      const _options = $.extend({}, Default, typeof config === 'object' ? config : data)
+      const plugin = new IFrame($(this), _options)
+
+      $(this).data(DATA_KEY, typeof config === 'object' ? config : data)
+
+      if (typeof config === 'string' && /createTab|openTabSidebar|switchTab|removeActiveTab/.test(config)) {
+        plugin[config]()
+      }
+    } else {
+      new IFrame($(this), Default)._initFrameElement()
     }
   }
 }

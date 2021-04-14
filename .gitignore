@@ -1,5 +1,4 @@
 ignore all logs *.log 
-AdminLTE
 node_modules
 package-lock.json
 default_VueJs

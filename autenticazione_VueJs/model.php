@@ -235,8 +235,6 @@ switch ($action) {
             $data['code'] = '400';
             $data['message'] = 'Le password non corrispondono';
         }
-
-        $data['teste'] = 'aqui funciona';
         echo json_encode($data);
 
         break;
@@ -246,9 +244,6 @@ switch ($action) {
         if (session_status() !== PHP_SESSION_ACTIVE) {
             session_start();
         }
-        // echo '<pre>';
-        // print_r($_SESSION);
-        // echo '</pre>';
         if (!isset($_SESSION['id_utente'])) {
             $data['code'] = '204';
             $data['state'] = 'No Content';

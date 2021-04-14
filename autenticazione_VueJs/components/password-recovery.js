@@ -68,7 +68,7 @@ app.component('password-recovery', {
 	methods: {
 		// request the recovery password to the backend
 		recover_password_clicked() {
-			// get all data from the form 
+			// set options to send with the post request
 			const requestOptions = {
 				method: 'POST',
 				mode: 'same-origin',
@@ -102,10 +102,9 @@ app.component('password-recovery', {
 						case '200':
 							// reporting a success message. ex: the password is updated
 							toastr.success(data.message)
-							// wait 2 second to go to the login page
-							setTimeout(function () {
-								login_clicked()
-							}, 2000);
+							// go to the login page
+							setTimeout(this.login_clicked, 2000)
+							break;
 						default:
 							break;
 					}

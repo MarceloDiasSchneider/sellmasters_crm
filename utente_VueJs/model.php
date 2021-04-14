@@ -21,7 +21,7 @@ $utente = new utenteClass();
 switch ($requestBody['action']) {
     case 'insert_or_update_user':
         // get the code session to verify if is the same 
-        $form = $_REQUEST['codiceSessione'];
+        $form = $requestBody['codiceSessione'];
         $session = $_SESSION['codiceSessione'];
 
         // if the code session does not match, unauthorized the insert or update

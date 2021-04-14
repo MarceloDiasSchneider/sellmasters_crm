@@ -194,7 +194,8 @@ app.component('register_user', {
                         'password': this.password,
                         'verificaPassword': this.verificaPassword,
                         'attivo': this.attivo,
-                        'user_id': this.user_id,
+                        'codiceSessione': this.codice_sessione,
+                        'user_id': this.user_id
                     })
                 }
                 fetch('model.php', requestOptions)
@@ -249,7 +250,6 @@ app.component('register_user', {
         },
         // get the user data to update
         get_user_data(user_id) {
-            console.log(user_id)
             // set options to send with the post request
             const requestOptions = {
                 method: 'POST',
@@ -314,6 +314,7 @@ app.component('register_user', {
             console.log(this.email);
             console.log(this.password);
             console.log(this.verificaPassword);
+            console.log(this.codice_sessione);
         }
         // TO DELETE
     },

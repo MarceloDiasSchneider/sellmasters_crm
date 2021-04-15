@@ -30,12 +30,12 @@ app.component('content_wrapper', {
         <!-- /.content -->
     </div>
     <!-- /.content-wrapper -->`,
-    data(){
-        return {
-
+    methods: {
+        send_page(){
+            this.$emit('page', 'registro_accesso_VueJs')
         }
     },
-    methods: {
-
+    beforeMount() {
+        this.send_page()
     }
 })

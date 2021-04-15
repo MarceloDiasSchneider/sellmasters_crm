@@ -4,8 +4,7 @@ app.component('all_merchants', {
     },
     template:
         /*html*/
-        `<!-- /.row -->
-        <div class="row">
+        `<div class="row">
             <div class="col-md-12">
                 <!-- table with all merchants -->
                 <div class="card card-primary">
@@ -23,13 +22,18 @@ app.component('all_merchants', {
                         </table>
                     </div>
                     <!-- /.card-body -->
+                    <!-- loading -->
+                    <div class="overlay dark" v-show="loading">
+                        <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                    </div>
+                    <!-- /.loading -->
                 </div>
                 <!-- /.tabella con tutti gli utente registrate -->
             </div>
         </div>`,
     data() {
         return {
-            errorMessage: null
+            loading: false
         }
     },
     methods: {
@@ -68,128 +72,68 @@ app.component('all_merchants', {
                 "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
             }).buttons().container().appendTo('#utenti_wrapper .col-md-6:eq(0)');
         },
-        // toggle to active or disabled
-        toggle_active_desable_merchant() {
-            $("#merchants").on("click", ".able_disable", function () {
-                // get the id
-                let id_to_toggle = $(this).attr('id');
-                // remove the prefix mc_ to get the id
-                id_to_toggle = 'id=' + id_to_toggle.replace(/^\D+/g, '');
-                $.ajax({
-                    type: "POST",
-                    url: "../merchants/model.php",
-                    data: "action=toggle_merchant&" + id_to_toggle,
-                    dataType: "json",
-                    async: false,
-                    success: function (data) {
-                        switch (data.code) {
-                            case '500':
-                                // reporting an internal server error. ex: try catch
-                                alert(data.state)
-                                console.log(data.message);
-                                break;
-                            case '401':
-                                // reporting an unauthorized error. ex: session code doesn't match 
-                                alert(data.state)
-                                console.log(data.message);
-                                break;
-                            case '409':
-                                // reporting already inserted data. ex: nome and merchants already used
-                                toastr.warning(data.message)
-                                break;
-                            case '201':
-                                // show a success message. ex: merchant inserted
-                                toastr.success(data.message)
-                                $('#merchants').dataTable().api().ajax.reload(null, false);
-                                break;
-                            case '200':
-                                // show a success message. ex: merchant updated
-                                toastr.success(data.message)
-                                $('#merchants').dataTable().api().ajax.reload(null, false);
-                                break;
-                            default:
-                        }
-                    },
-                    error: function (msg) {
-                        alert("Failed: " + msg.status + ": " + msg.statusText);
-                    }
-                });
-            });
+        // refresh the datatables
+        refresh_datatables() {
+            $('#merchants').dataTable().api().ajax.reload(null, false);
         },
-        // Get the merchant's data to update
-        get_merchant_data() {
+        // call method get user data from component register user
+        user_edit() {
+            // set the variable proxy to use Vue Js in jQuery
+            let proxy = this
             $('#merchants').on('click', '.update', function () {
                 let id = $(this).attr('id');
-                id = id.replace(/^\D+/g, '');
-                id_merchant = 'id=' + id;
-                $.ajax({
-                    type: "POST",
-                    url: "../merchants/model.php",
-                    data: "action=get_merchant_data&" + id_merchant,
-                    dataType: "json",
-                    async: false,
-                    success: function (data) {
+                // get the user's id
+                id = Number(id.replace(/^\D+/g, ''));
+                // call a method get user data from component register user
+                proxy.$emit('merchant_data', id)
+            });
+        },
+        // toggle to active or disabled
+        toggle_active_desable_merchant() {
+            let proxy = this
+            $("#merchants").on("click", ".able_disable", function () {
+                // get the merchant id
+                let id_to_toggle = $(this).attr('id');
+                // remove the prefix mc_ to get the id
+                id_to_toggle = id_to_toggle.replace(/^\D+/g, '');
+                const requestOptions = {
+                    method: 'POST',
+                    mode: 'same-origin',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({ 'action': 'toggle_merchant', 'id': id_to_toggle })
+                }
+                fetch('model.php', requestOptions)
+                    // process the backend response
+                    .then(async response => {
+                        const data = await response.json()
                         switch (data.code) {
                             case '500':
                                 // reporting an internal server error. ex: try catch
                                 alert(data.state)
                                 console.log(data.message);
                                 break;
-                            case '401':
-                                // reporting an unauthorized error. ex: session code doesn't match 
-                                alert(data.state)
-                                console.log(data.message);
-                                break;
-                            case '409':
-                                // reporting already inserted data. ex: nome and merchants already used
-                                toastr.warning(data.message)
-                                break;
-                            case '201':
-                                // show a success message. ex: merchant inserted
-                                toastr.success(data.message)
-                                break;
                             case '200':
-                                // reset all input to null
-                                $('#merchant').trigger("reset");
-                                // set all inputs with the values
-                                for (const [key, value] of Object.entries(data.merchant)) {
-                                    $(`#${key}`).val(value);
-                                }
-                                // Append a input hidden with the id to set up to update
-                                if ($('#id').length == 0) {
-                                    $('<input>').attr({
-                                        type: 'hidden',
-                                        id: 'id',
-                                        name: 'id',
-                                        value: id
-                                    }).appendTo('#merchant');
-                                } else {
-                                    $('#id').val(id);
-                                }
-
-                                // Set up the button to get back to nuovo utente
-                                $('#register').text('Aggiornare');
-
-                                // show the button to get back to register utente
-                                $("#back_register").removeClass("d-none");
-
                                 // show a success message. ex: merchant updated
                                 toastr.success(data.message)
-
+                                proxy.refresh_datatables()
                                 break;
                             default:
                         }
-                    },
-                    error: function (msg) {
-                        alert("Failed: " + msg.status + ": " + msg.statusText);
-                    }
-                });
+                    })
+                    // report an error if there is
+                    .catch(error => {
+                        this.errorMessage = error;
+                        console.error('There was an error!', error);
+                    });
             });
         }
     },
     mounted() {
+        // call the datatables when Vue Js is ready
         this.get_all_merchantes()
+        // call the functions to active jQuery event listener
         this.toggle_active_desable_merchant()
-        this.get_merchant_data()
+        this.user_edit()
+
     }
 })

@@ -1,9 +1,6 @@
 <?php
 session_start();
-
-if (!$_SESSION['id_utente']){
-    header('Location: ../autenticazione');
-}
+$_SESSION['started'] ?: header('Location: ../autenticazione');
 // echo '<pre>';
 // var_dump($_SESSION);
 // echo '</pre>';

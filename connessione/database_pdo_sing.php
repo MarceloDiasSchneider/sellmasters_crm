@@ -32,7 +32,7 @@ class DatabasePdoClass
 
         $db = new PDO('mysql:charset=utf8;host=' . $config['host'] . ';dbname=' . $config['dbname'], $config['username'], $config['password']);
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        //echo "connessione riuscita";
+        // echo "connessione riuscita";
         return $db;
     }
     // blocco catch per la gestione delle eccezioni

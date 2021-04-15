@@ -8,6 +8,11 @@ app.component('users_log', {
                 <div class="card card-primary">
                     <div class="card-header">
                         <h3 class="card-title">Registri di Accessi</h3>
+                        <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                    </div>
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
@@ -15,6 +20,11 @@ app.component('users_log', {
                         </table>
                     </div>
                     <!-- /.card-body -->
+                    <!-- loading -->
+                    <div class="overlay dark" v-show="loading">
+                        <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                    </div>
+                    <!-- /.loading -->
                 </div>
                 <!-- /.card -->
             </div>
@@ -23,7 +33,7 @@ app.component('users_log', {
         <!-- /.row -->`,
     data() {
         return {
-
+            loading: false
         }
     },
     methods: {

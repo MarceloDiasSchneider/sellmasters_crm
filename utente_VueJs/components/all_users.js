@@ -4,9 +4,7 @@ app.component('all_users', {
     },
     template:
         /*html*/
-        `<!-- pagina originale pages/tables/data.html | Datatables -->
-        <!-- pagina originale pages/UI/modals.html | Toastr -->
-        <div class="row">
+        `<div class="row">
             <div class="col-md-12">
                 <!-- tabella con tutti gli utente registrate -->
                 <div class="card card-primary">
@@ -24,16 +22,19 @@ app.component('all_users', {
                         </table>
                     </div>
                     <!-- /.card-body -->
-                    <div class="card-footer">
+                    <!-- loading -->
+                    <div class="overlay dark" v-show="loading">
+                        <i class="fas fa-2x fa-sync-alt fa-spin"></i>
                     </div>
+                    <!-- /.loading -->
                 </div>
                 <!-- /.tabella con tutti gli utente registrate -->
             </div>
-        </div>
-        <!-- /.row -->`,
+        <!-- /.row -->
+        </div>`,
     data() {
         return {
-            
+            loading: false
         }
     },
     methods: {
@@ -69,20 +70,24 @@ app.component('all_users', {
         refresh_datatables() {
             $('#utenti').dataTable().api().ajax.reload(null, false);
         },
+        // call method get user data from component register user
         user_edit() {
+            // set the variable proxy to use Vue Js in jQuery
+            let proxy = this
             $('#utenti').on('click', '.update_user', function () {
                 let id_utente = $(this).attr('id');
                 // get the user's id
                 id_utente = Number(id_utente.replace(/^\D+/g, ''));
-                // this.get_user_data(id_utente)
-                // app.component('all_users').methods.get_user_data(id_utente)
-                app.component('all_users').methods.get_user_data(id_utente)
+                // call a method get user data from component register user
+                proxy.$emit('user_data', id_utente)
             });
         },
         // toggle user to active or disabled
         toggle_user_active() {
             $("#utenti").on("click", ".disable_user", function () {
+                // get the user id
                 var id_to_toggle = $(this).attr('id');
+                // remove the prefix ut_ to get the id
                 id_to_toggle = id_to_toggle.replace(/^\D+/g, '');
                 const requestOptions = {
                     method: 'POST',
@@ -117,10 +122,6 @@ app.component('all_users', {
                     });
             });
         },
-        get_user_data(user_id){
-            console.log(user_id);
-            // console.log(app.component('all_users'))
-        }
     },
     mounted() {
         // call the datatables when Vue Js is ready

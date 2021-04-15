@@ -1,9 +1,4 @@
 app.component('content_wrapper', {
-	props: {
-		codice_sessione: {
-			type: String,
-		}
-	},
     template:
         /*html*/
         `<!-- Content Wrapper. Contains page content -->
@@ -49,6 +44,12 @@ app.component('content_wrapper', {
         refresh_datatables(){
             console.log(app);
             // console.log(this.$refs);
+        },
+        send_page(){
+            this.$emit('page', '_curl_api')
         }
+    },
+    beforeMount() {
+        this.send_page()
     }
 })

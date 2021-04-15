@@ -1,14 +1,12 @@
 app.component('content_wrapper', {
 	props: {
 		codice_sessione: {
-			type: String,
-			// requided: true
+			type: String
 		}
 	},
     template:
         /*html*/
-        `<!-- Content Wrapper. Contains page content -->
-        <div class="wrapper">
+        `<div class="wrapper">
             <!-- Content Header (Page header) -->
             <div class="content-wrapper">
                 <section class="content-header">
@@ -29,26 +27,28 @@ app.component('content_wrapper', {
                 <!-- Main content -->
                 <section class="content">
                     <div class="container-fluid">
-                        <register_user @refresh_datatables="refresh_datatables" :codice_sessione="codice_sessione"></register_user>
-                        <all_users @test="get_user_data" ref="refresh_datatables"></all_users>
+                        <register_user @refresh_datatables="refresh_datatables" ref="register" :codice_sessione="codice_sessione"></register_user>
+                        <all_users @user_data="get_user_data" ref="all_users"></all_users>
                     </div><!-- /.container-fluid -->
                 </section>
             </div>
             <!-- /.content -->
-        </div>
-        <!-- /.content-wrapper -->`,
-    data(){
-        return {
-
+        </div>`,
+    methods: {
+        // call a register user method get_user_data()
+        get_user_data(id){
+            this.$refs.register.get_user_data(id)
+        },
+        // call a method on the all users component 
+        refresh_datatables(){
+            this.$refs.all_users.refresh_datatables()
+        },
+        // send to the main js which page must appear as active on sidebar
+        send_page(){
+            this.$emit('page', 'utente_VueJs')
         }
     },
-    methods: {
-        get_user_data(id){
-            console.log('estou funcionanado ' + id );
-        },
-        refresh_datatables(){
-            console.log(app);
-            // console.log(this.$refs);
-        }
+    beforeMount() {
+        this.send_page()
     }
 })

@@ -1,12 +1,13 @@
 app.component('register_merchant', {
     props: {
-
+        codice_sessione: {
+            type: String
+        }
     },
     template:
         /*html*/
         `<div class="row">
             <div class="col-md-12">
-                <!-- form registra utente -->
                 <div class="card card-primary">
                     <div class="card-header">
                         <h3 class="card-title">Nuovo commerciante</h3>
@@ -20,119 +21,124 @@ app.component('register_merchant', {
                     <div class="card-body">
                         <!-- form start -->
                         <form action='#' id='merchant' name='merchant' method='post' @submit.prevent="insert_or_update_merchant">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="nome">Nome</label>
-                                            <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" maxlength="45" required v-model="nome">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="nome_sociale">Nome sociale</label>
-                                            <input type="text" class="form-control" id="nome_sociale" name="nome_sociale" placeholder="Nome sociale" maxlength="100" v-model="nome_sociale">
-                                        </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="nome">Nome</label>
+                                        <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" maxlength="45" required v-model="nome">
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="merchant_id">ID Commerciante</label>
-                                            <input type="text" class="form-control" id="merchant_id" name="merchant_id" placeholder="ID Commerciante" maxlength="45" required v-model="merchant_id">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="mws">MWS</label>
-                                            <input type="text" class="form-control" id="mws" name="mws" placeholder="MWS" maxlength="450" v-model="mws">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="interval_between_check">Intervallo tra i controlli</label>
-                                            <input type="number" class="form-control" id="interval_between_check" name="interval_between_check" placeholder="24 ore" v-model="interval_between_check">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="nome_contatto">Nome contatto</label>
-                                            <input type="text" class="form-control" id="nome_contatto" name="nome_contatto" placeholder="Nome contatto" maxlength="100" v-model="nome_contatto">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="telefono">Telefono</label>
-                                            <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Telefono" maxlength="16" v-model="telefono">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="email">Email</label>
-                                            <input type="email" class="form-control" id="email" name="email" placeholder="Email" maxlength="100" v-model="email">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="indirizzo">Indirizzo</label>
-                                            <input type="text" class="form-control" id="indirizzo" name="indirizzo" placeholder="Indirizzo" maxlength="100" v-model="indirizzo">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="numero_civico">Numero civico</label>
-                                            <input type="text" class="form-control" id="numero_civico" name="numero_civico" placeholder="Numero civico" maxlength="45" v-model="numero_civico">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="citta">Citta</label>
-                                            <input type="text" class="form-control" id="citta" name="citta" placeholder="Citta" maxlength="45" v-model="citta">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="cap">Cap</label>
-                                            <input type="text" class="form-control" id="cap" name="cap" placeholder="Cap" maxlength="45" v-model="cap">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="stato">Stato</label>
-                                            <input type="text" class="form-control" id="stato" name="stato" placeholder="Stato" maxlength="45" v-model="stato">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="provincia">Provincia</label>
-                                            <input type="text" class="form-control" id="provincia" name="provincia" placeholder="Provincia" maxlength="45" v-model="provincia">
-                                        </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="nome_sociale">Nome sociale</label>
+                                        <input type="text" class="form-control" id="nome_sociale" name="nome_sociale" placeholder="Nome sociale" maxlength="100" v-model="nome_sociale">
                                     </div>
                                 </div>
                             </div>
-                            <input type="hidden" id="attivo" name="attivo" value="1">
-                            <input type="hidden" id="codiceSessione" name="codiceSessione" value="<?php echo $_SESSION['codiceSessione'] ?>">
-                            <!-- /.card-body -->
-                            <div class="card-footer">
-                                <button type="submit" id="register" class="btn btn-primary">Registra</button>
-                                <button type="submit" id="back_register" class="btn btn-primary d-none">Indietro a nuovo commerciante</button>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="merchant_id">ID Commerciante</label>
+                                        <input type="text" class="form-control" id="merchant_id" name="merchant_id" placeholder="ID Commerciante" maxlength="45" required v-model="merchant_id">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="mws">MWS</label>
+                                        <input type="text" class="form-control" id="mws" name="mws" placeholder="MWS" maxlength="450" v-model="mws">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="interval_between_check">Intervallo tra i controlli</label>
+                                        <input type="number" class="form-control" id="interval_between_check" name="interval_between_check" placeholder="24 ore" v-model="interval_between_check">
+                                    </div>
+                                </div>
                             </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="nome_contatto">Nome contatto</label>
+                                        <input type="text" class="form-control" id="nome_contatto" name="nome_contatto" placeholder="Nome contatto" maxlength="100" v-model="nome_contatto">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="telefono">Telefono</label>
+                                        <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Telefono" maxlength="16" v-model="telefono">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email" maxlength="100" v-model="email">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="indirizzo">Indirizzo</label>
+                                        <input type="text" class="form-control" id="indirizzo" name="indirizzo" placeholder="Indirizzo" maxlength="100" v-model="indirizzo">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="numero_civico">Numero civico</label>
+                                        <input type="text" class="form-control" id="numero_civico" name="numero_civico" placeholder="Numero civico" maxlength="45" v-model="numero_civico">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="citta">Citta</label>
+                                        <input type="text" class="form-control" id="citta" name="citta" placeholder="Citta" maxlength="45" v-model="citta">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="cap">Cap</label>
+                                        <input type="text" class="form-control" id="cap" name="cap" placeholder="Cap" maxlength="45" v-model="cap">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="stato">Stato</label>
+                                        <input type="text" class="form-control" id="stato" name="stato" placeholder="Stato" maxlength="45" v-model="stato">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="provincia">Provincia</label>
+                                        <input type="text" class="form-control" id="provincia" name="provincia" placeholder="Provincia" maxlength="45" v-model="provincia">
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="attivo" name="attivo" v-model="attivo">
+                            <input v-if="merchant_primary_id" type="hidden" id="id_merchant" name="id_merchant" :value="merchant_primary_id">
+                            <input type="hidden" id="codiceSessione" name="codiceSessione" :value="codice_sessione">
+
+                            <button v-if="merchant_primary_id" type="submit" id="insert" class="btn btn-primary">Aggiorna</button>
+                            <button v-else type="submit" id="update" class="btn btn-primary">Registra</button>
+
+                            <button type="submit" id="reset_form" class="btn btn-primary" :class=" [merchant_primary_id ? '' : 'd-none']" @click.prevent="reset_form">Indietro a nuovo utente</button>
                         </form>
+                        <!-- /.form -->
                     </div>
+                    <!-- /.card-body -->
+                    <!-- loading -->
+                    <div class="overlay dark" v-show="loading">
+                        <i class="fas fa-2x fa-sync-alt fa-spin"></i>
+                    </div>
+                    <!-- /.loading -->
                 </div>
                 <!-- /.card -->
             </div>
-            <!--/.form registra utente -->
         </div>`,
     data() {
         return {
-            // variable to blind the form
+            // variable to bind the form
             nome: null,
             nome_sociale: null,
             merchant_id: null,
@@ -147,61 +153,158 @@ app.component('register_merchant', {
             cap: null,
             stato: null,
             provincia: null,
-            attivo: null,
-            azione: null
+            attivo: 1,
+            // variable to hold the merchant id to toggle between new merchant or update merchant
+            merchant_primary_id: null,
+            // variable to control the loading card
+            loading: false
         }
     },
     methods: {
         // register or update a merchant
         insert_or_update_merchant() {
-            let refresh = false
-            let datipresidalform = $("#merchant").serialize();
-            $.ajax({
-                type: "POST",
-                url: "../merchants/model.php",
-                data: "action=insert_or_update_merchants&" + datipresidalform,
-                dataType: "json",
-                async: false,
-                success: function (data) {
+            this.loading = true
+            // check if required inputs was fielded
+            if (this.nome != '' && this.merchant_id != '') {
+                // set options to send with the post request
+                const requestOptions = {
+                    method: 'POST',
+                    mode: 'same-origin',
+                    headers: { 'content-type': 'application/json' },
+                    body: JSON.stringify({
+                        'action': 'insert_or_update_merchants',
+                        'nome': this.nome,
+                        'nome_sociale': this.nome_sociale,
+                        'merchant_id': this.merchant_id,
+                        'mws': this.mws,
+                        'interval_between_check': this.interval_between_check,
+                        'nome_contatto': this.nome_contatto,
+                        'telefono': this.telefono,
+                        'email': this.email,
+                        'indirizzo': this.indirizzo,
+                        'numero_civico': this.numero_civico,
+                        'citta': this.citta,
+                        'cap': this.cap,
+                        'stato': this.stato,
+                        'provincia': this.provincia,
+                        'attivo': this.attivo,
+                        'codiceSessione': this.codice_sessione,
+                        'merchant_primary_id': this.merchant_primary_id
+                    })
+                }
+                fetch('model.php', requestOptions)
+                    // process the backend response
+                    .then(async response => {
+                        const data = await response.json()
+                        switch (data.code) {
+                            case '500':
+                                // reporting an internal server error. ex: try catch
+                                alert(data.state)
+                                console.log(data.message);
+                                break;
+                            case '401':
+                                // reporting an unauthorized error. ex: session code doesn't match 
+                                alert(data.state)
+                                console.log(data.message);
+                                break;
+                            case '409':
+                                // reporting already inserted data. ex: nome and merchants already used
+                                toastr.warning(data.message)
+                                break;
+                            case '201':
+                                // show a success message. ex: merchant inserted
+                                toastr.success(data.message)
+                                this.$emit('refresh_datatables')
+                                this.reset_form()
+                                break;
+                            case '200':
+                                // show a success message. ex: merchant updated
+                                toastr.success(data.message)
+                                this.$emit('refresh_datatables')
+                                this.reset_form()
+                                break;
+                            default:
+                        }
+                        this.loading = false
+                    })
+                    // report an error if there is
+                    .catch(error => {
+                        this.errorMessage = error;
+                        console.error('There was an error!', error);
+                    });
+            } else {
+                // create a report to each field that must to be completed
+                alert('compila tutti i campi')
+            }
+        },
+        // get the merchants data to update
+        get_merchant_data(merchant_primary_id) {
+            this.loading = true
+            // set options to send with the post request
+            const requestOptions = {
+                method: 'POST',
+                mode: 'same-origin',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 'action': 'get_merchant_data', 'id': merchant_primary_id })
+            };
+            fetch('model.php', requestOptions)
+                // process the backend response
+                .then(async response => {
+                    const data = await response.json();
                     switch (data.code) {
                         case '500':
                             // reporting an internal server error. ex: try catch
                             alert(data.state)
-                            console.log(data.message);
-                            break;
-                        case '401':
-                            // reporting an unauthorized error. ex: session code doesn't match 
-                            alert(data.state)
-                            console.log(data.message);
-                            break;
-                        case '409':
-                            // reporting already inserted data. ex: nome and merchants already used
-                            toastr.warning(data.message)
-                            break;
-                        case '201':
-                            // show a success message. ex: merchant inserted
-                            toastr.success(data.message)
-                            // refresh the datatables
-                            refresh = true
+                            console.log(data.message)
                             break;
                         case '200':
-                            // show a success message. ex: merchant updated
+                            // reporting a success message
                             toastr.success(data.message)
-                            refresh = true
-                            // refresh the datatables
+                            // set the value to the inputs
+                            this.merchant_primary_id = merchant_primary_id
+                            if (data.merchant.nome != undefined) { this.nome = data.merchant.nome } else { this.nome = null }
+                            if (data.merchant.nome != undefined) { this.nome = data.merchant.nome } else { this.nome = null }
+                            if (data.merchant.nome_sociale != undefined) { this.nome_sociale = data.merchant.nome_sociale } else { this.nome_sociale = null }
+                            if (data.merchant.merchant_id != undefined) { this.merchant_id = data.merchant.merchant_id } else { this.merchant_id = null }
+                            if (data.merchant.mws != undefined) { this.mws = data.merchant.mws } else { this.mws = null }
+                            if (data.merchant.interval_between_check != undefined) { this.interval_between_check = data.merchant.interval_between_check } else { this.interval_between_check = null }
+                            if (data.merchant.nome_contatto != undefined) { this.nome_contatto = data.merchant.nome_contatto } else { this.nome_contatto = null }
+                            if (data.merchant.telefono != undefined) { this.telefono = data.merchant.telefono } else { this.telefono = null }
+                            if (data.merchant.email != undefined) { this.email = data.merchant.email } else { this.email = null }
+                            if (data.merchant.indirizzo != undefined) { this.indirizzo = data.merchant.indirizzo } else { this.indirizzo = null }
+                            if (data.merchant.numero_civico != undefined) { this.numero_civico = data.merchant.numero_civico } else { this.numero_civico = null }
+                            if (data.merchant.citta != undefined) { this.citta = data.merchant.citta } else { this.citta = null }
+                            if (data.merchant.cap != undefined) { this.cap = data.merchant.cap } else { this.cap = null }
+                            if (data.merchant.stato != undefined) { this.stato = data.merchant.stato } else { this.stato = null }
+                            if (data.merchant.provincia != undefined) { this.provincia = data.merchant.provincia } else { this.provincia = null }
                             break;
                         default:
+                            break;
                     }
-                },
-                error: function (msg) {
-                    alert("Failed: " + msg.status + ": " + msg.statusText);
-                }
-            });
-            // call a method to refresh the datatables
-            if(refresh){ this.refresh_datatables()}
+                    this.loading = false
+                })
+                // report an error if there is
+                .catch(error => {
+                    this.errorMessage = error;
+                    console.error('There was an error!', error);
+                });
         },
-        refresh_datatables(){
-            $('#merchants').dataTable().api().ajax.reload(null, false);
-        }
+        // reset the from values to null
+        reset_form() {
+            this.nome = null,
+                this.nome_sociale = null,
+                this.merchant_id = null,
+                this.mws = null,
+                this.interval_between_check = null,
+                this.nome_contatto = null,
+                this.telefono = null,
+                this.email = null,
+                this.indirizzo = null,
+                this.numero_civico = null,
+                this.citta = null,
+                this.cap = null,
+                this.stato = null,
+                this.provincia = null
+        },
     }
 })

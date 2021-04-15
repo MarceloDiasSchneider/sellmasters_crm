@@ -1,11 +1,14 @@
 const app = Vue.createApp({
     data() {
         return {
+            // variable from session
             codice_sessione: null,
             id_utente: null,
             nome: null,
             permissione: null,
-            data: null
+            data: null,
+            // variable to set the active on sidebar link
+            nav_link: null
         }
     },
     methods: {
@@ -43,6 +46,9 @@ const app = Vue.createApp({
                     this.errorMessage = error;
                     console.log('There was an error!', error);
                 });
+        },
+        set_page_active(page){
+            this.nav_link = page
         }
     },
     beforeMount() {

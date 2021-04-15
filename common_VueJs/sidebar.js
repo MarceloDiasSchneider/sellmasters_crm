@@ -3,17 +3,20 @@ app.component('sidebar', {
 		nome: {
 			type: String,
 			requided: true
+		},
+		nav_link: {
+			type: String,
+			requided: true
 		}
 	},
 	template:
-	/*html*/
-	`<!--Main Sidebar Container-->
-		<aside class="main-sidebar sidebar-dark-primary elevation-4">
+		/*html*/
+		`<aside class="main-sidebar sidebar-dark-primary elevation-4">
 			<!-- Brand Logo -->
 			<a href="index3.html" class="brand-link">
 				<img src="../AdminLte/dist/img/AdminLTELogo.png" alt="AdminLTE Logo"
 					class="brand-image img-circle elevation-3" style="opacity: .8">
-				<span class="brand-text font-weight-light">AdminLTE 3</span>
+				<span class="brand-text font-weight-light">Sell Masters</span>
 			</a>
 
 			<!-- Sidebar -->
@@ -45,7 +48,7 @@ app.component('sidebar', {
 
 				<!-- Sidebar Menu -->
 				<nav class="mt-2">
-					<ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
+					<ul class="nav nav-pills nav-sidebar flex-column nav-flat nav-legacy" data-widget="treeview" role="menu"
 						data-accordion="false">
 						<!-- Add icons to the links using the .nav-icon class
 				with font-awesome or any other icon font library -->
@@ -59,25 +62,32 @@ app.component('sidebar', {
 							</a>
 							<ul class="nav nav-treeview">
 								<li class="nav-item">
-									<a href="../utente_VueJs" class="nav-link">
-										<i class="far fa-circle nav-icon"></i>
+									<a href="../utente_VueJs" class="nav-link" :class="[nav_link == 'utente_VueJs' ? 'active' : '' ]">
+										<i class="fas fa-user-tie nav-icon"></i>
 										<p>Utenti</p>
 									</a>
 								</li>
 								<li class="nav-item">
-									<a href="../registro_accesso_VueJs/" class="nav-link">
-										<i class="far fa-circle nav-icon"></i>
+									<a href="../registro_accesso_VueJs/" class="nav-link" :class="[nav_link == 'registro_accesso_VueJs' ? 'active' : '' ]">
+										<i class="fas fa-table nav-icon"></i>
 										<p>Registri di accessi</p>
 									</a>
 								</li>
 								<li class="nav-item">
-									<a href="../merchants_VueJs" class="nav-link">
-										<i class="far fa-circle nav-icon"></i>
+									<a href="../merchants_VueJs" class="nav-link" :class="[nav_link == 'merchants_VueJs' ? 'active' : '' ]">
+										<i class="fas fa-briefcase nav-icon"></i>
 										<p>Comerciantes</p>
+									</a>
+								</li>
+								<li class="nav-item">
+									<a href="../_curl_api" class="nav-link" :class="[nav_link == '_curl_api' ? 'active' : '' ]">
+										<i class="fas fa-network-wired nav-icon"></i>
+										<p>Curl Api</p>
 									</a>
 								</li>
 							</ul>
 						</li>
+						<li class="nav-header">EXAMPLES</li>
 						<li class="nav-item">
 							<a href="pages/widgets.html" class="nav-link">
 								<i class="nav-icon fas fa-th"></i>
@@ -685,9 +695,6 @@ app.component('sidebar', {
 				<!-- /.sidebar-menu -->
 			</div>
 			<!-- /.sidebar -->
-		</aside>
-	<!-- /.Main Sidebar Container-->`,
-	computed: {
+		</aside>`,
 
-	}
 })

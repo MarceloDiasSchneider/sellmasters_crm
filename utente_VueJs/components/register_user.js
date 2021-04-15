@@ -6,9 +6,7 @@ app.component('register_user', {
     },
     template:
         /*html*/
-        `<!-- pagina originale pages/from/general.html | General form -->
-        <!-- pagina originale pages/UI/modals.html | Toastr -->
-        <div class="row">
+        `<div class="row">
             <div class="col-md-12">
                 <!-- form registra utente -->
                 <div class="card card-primary">
@@ -24,101 +22,93 @@ app.component('register_user', {
                     <div class="card-body">
                         <!-- form start -->
                         <form action='#' id='user_form' name='user_form' method='post' @submit.prevent="insert_or_update_user">
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="Nome">Nome</label>
-                                            <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" maxlength="30" v-model="nome" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="Cognome">Cognome</label>
-                                            <input type="text" class="form-control" id="cognome" name="cognome" placeholder="Cognome" maxlength="30" v-model="cognome">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="data-nascita">Data di nascita</label>
-                                            <input type="date" class="form-control" id="data_nascita" name="data_nascita" placeholder="Data di nascita" v-model="data_nascita">
-                                        </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="Nome">Nome</label>
+                                        <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" maxlength="30" v-model="nome" required>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="codiceFiscale">Codice Fiscale</label>
-                                            <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale" placeholder="Codice Fiscale" pattern="^[a-zA-Z]{6}[0-9]{2}[a-zA-Z][0-9]{2}[a-zA-Z][0-9]{3}[a-zA-Z]$" title="Codice fiscale errato." maxlength="16" v-model="codice_fiscale">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="telefono">Telefono</label>
-                                            <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Telefono" maxlength="16" v-model="telefono">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>Livello</label>
-                                            <select id="livello" name="livello" class="form-control" v-model.number="livello" required>
-                                                <option disabled selected value="0">seleziona un livello</option>
-                                                <option v-for="option in select_option" :value="option.id">{{ option.description }}</option>
-                                            </select>
-                                        </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="Cognome">Cognome</label>
+                                        <input type="text" class="form-control" id="cognome" name="cognome" placeholder="Cognome" maxlength="30" v-model="cognome">
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="email">Email</label>
-                                            <input type="email" class="form-control" id="email" name="email" placeholder="Email" maxlength="50" v-model="email" required>
-                                        </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="data-nascita">Data di nascita</label>
+                                        <input type="date" class="form-control" id="data_nascita" name="data_nascita" placeholder="Data di nascita" v-model="data_nascita">
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="password">Password</label>
-                                            <input type="password" class="form-control" id="password" name="password" placeholder="Password" pattern="[a-zA-Z0-9]{8,20}" title="Deve contenere più di 8 caratteri" v-model="password" :required="!user_id">
-                                        </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="codiceFiscale">Codice Fiscale</label>
+                                        <input type="text" class="form-control" id="codice_fiscale" name="codice_fiscale" placeholder="Codice Fiscale" pattern="^[a-zA-Z]{6}[0-9]{2}[a-zA-Z][0-9]{2}[a-zA-Z][0-9]{3}[a-zA-Z]$" title="Codice fiscale errato." maxlength="16" v-model="codice_fiscale">
                                     </div>
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label for="verificaPassword">Verifica password</label>
-                                            <input type="password" class="form-control" id="verificaPassword" name="verificaPassword" placeholder="Verifica password" pattern="[a-zA-Z0-9]{8,20}" title="Deve contenere più di 8 caratteri" v-model="verificaPassword" :required="!user_id">
-                                        </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="telefono">Telefono</label>
+                                        <input type="text" class="form-control" id="telefono" name="telefono" placeholder="Telefono" maxlength="16" v-model="telefono">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Livello</label>
+                                        <select id="livello" name="livello" class="form-control" v-model.number="livello" required>
+                                            <option disabled selected value="0">seleziona un livello</option>
+                                            <option v-for="option in select_option" :value="option.id">{{ option.description }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="email">Email</label>
+                                        <input type="email" class="form-control" id="email" name="email" placeholder="Email" maxlength="50" v-model="email" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="password">Password</label>
+                                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" pattern="[a-zA-Z0-9]{8,20}" title="Deve contenere più di 8 caratteri" v-model="password" :required="!user_id">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="verificaPassword">Verifica password</label>
+                                        <input type="password" class="form-control" id="verificaPassword" name="verificaPassword" placeholder="Verifica password" pattern="[a-zA-Z0-9]{8,20}" title="Deve contenere più di 8 caratteri" v-model="verificaPassword" :required="!user_id">
                                     </div>
                                 </div>
                             </div>
                             <input type="hidden" id="attivo" name="attivo" v-model="attivo">
                             <input v-if="user_id" type="hidden" id="id_utente" name="id_utente" :value="user_id">
                             <input type="hidden" id="codiceSessione" name="codiceSessione" :value="codice_sessione">
-                            <!-- /.card-body -->
-                            <button v-if="user_id" type="submit" id="insert" class="btn btn-primary" :disabled="desable_button">Aggiorna</button>
-                            <button v-else type="submit" id="update" class="btn btn-primary" :disabled="desable_button">Registra</button>
+                            
+                            <button v-if="user_id" type="submit" id="insert" class="btn btn-primary">Aggiorna</button>
+                            <button v-else type="submit" id="update" class="btn btn-primary">Registra</button>
                         
                             <button type="submit" id="reset_form" class="btn btn-primary" :class=" [user_id ? '' : 'd-none']" @click.prevent="reset_form">Indietro a nuovo utente</button>
                         </form>
                     </div>
-                    <div class="card-footer">
+                    <!-- /.card-body -->
+                    <!-- loading -->
+                    <div class="overlay dark" v-show="loading">
+                        <i class="fas fa-2x fa-sync-alt fa-spin"></i>
                     </div>
-                    <!-- TO DELETE -->
-                    <div class="card-footer">
-                        <button type="submit" id="edit" class="btn btn-primary" @click.prevent="get_user_data(1)">Edit 1</button>
-                        <button type="submit" id="edit" class="btn btn-primary" @click.prevent="get_user_data(2)">Edit 2</button>
-                        <button type="submit" id="edit" class="btn btn-primary" @click.prevent="console_log()">cnsl_lg</button>
-                    </div>
-                    <!-- TO DELETE -->
+                    <!-- /.loading -->
                 </div>
                 <!-- /.card -->
             </div>
             <!--/.form registra utente -->
-        </div>
-        <!-- /.row -->`,
+        </div>`,
     data() {
         return {
-            // variable to eneble doble click
-            desable_button: false,
-            // variable to blid the form
+            // variable to bind the form
             nome: null,
             cognome: null,
             data_nascita: null,
@@ -133,11 +123,14 @@ app.component('register_user', {
             user_id: null,
             // variable to hold the select options
             select_option: [],
+            // variable to control the loading card
+            loading: false
         }
     },
     methods: {
         // search all select option 
         select_options() {
+            this.loading = true
             // set options to send with the post request
             const requestOptions = {
                 method: 'POST',
@@ -164,6 +157,7 @@ app.component('register_user', {
                         default:
                             break;
                     }
+                    this.loading = false
                 })
                 // report an error if there is
                 .catch(error => {
@@ -173,8 +167,7 @@ app.component('register_user', {
         },
         // register a new user
         insert_or_update_user() {
-            this.desable_button = true
-            let refresh = false
+            this.loading = true
             // check if required inputs was fielded
             if (this.nome != '' && this.livello != 0 && this.email != '' && (this.password != '' && this.verificaPassword != '' || this.user_id)) {
                 // set options to send with the post request
@@ -236,6 +229,7 @@ app.component('register_user', {
                             default:
                                 break;
                         }
+                        this.loading = false
                     })
                     // report an error if there is
                     .catch(error => {
@@ -246,10 +240,10 @@ app.component('register_user', {
                 // create a report to each field that must to be completed
                 alert('compila tutti i campi')
             }
-            this.desable_button = false
         },
         // get the user data to update
         get_user_data(user_id) {
+            this.loading = true
             // set options to send with the post request
             const requestOptions = {
                 method: 'POST',
@@ -270,7 +264,7 @@ app.component('register_user', {
                         case '200':
                             // reporting a success message
                             toastr.success(data.message)
-                            // set the value to the imputs
+                            // set the value to the inputs
                             this.user_id = user_id
                             if (data.user.nome != undefined) { this.nome = data.user.nome } else { this.nome = null }
                             if (data.user.cognome != undefined) { this.cognome = data.user.cognome } else { this.cognome = null }
@@ -283,6 +277,7 @@ app.component('register_user', {
                         default:
                             break;
                     }
+                    this.loading = false
                 })
                 // report an error if there is
                 .catch(error => {
@@ -292,6 +287,7 @@ app.component('register_user', {
         },
         // reset the from values to null
         reset_form() {
+            this.loading = true
             this.user_id = false
             this.nome = null
             this.cognome = null
@@ -302,21 +298,8 @@ app.component('register_user', {
             this.email = null
             this.password = null
             this.verificaPassword = null
+            this.loading = false
         },
-        // TO DELETE
-        console_log() {
-            console.log(this.nome);
-            console.log(this.cognome);
-            console.log(this.data_nascita);
-            console.log(this.codice_fiscale);
-            console.log(this.telefono);
-            console.log(this.livello);
-            console.log(this.email);
-            console.log(this.password);
-            console.log(this.verificaPassword);
-            console.log(this.codice_sessione);
-        }
-        // TO DELETE
     },
     beforeMount() {
         this.select_options()

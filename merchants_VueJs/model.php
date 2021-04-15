@@ -1,17 +1,27 @@
 <?php
-/*ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);*/
+
+if (isset($_SERVER['REQUEST_METHOD'])) {
+    // get resquet body data  
+    if (!isset($requestBody)) {
+        $requestBody = json_decode(file_get_contents('php://input'), true);
+    }
+} else {
+    // report an error if there is no request method
+    $data['code'] = '406';
+    $data['state'] = 'Not Acceptable';
+    $data['message'] = 'Request method not defined';
+
+    echo json_encode($data);
+    exit;
+}
 
 include_once('merchants_class.php');
 $merchants = new merchantsClass();
 
-$action = $_REQUEST['action'];
-// echo __LINE__. $action;
-switch ($action) {
+switch ($requestBody['action']) {
     case "insert_or_update_merchants":
         // get the code session to verify if is the same 
-        $form = $_REQUEST['codiceSessione'];
+        $form = $requestBody['codiceSessione'];
         $session = $_SESSION['codiceSessione'];
 
         // if the code session does not match, unauthorized the insert or update
@@ -26,56 +36,56 @@ switch ($action) {
 
         // setting merchants variables 
         // obligatory
-        $merchants->nome = $_REQUEST['nome'];
-        $merchants->merchant_id = $_REQUEST['merchant_id'];
+        $merchants->nome = $requestBody['nome'];
+        $merchants->merchant_id = $requestBody['merchant_id'];
         // check if the input is not blank
         // optional 
-        if (isset($_REQUEST['id'])) {
-            $merchants->id = $_REQUEST['id'];
+        if (isset($requestBody['id'])) {
+            $merchants->id = $requestBody['id'];
         }
-        if ($_REQUEST['nome_sociale'] != '') {
-            $merchants->nome_sociale = $_REQUEST['nome_sociale'];
+        if ($requestBody['nome_sociale'] != '') {
+            $merchants->nome_sociale = $requestBody['nome_sociale'];
         }
-        if ($_REQUEST['mws'] != '') {
-            $merchants->mws = $_REQUEST['mws'];
+        if ($requestBody['mws'] != '') {
+            $merchants->mws = $requestBody['mws'];
         }
-        if ($_REQUEST['interval_between_check'] != '') {
-            $merchants->interval_between_check = $_REQUEST['interval_between_check'];
+        if ($requestBody['interval_between_check'] != '') {
+            $merchants->interval_between_check = $requestBody['interval_between_check'];
         }
-        if ($_REQUEST['nome_contatto'] != '') {
-            $merchants->nome_contatto = $_REQUEST['nome_contatto'];
+        if ($requestBody['nome_contatto'] != '') {
+            $merchants->nome_contatto = $requestBody['nome_contatto'];
         }
-        if ($_REQUEST['telefono'] != '') {
-            $merchants->telefono = $_REQUEST['telefono'];
+        if ($requestBody['telefono'] != '') {
+            $merchants->telefono = $requestBody['telefono'];
         }
-        if ($_REQUEST['email'] != '') {
-            $merchants->email = $_REQUEST['email'];
+        if ($requestBody['email'] != '') {
+            $merchants->email = $requestBody['email'];
         }
-        if ($_REQUEST['indirizzo'] != '') {
-            $merchants->indirizzo = $_REQUEST['indirizzo'];
+        if ($requestBody['indirizzo'] != '') {
+            $merchants->indirizzo = $requestBody['indirizzo'];
         }
-        if ($_REQUEST['numero_civico'] != '') {
-            $merchants->numero_civico = $_REQUEST['numero_civico'];
+        if ($requestBody['numero_civico'] != '') {
+            $merchants->numero_civico = $requestBody['numero_civico'];
         }
-        if ($_REQUEST['citta'] != '') {
-            $merchants->citta = $_REQUEST['citta'];
+        if ($requestBody['citta'] != '') {
+            $merchants->citta = $requestBody['citta'];
         }
-        if ($_REQUEST['cap'] != '') {
-            $merchants->cap = $_REQUEST['cap'];
+        if ($requestBody['cap'] != '') {
+            $merchants->cap = $requestBody['cap'];
         }
-        if ($_REQUEST['stato'] != '') {
-            $merchants->stato = $_REQUEST['stato'];
+        if ($requestBody['stato'] != '') {
+            $merchants->stato = $requestBody['stato'];
         }
-        if ($_REQUEST['provincia'] != '') {
-            $merchants->provincia = $_REQUEST['provincia'];
+        if ($requestBody['provincia'] != '') {
+            $merchants->provincia = $requestBody['provincia'];
         }
-        if ($_REQUEST['attivo'] != '') {
-            $merchants->attivo = $_REQUEST['attivo'];
+        if ($requestBody['attivo'] != '') {
+            $merchants->attivo = $requestBody['attivo'];
         }
 
         // check if the ID is set to switch between insert or update the merchant
-        switch (isset($merchants->id)) {
-            case false; // Insert new merchant
+        switch ($merchants->id) {
+            case null; // Insert new merchant
                 // check if nome and merchant_id is already used
                 $result = $merchants->check_nome_merchant_id();
                 if (isset($result['catchError'])) { // reporting an error on try catch
@@ -198,7 +208,7 @@ switch ($action) {
 
     case "get_merchant_data":
         // set the id of the merchant to get the data
-        $merchants->id = $_REQUEST['id'];
+        $merchants->id = $requestBody['id'];
         $merchant = $merchants->get_merchant_data();
         if (isset($merchant['catchError'])) { // reporting an error on try catch
             $data['code'] = '500';
@@ -226,7 +236,7 @@ switch ($action) {
     case "toggle_merchant";
 
         // get merchant id
-        $merchants->id = $_REQUEST['id'];
+        $merchants->id = $requestBody['id'];
         // get the merchant attivo value
         $attivo = $merchants->get_merchant_attivo();
         if (isset($attivo['catchError'])) { // reporting an error on try catch
@@ -267,6 +277,5 @@ switch ($action) {
 
     default:
         # code...
-        //echo "not passing";
         break;
 }

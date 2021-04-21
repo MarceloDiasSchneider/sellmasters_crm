@@ -1,11 +1,10 @@
 <?php
 
-class livelloClass
+class profileClass
 {
 
-    public $id_livello;
+    public $id_profile;
     public $descrizione;
-    public $permissione;
 
     public $database;
 
@@ -16,11 +15,12 @@ class livelloClass
         $this->database = $obj->creaConnessione();
     }
 
-    public function get_livelli()
+    public function get_profiles()
     {
         try {
-            $query = $this->database->prepare("SELECT `id_livello`, `descrizione`, `permissione` FROM `livelli`");
+            $query = $this->database->prepare("SELECT `id_profile`, `descrizione`, `attivo` FROM `profiles`");
             $query->execute();
+            $query->setFetchMode(PDO::FETCH_ASSOC);
             $result = $query->fetchAll();
         } catch (PDOException $e) {
             $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage() ;
@@ -30,12 +30,12 @@ class livelloClass
         return $result;
     }
 
-    public function get_utente_livello()
+    public function get_utente_profile()
     {
-        // cerca il livello del'utente 
+        // cerca il profile del'utente 
         try {
-            $query = $this->database->prepare("SELECT permissione FROM `livelli` WHERE `id_livello` = :id_livello");
-            $query->bindValue(":id_livello", $this->id_livello);
+            $query = $this->database->prepare("SELECT permissione FROM `profiles` WHERE `id_profile` = :id_profile");
+            $query->bindValue(":id_profile", $this->id_profile);
             $query->execute();
             $result = $query->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {

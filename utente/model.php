@@ -45,7 +45,7 @@ switch ($action) {
             $utente->codice_fiscale = $_REQUEST['codice_fiscale'];
             $utente->telefono = $_REQUEST['telefono'];
             $utente->data_nascita = $_REQUEST['data_nascita'];
-            $utente->livello = $_REQUEST['livello'];
+            $utente->profile = $_REQUEST['profile'];
             $utente->attivo = $_REQUEST['attivo'];
 
             // check if there is an id_utente to update 
@@ -112,20 +112,20 @@ switch ($action) {
 
         $utenti = $utente->get_utenti();
 
-        // get livello to show description on the datatables
-        include_once('../livello/model.php');
-        if (isset($livelli['catchError'])) {
+        // get profile to show description on the datatables
+        include_once('../profile/model.php');
+        if (isset($profiles['catchError'])) {
             
             // check if an error occurred on try catch
             $data['code'] = '500';
             $data['state'] = 'error';
-            $data['message'] = $livelli['catchError'];
+            $data['message'] = $profiles['catchError'];
             
             echo json_encode($data);
 
         } else {
-            foreach ($livelli as $key => $value) {
-                $descrizioni[$value['id_livello']] = $value['descrizione'];
+            foreach ($profiles as $key => $value) {
+                $descrizioni[$value['id_profile']] = $value['descrizione'];
             }
 
             // prepare i dati per creare il json
@@ -147,7 +147,7 @@ switch ($action) {
                         } else {
                             $data[$k] = 'No';
                         }
-                    } else if ($k == 'id_livello') {
+                    } else if ($k == 'id_profile') {
                         $data[$k] = $descrizioni[$v];
                     } else {
                         $data[$k] = $v;
@@ -211,10 +211,10 @@ switch ($action) {
         echo json_encode($data);
         break;
 
-    case "get_livelli":
+    case "get_profiles":
 
-        // call a livello method return the options to the select
-        include_once('../livello/model.php');
+        // call a profile method return the options to the select
+        include_once('../profile/model.php');
 
         break;
 

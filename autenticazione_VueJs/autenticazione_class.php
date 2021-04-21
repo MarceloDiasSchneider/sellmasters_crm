@@ -6,7 +6,7 @@ class autenticazioneClass
     public $password;
     public $id_utente;
     public $nome;
-    public $id_livello;
+    public $id_profile;
     public $codice;
     public $scadenza;
 
@@ -50,7 +50,7 @@ class autenticazioneClass
     {
         /* verify if user is registered */
         try {
-            $query = $this->database->prepare("SELECT `id_utente`, `nome`, `id_livello`, attivo FROM `utenti` WHERE `email` = :email AND `password` = :cryptedPassword");
+            $query = $this->database->prepare("SELECT `id_utente`, `nome`, `id_profile`, attivo FROM `utenti` WHERE `email` = :email AND `password` = :cryptedPassword");
             $query->bindValue(":email", $this->email);
             $query->bindValue(":cryptedPassword", $this->password);
             $query->execute();

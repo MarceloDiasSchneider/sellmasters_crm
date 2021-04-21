@@ -56,7 +56,7 @@ switch ($requestBody['action']) {
                 $utente->codice_fiscale = $requestBody['codice_fiscale'];
                 $utente->telefono = $requestBody['telefono'];
                 $utente->data_nascita = $requestBody['data_nascita'];
-                $utente->livello = $requestBody['livello'];
+                $utente->profile = $requestBody['profile'];
                 $utente->attivo = $requestBody['attivo'];
                 // check if email is already registered
                 $email = $utente->check_email();
@@ -64,7 +64,7 @@ switch ($requestBody['action']) {
                     // report a try catch error
                     $data['code'] = '500';
                     $data['state'] = 'Internal Server Error';
-                    $data['message'] = $livelli['catchError'];
+                    $data['message'] = $email['catchError'];
                 } else if (isset($email['email'])) {
                     // report that the email is already used
                     $data['code'] = '401';
@@ -76,7 +76,7 @@ switch ($requestBody['action']) {
                         // report a try catch error
                         $data['code'] = '500';
                         $data['state'] = 'Internal Server Error';
-                        $data['message'] = $livelli['catchError'];
+                        $data['message'] = $rows['catchError'];
                     } else if ($rows > 0) {
                         // report user registred successfully
                         $data['code'] = '201';
@@ -104,7 +104,7 @@ switch ($requestBody['action']) {
                 $utente->data_nascita = $requestBody['data_nascita'];
                 $utente->codice_fiscale = $requestBody['codice_fiscale'];
                 $utente->telefono = $requestBody['telefono'];
-                $utente->livello = $requestBody['livello'];
+                $utente->profile = $requestBody['profile'];
                 $utente->email = $requestBody['email'];
                 $utente->attivo = $requestBody['attivo'];
                 // check if the email is already used from another user
@@ -158,18 +158,18 @@ switch ($requestBody['action']) {
     case 'get_all_users':
         $utenti = $utente->get_all_users();
 
-        // get livello to show description on the datatables
-        include_once('../livello_VueJs/model.php');
-        if (isset($livelli['catchError'])) {
+        // get profile to show description on the datatables
+        include_once('../profile_VueJs/model.php');
+        if (isset($profiles['catchError'])) {
             // check if an error occurred on try catch
             $data['code'] = '500';
             $data['state'] = 'error';
-            $data['message'] = $livelli['catchError'];
+            $data['message'] = $profiles['catchError'];
 
             echo json_encode($data);
         } else {
-            foreach ($livelli as $key => $value) {
-                $descrizioni[$value['id_livello']] = $value['descrizione'];
+            foreach ($profiles as $key => $value) {
+                $descrizioni[$value['id_profile']] = $value['descrizione'];
             }
             // prepare i dati per creare il json
             $dati = array();
@@ -190,7 +190,7 @@ switch ($requestBody['action']) {
                         } else {
                             $data[$k] = 'No';
                         }
-                    } else if ($k == 'id_livello') {
+                    } else if ($k == 'id_profile') {
                         $data[$k] = $descrizioni[$v];
                     } else {
                         $data[$k] = $v;
@@ -267,9 +267,9 @@ switch ($requestBody['action']) {
 
         echo json_encode($data);
         break;
-    case 'get_livelli':
-        // call a livello method return the options to the select
-        include_once('../livello_VueJs/model.php');
+    case 'get_profiles':
+        // call a profile method return the options to the select
+        include_once('../profile_VueJs/model.php');
 
         break;
     default:

@@ -10,7 +10,7 @@ class utenteClass
     public $telefono;
     public $data_nascita;
     public $password;
-    public $livello;
+    public $profile;
     public $attivo;
 
     public $database;
@@ -48,11 +48,11 @@ class utenteClass
             // check if password is setted
             if($this->password == null){
                 $query = $this->database->prepare("UPDATE `utenti` 
-                SET `nome` = :nome, `cognome` = :cognome, `email` = :email, `codice_fiscale` = :codice_fiscale, `telefono` = :telefono, `data_nascita` = :data_nascita, `id_livello` = :livello 
+                SET `nome` = :nome, `cognome` = :cognome, `email` = :email, `codice_fiscale` = :codice_fiscale, `telefono` = :telefono, `data_nascita` = :data_nascita, `id_profile` = :profile 
                 WHERE (`id_utente` = :id_utente)");
             } else {
                 $query = $this->database->prepare("UPDATE `utenti` 
-                SET `nome` = :nome, `cognome` = :cognome, `email` = :email, `codice_fiscale` = :codice_fiscale, `telefono` = :telefono, `data_nascita` = :data_nascita, `id_livello` = :livello, `password` = :password 
+                SET `nome` = :nome, `cognome` = :cognome, `email` = :email, `codice_fiscale` = :codice_fiscale, `telefono` = :telefono, `data_nascita` = :data_nascita, `id_profile` = :profile, `password` = :password 
                 WHERE (`id_utente` = :id_utente)");
             }
 
@@ -66,7 +66,7 @@ class utenteClass
             if($this->password != null){
                 $query->bindValue(":password", $this->password);
             }
-            $query->bindValue(":livello", $this->livello);
+            $query->bindValue(":profile", $this->profile);
             $query->bindValue(":id_utente", $this->id_utente);
 
             $query->execute();
@@ -96,8 +96,8 @@ class utenteClass
     public function insert_user()
     {
         try {
-            $query = $this->database->prepare("INSERT INTO `utenti` (`nome`, `cognome`, `email`, `codice_fiscale`, `telefono`, `data_nascita`, `password`, `id_livello`, `attivo`) 
-            VALUES (:nome, :cognome, :email, :codice_fiscale, :telefono, :data_nascita, :password, :livello, :attivo) ");
+            $query = $this->database->prepare("INSERT INTO `utenti` (`nome`, `cognome`, `email`, `codice_fiscale`, `telefono`, `data_nascita`, `password`, `id_profile`, `attivo`) 
+            VALUES (:nome, :cognome, :email, :codice_fiscale, :telefono, :data_nascita, :password, :profile, :attivo) ");
             $query->bindValue(":nome", $this->nome);
             $query->bindValue(":cognome", $this->cognome);
             $query->bindValue(":email", $this->email);
@@ -105,7 +105,7 @@ class utenteClass
             $query->bindValue(":telefono", $this->telefono);
             $query->bindValue(":data_nascita", $this->data_nascita);
             $query->bindValue(":password", $this->password);
-            $query->bindValue(":livello", $this->livello);
+            $query->bindValue(":profile", $this->profile);
             $query->bindValue(":attivo", $this->attivo);
 
             $query->execute();
@@ -122,7 +122,7 @@ class utenteClass
     {
         // cerca tutti gli utenti
         try {
-            $query = $this->database->prepare("SELECT id_utente, nome, cognome, email, codice_fiscale, telefono, data_nascita, id_livello, attivo  FROM `utenti`");
+            $query = $this->database->prepare("SELECT id_utente, nome, cognome, email, codice_fiscale, telefono, data_nascita, id_profile, attivo  FROM `utenti`");
             $query->execute();
             $query->setFetchMode(PDO::FETCH_ASSOC);
             $result = $query->fetchAll();
@@ -136,7 +136,7 @@ class utenteClass
     public function get_user_data()
     {
         try {
-        $query = $this->database->prepare("SELECT `nome`, `cognome`, `email`, `codice_fiscale`, `data_nascita`, `telefono`, `id_livello` FROM `utenti` WHERE id_utente = :id_utente");
+        $query = $this->database->prepare("SELECT `nome`, `cognome`, `email`, `codice_fiscale`, `data_nascita`, `telefono`, `id_profile` FROM `utenti` WHERE id_utente = :id_utente");
             $query->bindValue(":id_utente", $this->id_utente);
             $query->execute();
             $result = $query->fetch(PDO::FETCH_ASSOC);

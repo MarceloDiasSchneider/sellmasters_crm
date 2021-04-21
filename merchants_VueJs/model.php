@@ -156,9 +156,9 @@ switch ($requestBody['action']) {
     
                         echo json_encode($data);
                     } else { // merchant not updated
-                        $data['code'] = '500';
-                        $data['state'] = 'Internal server error';
-                        $data['message'] = 'The insert is not successfully';
+                        $data['code'] = '406';
+                        $data['state'] = 'Not Acceptable';
+                        $data['message'] = 'Questo dati già ci sono salvate';
     
                         echo json_encode($data);
                     }

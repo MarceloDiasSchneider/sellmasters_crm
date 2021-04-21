@@ -39,7 +39,7 @@ switch ($action) {
                 if ($utente['attivo'] == 1) {
                     $autenticazione->id_utente = $utente['id_utente'];
                     $autenticazione->nome = $utente['nome'];
-                    $autenticazione->id_livello = $utente['id_livello'];
+                    $autenticazione->id_profile = $utente['id_profile'];
 
                     $data['code'] = '200';
                     $data['state'] = 'Success';
@@ -47,28 +47,27 @@ switch ($action) {
 
                     // Se autenticazione é riuscita fa un registro di log 
                     if ($data['state'] == 'Success') {
-                        include_once('../livello_VueJs/model.php');
+                        include_once('../profile_VueJs/model.php');
                         // check if an error occurred on try catch
                         if (isset($permissione['catchError'])) {
                             $data['code'] = '500';
                             $data['state'] = 'Internal Server Error';
                             $data['message'] = $permissione['catchError'];
                         } else {
-                            // controlla se ha livello dell'utente 
-                            if (isset($permissione['permissione'])) {
-                                $livello->permissione = $permissione['permissione'];
-
-                                // Messaggio di riuscito a trovare un livello
+                            // controlla se ha profile dell'utente 
+                            if (isset($permissione['id_profile'])) {
+                                $profile->permissione = $permissione['id_profile'];
+                                // Messaggio di riuscito a trovare un profile
                                 $data['code'] = '200';
                                 $data['state'] = 'Success';
-                                $data['message'] = 'Riuscito a trovare un livello';
+                                $data['message'] = 'Riuscito a trovare un profile';
                             } else {
-                                // Messaggio di errore se l'utente non dispone del livello di autorizzazione
+                                // Messaggio di errore se l'utente non dispone del profile di autorizzazione
                                 $data['code'] = '401';
                                 $data['state'] = 'Unauthorized';
-                                $data['message'] = 'Utente senza livello di permissione';
+                                $data['message'] = 'Utente senza profilo di permissione';
                             }
-                            // Controlla la risposta del livello 
+                            // Controlla la risposta del profile 
                             if ($data['state'] == 'Success') {
                                 include_once('../registro_accesso_VueJs/model.php');
                                 if (isset($accessoRegistrato['catchError'])) {
@@ -89,9 +88,8 @@ switch ($action) {
                                     $_SESSION["codiceSessione"] = $autenticazione->codice;
                                     $_SESSION["id_utente"] = $autenticazione->id_utente;
                                     $_SESSION["nome"] = $autenticazione->nome;
-                                    $_SESSION["permissione"] = $livello->permissione;
+                                    $_SESSION["id_profile"] = $profile->permissione;
                                     $_SESSION['data'] = $datatime;
-                                    // $_SESSION['started'] = true; // deletar
 
                                     $data['state'] = 'Success';
                                     $data['code'] = '201';
@@ -256,10 +254,9 @@ switch ($action) {
             $data['codiceSessione'] = $_SESSION['codiceSessione'];
             $data['id_utente'] = $_SESSION['id_utente'];
             $data['nome'] = $_SESSION['nome'];
-            $data['permissione'] = $_SESSION['permissione'];
+            $data['id_profile'] = $_SESSION['id_profile'];
             $data['data'] = $_SESSION['data'];
         }
-        $data['teste'] = 'teste';
         echo json_encode($data);
 
         break;

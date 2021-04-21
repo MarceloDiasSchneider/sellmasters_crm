@@ -57,9 +57,9 @@ app.component('register_user', {
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>Livello</label>
-                                        <select id="livello" name="livello" class="form-control" v-model.number="livello" required>
-                                            <option disabled selected value="0">seleziona un livello</option>
+                                        <label>profile</label>
+                                        <select id="profile" name="profile" class="form-control" v-model.number="profile" required>
+                                            <option disabled selected value="0">seleziona un profile</option>
                                             <option v-for="option in select_option" :value="option.id">{{ option.description }}</option>
                                         </select>
                                     </div>
@@ -88,11 +88,14 @@ app.component('register_user', {
                             <input type="hidden" id="attivo" name="attivo" v-model="attivo">
                             <input v-if="user_id" type="hidden" id="id_utente" name="id_utente" :value="user_id">
                             <input type="hidden" id="codiceSessione" name="codiceSessione" :value="codice_sessione">
-                            
-                            <button v-if="user_id" type="submit" id="insert" class="btn btn-primary">Aggiorna</button>
-                            <button v-else type="submit" id="update" class="btn btn-primary">Registra</button>
-                        
-                            <button type="submit" id="reset_form" class="btn btn-primary" :class=" [user_id ? '' : 'd-none']" @click.prevent="reset_form">Indietro a nuovo utente</button>
+
+                            <div class="float-sm-right ml-1">
+                                <button v-if="user_id" type="submit" id="insert" class="btn btn-primary">Aggiorna</button>
+                                <button v-else type="submit" id="update" class="btn btn-primary">Registra</button>
+                            </div>
+                            <div class="float-sm-right ml-1">
+                                <button type="submit" id="reset_form" class="btn btn-primary" :class=" [user_id ? '' : 'd-none']" @click.prevent="reset_form">Indietro a nuovo utente</button>
+                            </div>
                         </form>
                     </div>
                     <!-- /.card-body -->
@@ -114,7 +117,7 @@ app.component('register_user', {
             data_nascita: null,
             codice_fiscale: null,
             telefono: null,
-            livello: 0,
+            profile: 0,
             email: null,
             password: null,
             verificaPassword: null,
@@ -136,7 +139,7 @@ app.component('register_user', {
                 method: 'POST',
                 mode: 'same-origin',
                 headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ 'action': 'get_livelli' })
+                body: JSON.stringify({ 'action': 'get_profiles' })
             }
             fetch('model.php', requestOptions)
                 // process the backend response
@@ -150,8 +153,8 @@ app.component('register_user', {
                             break;
                         case '200':
                             // format the data to show the selct options
-                            data.livelli.forEach(livello => {
-                                this.select_option.push({ id: livello.id_livello, description: livello.descrizione })
+                            data.profiles.forEach(profile => {
+                                this.select_option.push({ id: profile.id_profile, description: profile.descrizione })
                             });
                             break;
                         default:
@@ -169,7 +172,7 @@ app.component('register_user', {
         insert_or_update_user() {
             this.loading = true
             // check if required inputs was fielded
-            if (this.nome != '' && this.livello != 0 && this.email != '' && (this.password != '' && this.verificaPassword != '' || this.user_id)) {
+            if (this.nome != '' && this.profile != 0 && this.email != '' && (this.password != '' && this.verificaPassword != '' || this.user_id)) {
                 // set options to send with the post request
                 const requestOptions = {
                     method: 'POST',
@@ -182,7 +185,7 @@ app.component('register_user', {
                         'data_nascita': this.data_nascita,
                         'codice_fiscale': this.codice_fiscale,
                         'telefono': this.telefono,
-                        'livello': this.livello,
+                        'profile': this.profile,
                         'email': this.email,
                         'password': this.password,
                         'verificaPassword': this.verificaPassword,
@@ -239,6 +242,7 @@ app.component('register_user', {
             } else {
                 // create a report to each field that must to be completed
                 alert('compila tutti i campi')
+                this.loading = false
             }
         },
         // get the user data to update
@@ -271,7 +275,7 @@ app.component('register_user', {
                             if (data.user.data_nascita != undefined) { this.data_nascita = data.user.data_nascita } else { this.data_nascita = null }
                             if (data.user.codice_fiscale != undefined) { this.codice_fiscale = data.user.codice_fiscale } else { this.codice_fiscale = null }
                             if (data.user.telefono != undefined) { this.telefono = data.user.telefono } else { this.telefono = null }
-                            if (data.user.id_livello != undefined) { this.livello = data.user.id_livello } else { this.livello = null }
+                            if (data.user.id_profile != undefined) { this.profile = data.user.id_profile } else { this.profile = null }
                             if (data.user.email != undefined) { this.email = data.user.email } else { this.email = null }
                             break;
                         default:
@@ -294,7 +298,7 @@ app.component('register_user', {
             this.data_nascita = null
             this.codice_fiscale = null
             this.telefono = null
-            this.livello = 0
+            this.profile = 0
             this.email = null
             this.password = null
             this.verificaPassword = null

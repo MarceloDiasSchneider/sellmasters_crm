@@ -1,15 +1,11 @@
-app.component('all_users', {
-    props: {
-
-    },
+app.component('all_profiles', {
     template:
         /*html*/
         `<div class="row">
             <div class="col-md-12">
-                <!-- tabella con tutti gli utente registrate -->
                 <div class="card card-primary">
                     <div class="card-header">
-                        <h3 class="card-title">Tutti gli utenti</h3>
+                        <h3 class="card-title">Tutti i profili</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                 <i class="fas fa-minus"></i>
@@ -18,7 +14,7 @@ app.component('all_users', {
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="utenti" class="table table-bordered table-striped">
+                        <table id="profiles" class="table table-bordered table-striped">
                         </table>
                     </div>
                     <!-- /.card-body -->
@@ -30,56 +26,49 @@ app.component('all_users', {
                 </div>
                 <!-- /.tabella con tutti gli utente registrate -->
             </div>
-        <!-- /.row -->
         </div>`,
     data() {
         return {
+            // variable to control the loading card
             loading: false
         }
     },
     methods: {
-        // get all users to set datatables
-        get_all_users() {
-            $("#utenti").DataTable({
+        // get all profiles to set datatables
+        get_all_profiles() {
+            $("#profiles").DataTable({
                 'ajax': {
                     type: "POST",
-                    url: "../utente/model.php",
-                    data: { 'action': 'get_utenti' },
+                    url: "../profile/model.php",
+                    data: { 'action': 'get_profiles' },
                     dataType: "json",
                     async: false,
                     dataSrc: ""
                 },
                 columns: [
-                    { title: "Nome", data: "nome" },
-                    { title: "Cognome", data: "cognome" },
-                    { title: "Email", data: "email" },
-                    { title: "Codice Fiscale", data: "codice_fiscale" },
-                    { title: "Telefono", data: "telefono" },
-                    { title: "Data", data: "data_nascita" },
-                    { title: "profile", data: "id_profile" },
-                    { title: "Attivo", data: "attivo" },
+                    { title: "Descrizione", data: "descrizione" },
                     { title: "Azione", data: "azione" }
                 ],
                 "responsive": true,
                 "lengthChange": false,
                 "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-            }).buttons().container().appendTo('#utenti_wrapper .col-md-6:eq(0)');
+                // "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+            }).buttons().container().appendTo('#profiles_wrapper .col-md-6:eq(0)');
         },
         // refresh the datatables
         refresh_datatables() {
-            $('#utenti').DataTable().ajax.reload(null, false);
+            $('#profiles').dataTable().api().ajax.reload(null, false);
         },
-        // call method get user data from component register user
-        user_edit() {
+        // call method get profile data from component register profile
+        profile_edit() {
             // set the variable proxy to use Vue Js in jQuery
             let proxy = this
-            $('#utenti').on('click', '.update_user', function () {
-                let id_utente = $(this).attr('id');
-                // get the user's id
-                id_utente = Number(id_utente.replace(/^\D+/g, ''));
-                // call a method get user data from component register user
-                proxy.$emit('user_data', id_utente)
+            $('#profiles').on('click', '.update_profile', function () {
+                let id_profile = $(this).attr('id');
+                // get the profile's id
+                id_profile = Number(id_profile.replace(/^\D+/g, ''));
+                // call a method get profile data from component register profile
+                proxy.$emit('profile_data', id_profile)
             });
         },
         // toggle user to active or disabled
@@ -125,9 +114,9 @@ app.component('all_users', {
     },
     mounted() {
         // call the datatables when Vue Js is ready
-        this.get_all_users()
+        this.get_all_profiles()
         // call the functions to active jQuery event listener
-        this.toggle_user_active()
-        this.user_edit()
+        // this.toggle_user_active()
+        this.profile_edit()
     }
 })

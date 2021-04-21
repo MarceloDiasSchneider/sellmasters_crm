@@ -29,7 +29,7 @@ switch ($action) {
                 if ($utente['attivo'] == 1) {
                     $autenticazione->id_utente = $utente['id_utente'];
                     $autenticazione->nome = $utente['nome'];
-                    $autenticazione->id_livello = $utente['id_livello'];
+                    $autenticazione->id_profile = $utente['id_profile'];
 
                     $data['code'] = '200';
                     $data['state'] = 'Success';
@@ -37,28 +37,28 @@ switch ($action) {
 
                     // Se autenticazione é riuscita fa un registro di log 
                     if ($data['state'] == 'Success') {
-                        include_once('../livello/model.php');
+                        include_once('../profile/model.php');
                         // check if an error occurred on try catch
                         if (isset($permissione['catchError'])) {
                             $data['code'] = '500';
                             $data['state'] = 'Internal Server Error';
                             $data['message'] = $permissione['catchError'];
                         } else {
-                            // controlla se ha livello dell'utente 
+                            // controlla se ha profile dell'utente 
                             if (isset($permissione['permissione'])) {
-                                $livello->permissione = $permissione['permissione'];
+                                $profile->permissione = $permissione['permissione'];
 
-                                // Messaggio di riuscito a trovare un livello
+                                // Messaggio di riuscito a trovare un profile
                                 $data['code'] = '200';
                                 $data['state'] = 'Success';
-                                $data['message'] = 'Riuscito a trovare un livello';
+                                $data['message'] = 'Riuscito a trovare un profile';
                             } else {
-                                // Messaggio di errore se l'utente non dispone del livello di autorizzazione
+                                // Messaggio di errore se l'utente non dispone del profile di autorizzazione
                                 $data['code'] = '401';
                                 $data['state'] = 'Unauthorized';
-                                $data['message'] = 'Utente senza livello di permissione';
+                                $data['message'] = 'Utente senza profile di permissione';
                             }
-                            // Controlla la risposta del livello 
+                            // Controlla la risposta del profile 
                             if ($data['state'] == 'Success') {
                                 include_once('../registro_accesso/model.php');
                                 if (isset($accessoRegistrato['catchError'])) {
@@ -79,7 +79,7 @@ switch ($action) {
                                     $_SESSION["codiceSessione"] = $autenticazione->codice;
                                     $_SESSION["id_utente"] = $autenticazione->id_utente;
                                     $_SESSION["nome"] = $autenticazione->nome;
-                                    $_SESSION["permissione"] = $livello->permissione;
+                                    $_SESSION["permissione"] = $profile->permissione;
                                     $_SESSION['data'] = $datatime;
                                     // $_SESSION['started'] = true; // deletar
 

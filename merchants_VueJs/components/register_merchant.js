@@ -119,10 +119,14 @@ app.component('register_merchant', {
                             <input v-if="merchant_primary_id" type="hidden" id="id_merchant" name="id_merchant" :value="merchant_primary_id">
                             <input type="hidden" id="codiceSessione" name="codiceSessione" :value="codice_sessione">
 
-                            <button v-if="merchant_primary_id" type="submit" id="insert" class="btn btn-primary">Aggiorna</button>
-                            <button v-else type="submit" id="update" class="btn btn-primary">Registra</button>
-
-                            <button type="submit" id="reset_form" class="btn btn-primary" :class=" [merchant_primary_id ? '' : 'd-none']" @click.prevent="reset_form">Indietro a nuovo utente</button>
+                            <div class="float-sm-right ml-1">
+                                <button v-if="merchant_primary_id" type="submit" id="insert" class="btn btn-primary">Aggiorna</button>
+                                <button v-else type="submit" id="update" class="btn btn-primary">Registra</button>
+                            </div>
+                            
+                            <div class="float-sm-right ml-1">
+                                <button type="submit" id="reset_form" class="btn btn-primary" :class=" [merchant_primary_id ? '' : 'd-none']" @click.prevent="reset_form">Indietro a nuovo utente</button>
+                            </div>
                         </form>
                         <!-- /.form -->
                     </div>
@@ -189,7 +193,7 @@ app.component('register_merchant', {
                         'provincia': this.provincia,
                         'attivo': this.attivo,
                         'codiceSessione': this.codice_sessione,
-                        'merchant_primary_id': this.merchant_primary_id
+                        'id': this.merchant_primary_id
                     })
                 }
                 fetch('model.php', requestOptions)
@@ -202,14 +206,18 @@ app.component('register_merchant', {
                                 alert(data.state)
                                 console.log(data.message);
                                 break;
+                            case '409':
+                                // reporting already inserted data. ex: nome and merchants already used
+                                toastr.warning(data.message)
+                                break;
+                            case '406':
+                                // reporting already inserted data. ex: update is the same as in database
+                                toastr.warning(data.message)
+                                break;
                             case '401':
                                 // reporting an unauthorized error. ex: session code doesn't match 
                                 alert(data.state)
                                 console.log(data.message);
-                                break;
-                            case '409':
-                                // reporting already inserted data. ex: nome and merchants already used
-                                toastr.warning(data.message)
                                 break;
                             case '201':
                                 // show a success message. ex: merchant inserted
@@ -292,19 +300,20 @@ app.component('register_merchant', {
         // reset the from values to null
         reset_form() {
             this.nome = null,
-                this.nome_sociale = null,
-                this.merchant_id = null,
-                this.mws = null,
-                this.interval_between_check = null,
-                this.nome_contatto = null,
-                this.telefono = null,
-                this.email = null,
-                this.indirizzo = null,
-                this.numero_civico = null,
-                this.citta = null,
-                this.cap = null,
-                this.stato = null,
-                this.provincia = null
+            this.nome_sociale = null,
+            this.merchant_id = null,
+            this.mws = null,
+            this.interval_between_check = null,
+            this.nome_contatto = null,
+            this.telefono = null,
+            this.email = null,
+            this.indirizzo = null,
+            this.numero_civico = null,
+            this.citta = null,
+            this.cap = null,
+            this.stato = null,
+            this.provincia = null
+            this.merchant_primary_id = null 
         },
     }
 })

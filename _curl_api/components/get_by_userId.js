@@ -15,7 +15,9 @@ app.component('get_post_by_userId', {
                             </div>
                         </div>
                         <div class="card-footer">
-                            <button type="submit" class="btn btn-primary">Refresh</button>
+                            <div class="float-sm-right ml-1">
+                                <button type="submit" class="btn btn-primary">Refresh</button>
+                            </div>
                         </div>
                     </form>
                 </div>

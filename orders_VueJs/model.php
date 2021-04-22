@@ -16,11 +16,12 @@ if (isset($_SERVER['REQUEST_METHOD'])) {
 }
 
 include_once('orders_class.php');
-$order = new pageClass();
+$order = new ordersClass();
 
 switch ($requestBody['action']) {
-    case 'default': 
-        # code...
+    case 'get_merchants': 
+        // call a merchants method to get all merchants
+        include_once('../merchants_VueJs/model.php');
         break;
 
     default:

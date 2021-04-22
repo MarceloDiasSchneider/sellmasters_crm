@@ -178,7 +178,7 @@ switch ($requestBody['action']) {
 
             echo json_encode($data);
         } else { // Organize the info to load in datatables
-            $data = array();
+            $merchatsData = array();
             $info = array();
             foreach ($allMerchant as $key => $value) { // set the data as datatables need
                 // variables to use on actions
@@ -199,8 +199,13 @@ switch ($requestBody['action']) {
                         $info[$k] = $v;
                     }
                 }
-                $data[] = $info;
+                $merchatsData[] = $info;
             }
+
+            $data['code'] = '200';
+            $data['state'] = 'Success';
+            $data['message'] = 'All merchants found';
+            $data['merchatsData'] = $merchatsData;
             echo json_encode($data);
         }
 
@@ -224,7 +229,7 @@ switch ($requestBody['action']) {
                 }
             }
             $data['merchant'] = $info;
-            $data['state'] = 'success';
+            $data['state'] = 'Success';
             $data['code'] = '200';
             $data['message'] = 'Commerciante pronto per essere aggiornato';
 
@@ -257,7 +262,7 @@ switch ($requestBody['action']) {
                 echo json_encode($data);
             } else if ($result) { // confirm the request
                 $data['code'] = '200';
-                $data['state'] = 'success';
+                $data['state'] = 'Success';
                 if (!$merchants->attivo) {
                     $data['message'] = "Commerciante attivo";
                 } else {

@@ -74,7 +74,7 @@ app.component('all_merchants', {
         },
         // refresh the datatables
         refresh_datatables() {
-            $('#merchants').dataTable().api().ajax.reload(null, false);
+            $('#merchants').DataTable().ajax.reload(null, false);
         },
         // call method get user data from component register user
         user_edit() {

@@ -57,7 +57,7 @@ app.component('all_profiles', {
         },
         // refresh the datatables
         refresh_datatables() {
-            $('#profiles').dataTable().api().ajax.reload(null, false);
+            $('#profiles').DataTable().ajax.reload(null, false);
         },
         // call method get profile data from component register profile
         profile_edit() {

@@ -15,7 +15,7 @@ app.component('orders', {
                     <!-- /.card-header -->
                     <div class="card-body">
                         <form action='#' id='user_form' name='user_form' method='post' @submit.prevent="get_orders">
-                            <div class="row" v-show="!datatables">
+                            <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="start_date">Data inizio</label>
@@ -43,7 +43,7 @@ app.component('orders', {
                                     <div class="float-sm-right ml-1 mt-1" v-show="!datatables">
                                         <button type="submit" class="btn btn-primary">Ricerca</button>
                                     </div>
-                                    <div class="float-sm-right ml-1 mt-1" v-show="false">
+                                    <div class="float-sm-right ml-1 mt-1" v-show="datatables">
                                         <button type="submit" class="btn btn-primary" @click.prevent="refresh_datatables">Ricaricare</button>
                                     </div>
                                 </div>
@@ -63,7 +63,6 @@ app.component('orders', {
             </div>
             <!-- /.tabella con tutti gli utente registrate -->
         </div>
-        {{columns_data}}
         <!-- /.row -->`,
     data() {
         return {
@@ -77,9 +76,6 @@ app.component('orders', {
             datatables: false,
             // variable to control the loading card
             loading: false,
-            // variable to hold the orders data
-            orders_data: null,
-            columns_data: [],
         }
     },
     methods: {
@@ -120,74 +116,37 @@ app.component('orders', {
                     console.error('There was an error!', error);
                 });
         },
-        // get json from backend
+        // initiate the dataTables
         get_orders() {
             let self = this
-            let dates = 'data_inizio=' + this.startDate + '&data_fine=' + this.endDate
-            $.ajax({
-                type: "POST",
-                url: "http://51.91.97.200/sellmaster/api_sellmasters/ordini_mondotop.php",
-                data: dates,
-                dataType: "json",
-                async: false,
-                success: function(data) {
-                    self.orders_data = data
-                    self.set_header_titles()
-                    self.set_market_status_color()
-                    self.set_datatables()
-                },
-                error: function(msg) {
-                    alert("Failed: " + msg.status + ": " + msg.statusText);
-                }
-            });
-        },
-        // define the title on datatables header 
-        set_header_titles() {
-            let header_titles = Object.keys(this.orders_data[0]);
-            header_titles.forEach(title => {
-                let Title = title.replaceAll("_", " ").toUpperCase();
-                this.columns_data.push({ 'title': Title, 'data': title, })
-            });
-        },
-        // set a color to each merket status 
-        set_market_status_color() {
-            this.orders_data.forEach(order => {
-                switch (order.market_status) {
-                    case 'Pending':
-                        order.market_status = '<span class="bg-info px-3">' + order.market_status + '</span>'
-                        break;
-                    case 'Unhipped':
-                        order.market_status = '<span class="bg-orange px-3">' + order.market_status + '</span>'
-                        break;
-                    case 'Shipped':
-                        order.market_status = '<span class="bg-success px-3">' + order.market_status + '</span>'
-                        break;
-                    case 'Cancelled':
-                        order.market_status = '<span class="bg-danger px-3">' + order.market_status + '</span>'
-                        break;
-                    default:
-                        break;
-                }
-            });
-        },
-        // initiate the dataTables
-        set_datatables() {
-            this.datatables = true
-            let self = this
             $("#orders").DataTable({
-                "data": self.orders_data,
-                "dom": '<"row mb-2"<"col-sm-12 col-md-8"B><"col-sm-12 col-md-4"f>><"row mb-2"<"col-sm-12"rt>><"row mb-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
-                // set the inicial page length
-                "pageLength": 25,
-                // desable responsive to activete the scroll X
-                "responsive": false,
-                "scrollX": true,
-                // "lengthChange": true,
-                columns: self.columns_data,
+                'ajax': {
+                    type: "GET",
+                    url: "orders_manipulator_class.php",
+                    data: function() {
+                        return {
+                            'startDate': self.startDate, 
+                            'endDate': self.endDate,
+                            'merchant_id': self.merchants_id
+                        }
+                    },
+                    dataType: "json",
+                    async: false,
+                    dataSrc: ""
+                },
+                columns: [
+                    { title: "order_id", data: "order_id" },
+                    { title: "market_status", data: "market_status" },
+                    { title: "item_price", data: "item_price" },
+                    { title: "shipping_price", data: "shipping_price" },
+                    { title: "item_promotion_discount", data: "item_promotion_discount" },
+                    { title: "total_order", data: "total_order" },
+                ],
+                "responsive": true,
                 "lengthChange": false,
-                "autoWidth": true,
+                "autoWidth": false,
                 "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-            }).buttons().container().appendTo('#orders_wrapper .col-md-8:eq(0)');
+            }).buttons().container().appendTo('#orders_wrapper .col-md-6:eq(0)');
         },
         // refresh the datatables
         refresh_datatables() {
@@ -201,6 +160,6 @@ app.component('orders', {
     },
     mounted() {
         this.get_select_options()
-            // this.get_orders()
+        // this.get_orders()
     }
 })

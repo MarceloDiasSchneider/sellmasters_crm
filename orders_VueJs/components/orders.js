@@ -120,6 +120,7 @@ app.component('orders', {
         get_orders() {
             let self = this
             $("#orders").DataTable({
+                "dom": '<"row mb-2"<"col-sm-12 col-md-8"B><"col-sm-12 col-md-4"f>><"row mb-2"<"col-sm-12"rt>><"row mb-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
                 'ajax': {
                     type: "GET",
                     url: "orders_manipulator_class.php",

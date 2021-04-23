@@ -142,7 +142,8 @@ app.component('orders', {
                     { title: "item_promotion_discount", data: "item_promotion_discount" },
                     { title: "total_order", data: "total_order" },
                 ],
-                "responsive": true,
+                "responsive": false,
+                "scrollX": true,
                 "lengthChange": false,
                 "autoWidth": false,
                 "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]

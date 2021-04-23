@@ -96,7 +96,7 @@ class ordersManipulatorClass
             $shipping_price = $order['shipping_price'];
             $item_promotion_discount = $order['item_promotion_discount'];
             $total = $item_price + $shipping_price + $item_promotion_discount;
-            $order['total_order'] =  $total;
+            $order['total_order'] = number_format($total, 2, '.', '');
             $totalOrder[] = $order;
         }
         return $totalOrder;

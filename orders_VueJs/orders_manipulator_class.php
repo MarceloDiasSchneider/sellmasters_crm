@@ -75,7 +75,7 @@ class ordersManipulatorClass
                     $order['market_status'] = '<span class="bg-success px-3">' . $order['market_status'] . '</span>';
                     break;
                 case 'Cancelled':
-                    $order['market_status'] = '<span class="bg-lime px-3">' . $order['market_status'] . '</span>';
+                    $order['market_status'] = '<span class="bg-Lightblue px-3">' . $order['market_status'] . '</span>';
                     break;
                 case 'Refund':
                     $order['market_status'] = '<span class="bg-danger px-3">' . $order['market_status'] . '</span>';

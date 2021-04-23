@@ -148,7 +148,7 @@ app.component('orders', {
                 "lengthChange": false,
                 "autoWidth": false,
                 "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-            }).buttons().container().appendTo('#orders_wrapper .col-md-6:eq(0)');
+            }).buttons().container().appendTo('#orders_wrapper .col-md-8:eq(0)');
         },
         // refresh the datatables
         refresh_datatables() {

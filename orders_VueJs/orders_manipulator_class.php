@@ -92,9 +92,9 @@ class ordersManipulatorClass
     {
         foreach ($orders as $key => $order) {
             // use floatval to avoid non-numeric warning
-            $item_price = floatval($order['item_price']);
-            $shipping_price = floatval($order['shipping_price']);
-            $item_promotion_discount = floatval($order['item_promotion_discount']);
+            $item_price = $order['item_price'];
+            $shipping_price = $order['shipping_price'];
+            $item_promotion_discount = $order['item_promotion_discount'];
             $total = $item_price + $shipping_price + $item_promotion_discount;
             $order['total_order'] =  $total;
             $totalOrder[] = $order;

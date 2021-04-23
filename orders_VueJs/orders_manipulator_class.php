@@ -66,19 +66,19 @@ class ordersManipulatorClass
         foreach ($orders as $key => $order) {
             switch ($order['market_status']) {
                 case 'Pending':
-                    $order['market_status'] = '<span class="bg-info px-3">' . $order['market_status'] . '<\/span>';
+                    $order['market_status'] = '<span class="bg-info px-3">' . $order['market_status'] . '</span>';
                     break;
                 case 'Unhipped':
-                    $order['market_status'] = '<span class="bg-orange px-3">' . $order['market_status'] . '<\/span>';
+                    $order['market_status'] = '<span class="bg-orange px-3">' . $order['market_status'] . '</span>';
                     break;
                 case 'Shipped':
-                    $order['market_status'] = '<span class="bg-success px-3">' . $order['market_status'] . '<\/span>';
+                    $order['market_status'] = '<span class="bg-success px-3">' . $order['market_status'] . '</span>';
                     break;
                 case 'Cancelled':
-                    $order['market_status'] = '<span class="bg-lime px-3">' . $order['market_status'] . '<\/span>';
+                    $order['market_status'] = '<span class="bg-lime px-3">' . $order['market_status'] . '</span>';
                     break;
                 case 'Refund':
-                    $order['market_status'] = '<span class="bg-danger px-3">' . $order['market_status'] . '<\/span>';
+                    $order['market_status'] = '<span class="bg-danger px-3">' . $order['market_status'] . '</span>';
                     break;
                 default:
                     break;

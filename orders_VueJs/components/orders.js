@@ -14,6 +14,8 @@ app.component('orders', {
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
+                        <div class="row">
+                        <div class="col-lg-10 col-xl-8">
                         <form action='#' id='user_form' name='user_form' method='post' @submit.prevent="get_orders">
                             <div class="row">
                                 <div class="col-md-4">
@@ -49,6 +51,8 @@ app.component('orders', {
                                 </div>
                             </div>
                         </form>
+                        </div>
+                        </div>
                         <hr>
                         <!-- table -->
                         <table id="orders" class="table table-bordered table-striped nowrap">
@@ -82,7 +86,7 @@ app.component('orders', {
         // get all select options
         get_select_options() {
             this.loading = true
-                // set options to send with the post request
+            // set options to send with the post request
             const requestOptions = {
                 method: 'POST',
                 mode: 'same-origin',
@@ -118,9 +122,10 @@ app.component('orders', {
         },
         // initiate the dataTables
         get_orders() {
+            this.datatables = true
             let self = this
             $("#orders").DataTable({
-                "dom": '<"row mb-2"<"col-sm-12 col-md-8"B><"col-sm-12 col-md-4"f>><"row mb-2"<"col-sm-12"rt>><"row mb-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>',
+                "dom": '<"row mb-2"<"col-sm-12 col-md-8"B><"col-sm-12 col-md-4"f>><"row mb-2"<"col-sm-12"rt>><"row mb-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>R',
                 'ajax': {
                     type: "GET",
                     url: "orders_manipulator_class.php",
@@ -136,28 +141,54 @@ app.component('orders', {
                     dataSrc: ""
                 },
                 columns: [
-                    { title: "order_id", data: "order_id" },
-                    { title: "market_status", data: "market_status" },
-                    { title: "item_price", data: "item_price" },
-                    { title: "shipping_price", data: "shipping_price" },
-                    { title: "item_promotion_discount", data: "item_promotion_discount" },
-                    { title: "total_order", data: "total_order" },
+                    { "title": "Order id", data: "order_id" },
+                    { "title": "Merchant id", data: "merchant_id" },
+                    { "title": "Purchase date", data: "purchase_date" },
+                    { "title": "Account id", data: "account_id" },
+                    { "title": "Market status", data: "market_status" },
+                    { "title": "Paese", data: "paese" },
+                    { "title": "Recipient name", data: "recipient_name" },
+                    { "title": "Currency", data: "currency" },
+                    { "title": "Item price", data: "item_price" },
+                    { "title": "Shipping price", data: "shipping_price" },
+                    { "title": "Item promotion discount", data: "item_promotion_discount" },
+                    { "title": "Total order", data: "total_order" },
+                    { "title": "Quantity purchased", data: "quantity_purchased" },
+                    { "title": "Sku", data: "sku" },
+                    { "title": "Manufacturer", data: "manufacturer" },
+                    { "title": "Category", data: "category" },
+                    { "title": "Marketplace", data: "marketplace" },
+                    { "title": "Weight", data: "weight" },
+                    { "title": "Fee people amazon it", data: "fee_people_amazon_it" },
+                    { "title": "Is business order", data: "is_business_order" },
+                    { "title": "Title", data: "title" },
+                    { "title": "Is prime", data: "isprime" },
+                    { "title": "Fulfillment channel", data: "fulfillment_channel" },
+                    { "title": "Group price", data: "group_price" },
+                    { "title": "Numberofitems shipped", data: "numberofitems_shipped" },
+                    { "title": "Numberofitems unshipped", data: "numberofitems_unshipped" },
+                    { "title": "Fee people amazon de", data: "fee_people_amazon_de" },
+                    { "title": "Fee people amazon es", data: "fee_people_amazon_es" },
+                    { "title": "Fee people amazon fr", data: "fee_people_amazon_fr" },
+                    { "title": "Fee people amazon uk", data: "fee_people_amazon_uk" },
+                    { "title": "Shipping tax", data: "shipping_tax" },
+                    { "title": "Commission by lengow", data: "commission_by_lengow" },
+                    { "title": "Tracking number", data: "tracking_number" },
+                    { "title": "Carrier", data: "carrier" },
+                    { "title": "Price", data: "price" },
+                    { "title": "Dati finanziari", data: "dati_finanziari" },
                 ],
                 "responsive": false,
                 "scrollX": true,
                 "lengthChange": false,
                 "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+                "buttons": ["copy", "csv", "excel", "print", "colvis"] // "PDF"
             }).buttons().container().appendTo('#orders_wrapper .col-md-8:eq(0)');
         },
         // refresh the datatables
         refresh_datatables() {
-            this.loading = true
-            let self = this
-            $('#orders').DataTable().ajax.reload(
-                function() { self.loading = false; },
-                false
-            );
+            $('#orders').DataTable().ajax.reload(null, false);
+
         },
     },
     mounted() {

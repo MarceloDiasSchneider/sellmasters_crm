@@ -66,19 +66,19 @@ class ordersManipulatorClass
         foreach ($orders as $key => $order) {
             switch ($order['market_status']) {
                 case 'Pending':
-                    $order['market_status'] = '<span class="bg-info px-3">' . $order['market_status'] . '</span>';
+                    $order['market_status'] = '<span class="bg-info py-1 px-3 rounded">' . $order['market_status'] . '</span>';
                     break;
                 case 'Unhipped':
-                    $order['market_status'] = '<span class="bg-orange px-3">' . $order['market_status'] . '</span>';
+                    $order['market_status'] = '<span class="bg-orange py-1 px-3 rounded">' . $order['market_status'] . '</span>';
                     break;
                 case 'Shipped':
-                    $order['market_status'] = '<span class="bg-success px-3">' . $order['market_status'] . '</span>';
+                    $order['market_status'] = '<span class="bg-success py-1 px-3 rounded">' . $order['market_status'] . '</span>';
                     break;
                 case 'Cancelled':
-                    $order['market_status'] = '<span class="bg-lightblue px-3">' . $order['market_status'] . '</span>';
+                    $order['market_status'] = '<span class="bg-lightblue py-1 px-3 rounded">' . $order['market_status'] . '</span>';
                     break;
                 case 'Refund':
-                    $order['market_status'] = '<span class="bg-danger px-3">' . $order['market_status'] . '</span>';
+                    $order['market_status'] = '<span class="bg-danger py-1 px-3 rounded">' . $order['market_status'] . '</span>';
                     break;
                 default:
                     break;
@@ -92,11 +92,11 @@ class ordersManipulatorClass
     {
         foreach ($orders as $key => $order) {
             // use floatval to avoid non-numeric warning
-            $item_price = $order['item_price'];
-            $shipping_price = $order['shipping_price'];
-            $item_promotion_discount = $order['item_promotion_discount'];
+            $item_price = floatval($order['item_price']);
+            $shipping_price = floatval($order['shipping_price']);
+            $item_promotion_discount = floatval($order['item_promotion_discount']);
             $total = $item_price + $shipping_price + $item_promotion_discount;
-            $order['total_order'] = number_format($total, 2, '.', '');
+            $order['total_order'] = "<span title='item price + shipping price + item promotion discount'>" . number_format($total, 2, '.', '') . "</span>";
             $totalOrder[] = $order;
         }
         return $totalOrder;

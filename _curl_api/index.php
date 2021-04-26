@@ -3,7 +3,7 @@
 <!-- Import aditionals files -->
 <?php include_once('style_sheet.html'); ?>
 
-<body class="layout-fixed sidebar-mini-md sidebar-closed sidebar-collapse">
+<body :class="bodyClass">
 	<div id="app">
 		<navbar></navbar>
 		<sidebar :nome="nome" :nav_link="nav_link"></sidebar>

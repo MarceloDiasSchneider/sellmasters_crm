@@ -46,8 +46,26 @@ class pagesClass
             $query->bindValue(":id_profile", $this->id_profile);
             $query->bindValue(":access", $this->access);
             $query->execute();
-            $query->setFetchMode(PDO::FETCH_ASSOC);
-            $result = $query->fetchAll();
+            $result = $this->database->lastInsertId();
+        } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
+            error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
+        }
+
+        return $result;
+    }
+
+    public function update_page_access()
+    {
+        try {
+            $query = $this->database->prepare("UPDATE `access_profile` 
+                SET `access` = :access
+                WHERE id_page = :id_page AND id_profile = :id_profile");
+            $query->bindValue(":id_page", $this->id_page);
+            $query->bindValue(":id_profile", $this->id_profile);
+            $query->bindValue(":access", $this->access);
+            $query->execute();
+            $result = $query->rowCount();
         } catch (PDOException $e) {
             $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");

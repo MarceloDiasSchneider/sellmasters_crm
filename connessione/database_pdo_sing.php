@@ -21,6 +21,7 @@ class DatabasePdoClass
             'host' => '107.180.25.194',
             'username' => 'MarceloSchneider',
             'password' => 'pfekr3sJ22VjzH8',
+            // 'dbname' => 'crm_teste'
             'dbname' => 'sellmasters'
             
                 

@@ -12,12 +12,10 @@ CREATE TABLE `pages` (
 CREATE TABLE `profiles`(
 	`id_profile` INT AUTO_INCREMENT,
     `descrizione` VARCHAR(20) NOT NULL,
+    `attivo` INT NOT NULL,
 	PRIMARY KEY (`id_profile`),
     UNIQUE KEY `nodouble` (`descrizione`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
-
-ALTER TABLE `profiles`
-ADD `attivo` INT NOT NULL;
 
 ###
 
@@ -45,12 +43,10 @@ CREATE TABLE `utenti`(
     `password` VARCHAR(255) NOT NULL,
     `id_profile` INT NOT NULL,
     `attivo` INT NOT NULL,
+    `codice_recupera` VARCHAR(15),
+    `scadenza` TIMESTAMP,
 	PRIMARY KEY (`id_utente`)   
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
-
-ALTER TABLE utenti
-ADD codice_recupera VARCHAR(15),
-ADD scadenza TIMESTAMP;
 
 ###
 
@@ -87,3 +83,21 @@ CREATE TABLE `merchants` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `nodouble` (`nome`,`merchant_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+
+###
+
+INSERT INTO `profiles` (`descrizione`, `attivo`) VALUES ('Sviluppatore', '1');
+#
+INSERT INTO `pages` (`main`, `subpage`, `link`) VALUES ('Gestire Utenti', 'Utenti', 'utenti_VueJs');
+INSERT INTO `pages` (`main`, `subpage`, `link`) VALUES ('Gestire Utenti', 'Registro Accesso', 'registro_accesso_VueJs');
+INSERT INTO `pages` (`main`, `subpage`, `link`) VALUES ('Gestire Utenti', 'Profile', 'profile_VueJs');
+INSERT INTO `pages` (`main`, `subpage`, `link`) VALUES ('Gestire Commerciante', 'Commerciante', 'merchants_VueJs');
+INSERT INTO `pages` (`main`, `subpage`, `link`) VALUES ('Ordini', 'Ordini', 'orders_VueJs');
+#
+INSERT INTO `access_profile` (`id_page`, `id_profile`, `access`) VALUES ('1', '1', '1');
+INSERT INTO `access_profile` (`id_page`, `id_profile`, `access`) VALUES ('2', '1', '1');
+INSERT INTO `access_profile` (`id_page`, `id_profile`, `access`) VALUES ('3', '1', '1');
+INSERT INTO `access_profile` (`id_page`, `id_profile`, `access`) VALUES ('4', '1', '1');
+INSERT INTO `access_profile` (`id_page`, `id_profile`, `access`) VALUES ('5', '1', '1');
+#
+INSERT INTO `utenti` (`nome`, `cognome`, `email`, `data_nascita`, `password`, `id_profile`, `attivo`) VALUES ('Marcelo', 'Dias Schneider', 'marcelo.d.schneider@gmail.com', '1992-01-14', '$2a$09$iWHICrsXJA0JvEjJdUri5ekFu8GWq0c/lLf.g3qUk4lnx3wMRyqrO', '1', '1');

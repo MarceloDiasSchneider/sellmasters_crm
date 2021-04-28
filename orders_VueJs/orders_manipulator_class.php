@@ -42,7 +42,7 @@ class ordersManipulatorClass
         return json_decode($response, true);
     }
 
-    // check if dati_finanziari iqual a refund
+    // check if dati_finanziari is equal a refund
     public function dati_finanziari_refund($orders)
     {
         foreach ($orders as $key => $order) {
@@ -60,7 +60,7 @@ class ordersManipulatorClass
         return $ordersRefund;
     }
 
-    // set the fomataion foreach market_status 
+    // set the formation foreach market_status 
     public function market_status_formation($orders)
     {
         foreach ($orders as $key => $order) {
@@ -68,7 +68,7 @@ class ordersManipulatorClass
                 case 'Pending':
                     $order['market_status'] = '<span class="bg-info py-1 px-3 rounded">' . $order['market_status'] . '</span>';
                     break;
-                case 'Unhipped':
+                case 'Unshipped':
                     $order['market_status'] = '<span class="bg-orange py-1 px-3 rounded">' . $order['market_status'] . '</span>';
                     break;
                 case 'Shipped':
@@ -87,7 +87,7 @@ class ordersManipulatorClass
         }
         return $ordersFormated;
     }
-    // item_price shipping_prici item_promotion_discount 
+    // create the column total_order with = item_price + shipping_prici + item_promotion_discount 
     public function total_order($orders)
     {
         foreach ($orders as $key => $order) {
@@ -101,7 +101,7 @@ class ordersManipulatorClass
         }
         return $totalOrder;
     }
-    // GBP currency convert fi 
+    // if the currency is equal to GBP divides by 0.9
     public function currency_convert($orders)
     {
         foreach ($orders as $key => $order) {
@@ -112,6 +112,33 @@ class ordersManipulatorClass
         }
         return $currencyUpdated;
     }
+
+    // format the array to show all dati_finaziari
+    public function format_dati_finanziare($orders)
+    {
+        foreach ($orders as $key => $order) {
+            $dati_formated = null; 
+            foreach ($order['dati_finanziari'] as $key => $value) {
+                // switch the currency
+                $currency = null;
+                switch ($value['currency']) {
+                    case 'EUR':
+                        $currency = ' &euro;';
+                        break;
+                    case 'GBP':
+                        $currency = ' &pound;';
+                        break;
+                    default:
+                        $currency = ' Undefined';
+                        break;
+                }
+                $dati_formated = $dati_formated . '<span class="bg-info py-1 px-3 ml-1 rounded">' . $value['type'] . $currency . ' ' . $value['amount'] . '</span>';
+            }
+            $order['dati_finanziari'] = $dati_formated;
+            $dati_finanziari_formated[] = $order; 
+        }
+        return $dati_finanziari_formated;
+    }
 }
 
 $order = new ordersManipulatorClass($url, $merchant_id, $startDate, $endDate);
@@ -120,5 +147,6 @@ $ordersRefund = $order->dati_finanziari_refund($orders);
 $ordersFormated = $order->market_status_formation($ordersRefund);
 $totalOrder = $order->total_order($ordersFormated);
 $currencyUpdated = $order->currency_convert($totalOrder);
+$dati_finanziari_formated = $order->format_dati_finanziare($currencyUpdated);
 
-echo json_encode($currencyUpdated);
+echo json_encode($dati_finanziari_formated);

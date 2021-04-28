@@ -14,7 +14,7 @@ app.component('all_profiles', {
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="profiles" class="table table-bordered table-striped">
+                        <table id="profiles" class="table table-bordered table-striped nowrap">
                         </table>
                     </div>
                     <!-- /.card-body -->

@@ -1,7 +1,7 @@
 <?php include_once('../common_VueJs/header.html'); ?>
 <?php include_once('style_sheet.html'); ?>
 
-<body :class="bodyClass">
+<body class="control-sidebar-slide-open layout-fixed sidebar-collapse">
     <div id="app">
 		<navbar></navbar>
 		<sidebar :nome="nome" :nav_link="nav_link"></sidebar>

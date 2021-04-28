@@ -46,11 +46,11 @@ app.component('profile', {
                             <input v-if="id_profile" type="hidden" id="id_utente" name="id_utente" :value="id_profile">
                             <input type="hidden" id="codiceSessione" name="codiceSessione" :value="codice_sessione">
 
-                            <div class="float-sm-right ml-1">
+                            <div class="float-sm-right ml-1 mb-1">
                                 <button v-if="id_profile" type="submit" id="insert" class="btn btn-primary">Aggiorna</button>
                                 <button v-else type="submit" id="update" class="btn btn-primary">Registra</button>
                             </div>
-                            <div class="float-sm-right ml-1">
+                            <div class="float-sm-right ml-1 mb-1">
                                 <button type="submit" id="reset_form" class="btn btn-primary" :class=" [id_profile ? '' : 'd-none']" @click.prevent="reset_form">Indietro a nuovo utente</button>
                             </div>
                         </form>
@@ -111,6 +111,10 @@ app.component('profile', {
                             // reporting an unauthorized error. ex: profile already registered 
                             toastr.warning(data.message)
                             break;
+                        case '400':
+                            // reporting an unauthorized error. ex: profile already registered 
+                            toastr.warning(data.message)
+                            break;
                         case '201':
                             // reporting a success message. ex: profile inserted
                             toastr.success(data.message)
@@ -137,6 +141,7 @@ app.component('profile', {
         // get the profile data to update
         get_profile_data(id_profile) {
             this.loading = true
+            this.reset_form();
             // set options to send with the post request
             const requestOptions = {
                 method: 'POST',
@@ -162,7 +167,6 @@ app.component('profile', {
                             this.description = data.profile
                             data.pages.forEach(page => {
                                 let mainPage = _.find(this.mainPages, { 'idPage': page.id_page });
-                                console.log(mainPage);
                                 mainPage.checked = Number(page.access) ? true : false
                             })
                             break;

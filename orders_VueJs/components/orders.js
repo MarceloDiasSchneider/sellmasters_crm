@@ -71,8 +71,8 @@ app.component('orders', {
     data() {
         return {
             // variables to bind the form
-            startDate: '2021-03-15',
-            endDate: '2021-03-16',
+            startDate: null,
+            endDate: null,
             merchants_id: '',
             // array to hold the select options
             select_options: [],
@@ -83,10 +83,32 @@ app.component('orders', {
         }
     },
     methods: {
+        // set a default date to the input 
+        set_today() {
+            // today
+            let today = new Date();
+            let dd = String(today.getDate()).padStart(2, '0');
+            let mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+            let yyyy = today.getFullYear();
+
+            today = `${yyyy}-${mm}-${dd}`;
+
+            this.endDate = today
+            // X days ago
+            let x = 2
+            let sevenDaysAgo = new Date(Date.now() - x * 24 * 60 * 60 * 1000)
+            dd = String(sevenDaysAgo.getDate()).padStart(2, '0');
+            mm = String(sevenDaysAgo.getMonth() + 1).padStart(2, '0'); //January is 0!
+            yyyy = sevenDaysAgo.getFullYear();
+
+            sevenDaysAgo = `${yyyy}-${mm}-${dd}`;
+
+            this.startDate = sevenDaysAgo
+        },
         // get all select options
         get_select_options() {
             this.loading = true
-            // set options to send with the post request
+                // set options to send with the post request
             const requestOptions = {
                 method: 'POST',
                 mode: 'same-origin',
@@ -124,14 +146,35 @@ app.component('orders', {
         get_orders() {
             this.datatables = true
             let self = this
+            // formatting function for row child details 
+            function format ( data ) {
+                dati_finanziari = null
+                if (data.dati_finanziari){
+                    dati_finanziari = '<table cellpadding="3" cellspacing="0" border="0" style="padding-left:50px;">'+
+                        '<tr>'+
+                            '<td>Dati finanziari:</td>'+
+                            '<td>'+data.dati_finanziari+'</td>'+
+                        '</tr>'+
+                    '</table>';
+                } else {
+                    dati_finanziari = '<table cellpadding="3" cellspacing="0" border="0" style="padding-left:50px;">'+
+                    '<tr>'+
+                        '<td>Nessun dati finanziari</td>'+
+                    '</tr>'+
+                '</table>';
+                }
+                return dati_finanziari
+            }
+            // set the datatables
             $("#orders").DataTable({
-                "dom": '<"row mb-2"<"col-sm-12 col-md-8"B><"col-sm-12 col-md-4"f>><"row mb-2"<"col-sm-12"rt>><"row mb-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>R',
+                // P search panes Q custom search
+                "dom": 'l<"row mb-2"<"col-sm-12 col-md-8"B><"col-sm-12 col-md-4"f>><"row mb-2"<"col-sm-12"rt>><"row mb-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>RQ', 
                 'ajax': {
                     type: "GET",
                     url: "orders_manipulator_class.php",
                     data: function() {
                         return {
-                            'startDate': self.startDate, 
+                            'startDate': self.startDate,
                             'endDate': self.endDate,
                             'merchant_id': self.merchants_id
                         }
@@ -140,8 +183,24 @@ app.component('orders', {
                     async: false,
                     dataSrc: ""
                 },
+                searchPanes: {
+                    cascadePanes: true
+                },
+                "pageLength": 10,
+                select: true,
+                // rowGroup: {
+                //     dataSrc: 'purchase_date',
+                // },
                 columns: [
-                    { "title": "Order id", data: "order_id" },
+                    { 
+                        "title": "",
+                        "className": 'dtr-control',
+                        "orderable": false,
+                        "selected": false,
+                        "data": null,
+                        "defaultContent": "<i class='fas fa-plus-square'></i>"
+                    },
+                    { "title": "Order id", data: "order_id"},
                     { "title": "Merchant id", data: "merchant_id" },
                     { "title": "Purchase date", data: "purchase_date" },
                     { "title": "Account id", data: "account_id" },
@@ -176,23 +235,38 @@ app.component('orders', {
                     { "title": "Tracking number", data: "tracking_number" },
                     { "title": "Carrier", data: "carrier" },
                     { "title": "Price", data: "price" },
-                    { "title": "Dati finanziari", data: "dati_finanziari" },
+                    // { "title": "Dati finanziari", data: "dati_finanziari" },
                 ],
+                "order": [[ 3, "desc" ]],
                 "responsive": false,
                 "scrollX": true,
-                "lengthChange": false,
+                "lengthChange": true,
                 "autoWidth": false,
-                "buttons": ["copy", "csv", "excel", "print", "colvis"] // "PDF"
+                "buttons": ["copy", "csv", "excel", "print", "colvis", "searchPanes"] // "PDF" 
             }).buttons().container().appendTo('#orders_wrapper .col-md-8:eq(0)');
+
+            // Add event listener for opening and closing details
+            $('#orders tbody').on('click', 'td.dtr-control', function () {
+                let tr = $(this).closest('tr');
+                let row = $('#orders').DataTable().row( tr );
+         
+                if ( row.child.isShown() ) {
+                    // This row is already open - close it
+                    row.child.hide();
+                }
+                else {
+                    // Open this row
+                    row.child( format(row.data()) ).show();
+                }
+            } );
         },
         // refresh the datatables
         refresh_datatables() {
             $('#orders').DataTable().ajax.reload(null, false);
-
         },
     },
     mounted() {
         this.get_select_options()
-        // this.get_orders()
+        this.set_today()
     }
 })

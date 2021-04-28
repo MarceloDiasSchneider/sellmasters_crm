@@ -18,7 +18,7 @@ app.component('all_users', {
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="utenti" class="table table-bordered table-striped">
+                        <table id="utenti" class="table table-bordered table-striped nowrap">
                         </table>
                     </div>
                     <!-- /.card-body -->

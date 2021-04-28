@@ -18,7 +18,7 @@ app.component('all_merchants', {
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="merchants" class="table table-bordered table-striped">
+                        <table id="merchants" class="table table-bordered table-striped nowrap">
                         </table>
                     </div>
                     <!-- /.card-body -->

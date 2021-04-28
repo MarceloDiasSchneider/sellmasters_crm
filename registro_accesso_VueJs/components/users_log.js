@@ -16,7 +16,7 @@ app.component('users_log', {
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body">
-                        <table id="registri_accessi" class="table table-bordered table-hover">
+                        <table id="registri_accessi" class="table table-bordered table-hover nowrap">
                         </table>
                     </div>
                     <!-- /.card-body -->

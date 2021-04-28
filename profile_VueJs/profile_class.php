@@ -67,10 +67,41 @@ class profileClass
         return $result;
     }
 
+    public function check_description_others()
+    {
+        try {
+            $query = $this->database->prepare("SELECT `descrizione` FROM profiles WHERE `descrizione` = :descrizione AND id_profile != :id_profile");
+            $query->bindValue(":id_profile", $this->id_profile);
+            $query->bindValue(":descrizione", $this->descrizione);
+            $query->execute();
+            $result = $query->fetch();
+        } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
+            error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
+        }
+
+        return $result;
+    }
+
+    public function check_description_self()
+    {
+        try {
+            $query = $this->database->prepare("SELECT `descrizione` FROM profiles WHERE `descrizione` = :descrizione AND id_profile = :id_profile");
+            $query->bindValue(":id_profile", $this->id_profile);
+            $query->bindValue(":descrizione", $this->descrizione);
+            $query->execute();
+            $result = $query->fetch();
+        } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
+            error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
+        }
+
+        return $result;
+    }
+
     public function get_profile_data()
     {
         try {
-
             $query = $this->database->prepare("SELECT `descrizione` FROM `profiles` WHERE `id_profile` = :id_profile");
             $query->bindValue(":id_profile", $this->id_profile);
             $query->execute();

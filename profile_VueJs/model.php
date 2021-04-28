@@ -38,7 +38,7 @@ switch ($requestBody['action']) {
             case null: // insert new profile
                 // set the value to the description
                 $profile->descrizione = $requestBody['description'];
-                // check id this description is already used
+                // check if this description is already used
                 $description = $profile->check_description();
                 if (isset($description['catchError'])) {
                     // report a try catch error
@@ -71,35 +71,47 @@ switch ($requestBody['action']) {
                 $profile->id_profile = $requestBody['id_profile'];
                 $profile->descrizione = $requestBody['description'];
                 // check if the new description is alread used
-                $description = $profile->check_description();
+                $description = $profile->check_description_others();
                 if (isset($description['catchError'])) {
                     // report a try catch error
                     $data['code'] = '500';
                     $data['state'] = 'Internal Server Error';
                     $data['message'] = $description['catchError'];
-                } else if (isset($description['descrizione'])) {
+                } elseif (isset($description['descrizione'])) {
                     // report that the description is already used
                     $data['code'] = '401';
                     $data['state'] = 'Unauthorized';
                     $data['message'] = 'Descrizione già registrata';
                 } else {
-                    // execute the updated
-                    $result = $profile->update_profile();
-                    if (isset($result['catchError'])) {
+                    $description = $profile->check_description_self();
+                    if (isset($description['catchError'])) {
                         // report a try catch error
                         $data['code'] = '500';
                         $data['state'] = 'Internal Server Error';
-                        $data['message'] = $result['catchError'];
-                    } else if ($result > 0) {
-                        // check if the profile was updated successfully
-                        $data['state'] = 'Success';
-                        $data['code'] = '200';
-                        $data['message'] = 'profile aggiornato';
-                    } else {
-                        $data['code'] = '400';
-                        $data['state'] = 'Bad request';
-                        $data['message'] = 'Utente non aggiornato';
-                    }
+                        $data['message'] = $description['catchError'];
+                    } elseif (!isset($description['descrizione'])) {
+                        // execute the profile update 
+                        $result = $profile->update_profile();
+                        if (isset($result['catchError'])) {
+                            // report a try catch error
+                            $data['code'] = '500';
+                            $data['state'] = 'Internal Server Error';
+                            $data['message'] = $result['catchError'];
+
+                            echo json_encode($data);
+                            exit;
+                        } else if ($result < 1) {
+                            // report a try catch error
+                            $data['code'] = '400';
+                            $data['state'] = 'Bad request';
+                            $data['message'] = 'Problema!! profilo non registrato';
+
+                            echo json_encode($data);
+                            exit;
+                        }
+                    } 
+                    // call a method in pages_VueJs/model.php to bind all pages
+                    include_once('../pages_VueJs/model.php');
                 }
                 echo json_encode($data);
                 break;
@@ -108,9 +120,10 @@ switch ($requestBody['action']) {
                 # code...
                 break;
 
-                echo json_encode($data);
         }
+        
         break;
+
     case "get_profiles":
         // get profile to set option on the form | called from utente/model.php
         $profiles = $profile->get_profiles();
@@ -157,17 +170,6 @@ switch ($requestBody['action']) {
             $data['code'] = '200';
             $data['id'] = $requestBody['id_profile'];
         }
-        // switch ($requestBody['id_profile']) {
-        //     case null: // get default pages
-                
-        //         break;
-        //     case true: // get the pages setting of profile
-
-        //         break;
-        //     default:
-        //         # code...
-        //         break;
-        // }
 
         echo json_encode($data);
 

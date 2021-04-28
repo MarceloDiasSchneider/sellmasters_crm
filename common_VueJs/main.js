@@ -8,7 +8,6 @@ const app = Vue.createApp({
             permissione: null,
             data: null,
             // variable to control the layout
-            bodyClass: 'layout-fixed sidebar-mini-md sidebar-closed sidebar-collapse',
             nav_link: null,
         }
     },

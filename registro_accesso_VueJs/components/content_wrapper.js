@@ -1,4 +1,9 @@
 app.component('content_wrapper', {
+    props: {
+		codice_sessione: {
+			type: String
+		}
+	},
     template:
     /*html*/
     `<!-- Content Wrapper. Contains page content -->
@@ -32,7 +37,7 @@ app.component('content_wrapper', {
     <!-- /.content-wrapper -->`,
     methods: {
         send_page(){
-            this.$emit('page', 'registro_accesso_VueJs')
+            this.$emit('page', 'Gestire Utenti','registro_accesso_VueJs')
         }
     },
     beforeMount() {

@@ -47,7 +47,7 @@ app.component('content_wrapper', {
         },
         // send to the main js which page must appear as active on sidebar
         send_page(){
-            this.$emit('page', 'profiles')
+            this.$emit('page', 'Gestire Utenti','profile_VueJs')
         },
     },
     beforeMount() {

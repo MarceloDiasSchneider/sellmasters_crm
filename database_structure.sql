@@ -3,6 +3,7 @@ CREATE TABLE `pages` (
     `main` VARCHAR(100) NOT NULL,
     `subpage` VARCHAR(100) NOT NULL,
     `link` VARCHAR(100) NOT NULL,
+    `nav_icon` VARCHAR(100) NOT NULL,
     PRIMARY KEY (`id_page`),
     UNIQUE KEY `nodouble` (`subpage`)
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
@@ -88,11 +89,11 @@ CREATE TABLE `merchants` (
 
 INSERT INTO `profiles` (`descrizione`, `attivo`) VALUES ('Sviluppatore', '1');
 #
-INSERT INTO `pages` (`main`, `subpage`, `link`) VALUES ('Gestire Utenti', 'Utenti', 'utenti_VueJs');
-INSERT INTO `pages` (`main`, `subpage`, `link`) VALUES ('Gestire Utenti', 'Registro Accesso', 'registro_accesso_VueJs');
-INSERT INTO `pages` (`main`, `subpage`, `link`) VALUES ('Gestire Utenti', 'Profile', 'profile_VueJs');
-INSERT INTO `pages` (`main`, `subpage`, `link`) VALUES ('Gestire Commerciante', 'Commerciante', 'merchants_VueJs');
-INSERT INTO `pages` (`main`, `subpage`, `link`) VALUES ('Ordini', 'Ordini', 'orders_VueJs');
+INSERT INTO `pages` (`main`, `subpage`, `link`, `nav_icon`) VALUES ('Gestire Utenti', 'Utenti', 'utente_VueJs', 'fas fa-user-tie nav-icon');
+INSERT INTO `pages` (`main`, `subpage`, `link`, `nav_icon`) VALUES ('Gestire Utenti', 'Registro Accesso', 'registro_accesso_VueJs', 'fas fa-user-tie nav-icon');
+INSERT INTO `pages` (`main`, `subpage`, `link`, `nav_icon`) VALUES ('Gestire Utenti', 'Profile', 'profile_VueJs', 'fas fa-user-tie nav-icon');
+INSERT INTO `pages` (`main`, `subpage`, `link`, `nav_icon`) VALUES ('Gestire Commerciante', 'Commerciante', 'merchants_VueJs', 'fas fa-briefcase nav-icon');
+INSERT INTO `pages` (`main`, `subpage`, `link`, `nav_icon`) VALUES ('Ordini', 'Ordini', 'orders_VueJs', 'fas fa-box-open nav-icon');
 #
 INSERT INTO `access_profile` (`id_page`, `id_profile`, `access`) VALUES ('1', '1', '1');
 INSERT INTO `access_profile` (`id_page`, `id_profile`, `access`) VALUES ('2', '1', '1');

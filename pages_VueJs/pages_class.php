@@ -89,4 +89,25 @@ class pagesClass
 
         return $result;
     }
+
+    public function get_access_pages_by_id_profile()
+    {
+        try {
+            $query = $this->database->prepare("SELECT `pages`.`main`, `pages`.`subpage`, `pages`.`link`, `pages`.`nav_icon`
+            FROM `access_profile` 
+            LEFT JOIN `pages`
+            ON `access_profile`.`id_page` = `pages`.`id_page`
+            WHERE `id_profile` = :id_profile AND `access` = :access");
+            $query->bindValue(":id_profile", $this->id_profile);
+            $query->bindValue(":access", $this->access);
+            $query->execute();
+            $query->setFetchMode(PDO::FETCH_ASSOC);
+            $result = $query->fetchAll();
+        } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
+            error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
+        }
+
+        return $result;
+    }
 }

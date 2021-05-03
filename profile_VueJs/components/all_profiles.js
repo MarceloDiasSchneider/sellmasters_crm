@@ -42,11 +42,12 @@ app.component('all_profiles', {
                     url: "../profile/model.php",
                     data: { 'action': 'get_profiles' },
                     dataType: "json",
-                    async: false,
+                    async: true,
                     dataSrc: ""
                 },
                 columns: [
                     { title: "Descrizione", data: "descrizione" },
+                    { title: "Attivo", data: "attivo" },
                     { title: "Azione", data: "azione" }
                 ],
                 "responsive": true,
@@ -73,16 +74,17 @@ app.component('all_profiles', {
         },
         // toggle user to active or disabled
         toggle_user_active() {
-            $("#utenti").on("click", ".disable_user", function () {
+            let self = this
+            $("#profiles").on("click", ".disable_profile", function () {
                 // get the user id
-                var id_to_toggle = $(this).attr('id');
+                let id_to_toggle = $(this).attr('id');
                 // remove the prefix ut_ to get the id
                 id_to_toggle = id_to_toggle.replace(/^\D+/g, '');
                 const requestOptions = {
                     method: 'POST',
                     mode: 'same-origin',
                     headers: { 'content-type': 'application/json' },
-                    body: JSON.stringify({ 'action': 'toggle_user_active', 'id_utente': id_to_toggle })
+                    body: JSON.stringify({ 'action': 'toggle_profile_active', 'id_profile': id_to_toggle })
                 }
                 fetch('model.php', requestOptions)
                     // process the backend response
@@ -98,7 +100,7 @@ app.component('all_profiles', {
                                 // reporting an internal server error. ex: try catch
                                 toastr.success(data.message)
                                 // call datatables refresh
-                                app.component('all_users').methods.refresh_datatables()
+                                self.refresh_datatables()
                                 break
                             default:
                                 break;
@@ -116,7 +118,7 @@ app.component('all_profiles', {
         // call the datatables when Vue Js is ready
         this.get_all_profiles()
         // call the functions to active jQuery event listener
-        // this.toggle_user_active()
+        this.toggle_user_active()
         this.profile_edit()
     }
 })

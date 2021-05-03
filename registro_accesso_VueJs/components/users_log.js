@@ -44,7 +44,7 @@ app.component('users_log', {
                     url: "../registro_accesso/model.php",
                     data: { 'action': 'registri_accessi' },
                     dataType: "json",
-                    async: false,
+                    async: true,
                     dataSrc: ""
                 },
                 columns: [

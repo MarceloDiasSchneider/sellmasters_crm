@@ -4,8 +4,12 @@ app.component('sidebar', {
 			type: String,
 			requided: true
 		},
-		nav_link: {
-			type: String,
+		page_data: {
+			type: Object,
+			requided: true
+		},
+		menu_pages: {
+			type: Object,
 			requided: true
 		}
 	},
@@ -48,53 +52,22 @@ app.component('sidebar', {
 
 				<!-- Sidebar Menu -->
 				<nav class="mt-2">
-					<ul class="nav nav-pills nav-sidebar flex-column nav-flat nav-legacy" data-widget="treeview" role="menu"
-						data-accordion="false">
-						<!-- Add icons to the links using the .nav-icon class
-				with font-awesome or any other icon font library -->
-						<li class="nav-item menu-open ">
-							<a href="#" class="nav-link active">
-								<i class="nav-icon fas fa-tachometer-alt"></i>
+					<ul class="nav nav-pills nav-sidebar flex-column nav-flat nav-legacy" data-widget="treeview" role="menu" data-accordion="false">
+						<!-- Add icons to the links using the .nav-icon class with font-awesome or any other icon font library -->
+						<li class="nav-item" :class="[page_data.main == main[0].main ? 'menu-is-opening menu-open' : '' ]" v-for="main in menu_pages">
+							<a href="#" class="nav-link" :class="[page_data.main == main[0].main ? 'active' : '' ]">
+								<i :class="main[0].nav_icon" :id="main[0].subpage"></i> 
 								<p>
-									Dashboard
+									{{ main[0].main }}
 									<i class="right fas fa-angle-left"></i>
 								</p>
 							</a>
-							<ul class="nav nav-treeview ">
-								<li class="nav-item">
-									<a href="../utente_VueJs" class="nav-link" :class="[nav_link == 'utente_VueJs' ? 'active ' : '' ]">
-										<i class="fas fa-user-tie nav-icon" :class="[nav_link == 'utente_VueJs' ? 'text-warning' : '' ]"></i>
-										<p>Utenti</p>
-									</a>
-								</li>
-								<li class="nav-item">
-									<a href="../registro_accesso_VueJs/" class="nav-link" :class="[nav_link == 'registro_accesso_VueJs' ? 'active' : '' ]">
-										<i class="fas fa-table nav-icon" :class="[nav_link == 'registro_accesso_VueJs' ? 'text-warning' : '' ]"></i>
-										<p>Registri di accessi</p>
-									</a>
-								</li>
-								<li class="nav-item">
-									<a href="../merchants_VueJs" class="nav-link" :class="[nav_link == 'merchants_VueJs' ? 'active' : '' ]">
-										<i class="fas fa-briefcase nav-icon" :class="[nav_link == 'merchants_VueJs' ? 'text-warning' : '' ]"></i>
-										<p>Comerciantes</p>
-									</a>
-								</li>
-								<li class="nav-item">
-									<a href="../_curl_api" class="nav-link" :class="[nav_link == '_curl_api' ? 'active' : '' ]">
-										<i class="fas fa-network-wired nav-icon" :class="[nav_link == '_curl_api' ? 'text-warning' : '' ]"></i>
-										<p>Curl Api</p>
-									</a>
-								</li>
-								<li class="nav-item">
-									<a href="../profile_VueJs" class="nav-link" :class="[nav_link == 'profiles' ? 'active' : '' ]">
-										<i class="fas fa-tasks nav-icon" :class="[nav_link == 'profiles' ? 'text-warning' : '' ]"></i>
-										<p>Profilo di accesso</p>
-									</a>
-								</li>
-								<li class="nav-item">
-									<a href="../orders_VueJs" class="nav-link" :class="[nav_link == 'orders' ? 'active' : '' ]">
-										<i class="fas fa-box-open nav-icon" :class="[nav_link == 'orders' ? 'text-warning' : '' ]"></i>
-										<p>Ordini</p>
+							<ul class="nav nav-treeview" :style="[page_data.main == main[0].main ? 'display: block;' : 'display: none;']" v-for="subpage of main">
+								<li class="nav-item" :id="subpage.subpage">
+									<a :href="'../' + subpage.link" class="nav-link" :class="[page_data.subpage == subpage.link ? 'active ' : '' ]">
+										<i :class="[page_data.subpage == subpage.link ? 'far fa-dot-circle nav-icon text-warning' : 'far fa-circle nav-icon' ]" :for="subpage.subpage">
+										</i>
+										<p :for="subpage.subpage">{{ subpage.subpage }}</p>
 									</a>
 								</li>
 							</ul>
@@ -708,5 +681,4 @@ app.component('sidebar', {
 			</div>
 			<!-- /.sidebar -->
 		</aside>`,
-
 })

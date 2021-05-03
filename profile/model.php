@@ -24,22 +24,22 @@ switch ($action) {
                 $title = $value['attivo'] ? 'disabilitare' : 'attivare';
                 foreach ($value as $k => $v) {
                     if ($k == 'id_profile') {
-                        $poste['azione'] = "
+                        $profileData['azione'] = "
                              <span class='update_profile' id='lv_$v'><i class='fas fa-edit' title='modificare'></i></span> 
                              <span class='disable_profile' id='lv_$v'><i class='$fa_lock' title='$title'></i></span>";
                     } else if ($k == 'attivo') {
                         if ($v == 1) {
-                            $poste[$k] = 'Sì';
+                            $profileData[$k] = 'Sì';
                         } else {
-                            $poste[$k] = 'No';
+                            $profileData[$k] = 'No';
                         }
                     } else if ($k == 'id_profile') {
-                        $poste[$k] = $descrizioni[$v];
+                        $profileData[$k] = $descrizioni[$v];
                     } else {
-                        $poste[$k] = $v;
+                        $profileData[$k] = $v;
                     }
                 }
-                $data[] = $poste;
+                $data[] = $profileData;
             }
         }
         echo json_encode($data);

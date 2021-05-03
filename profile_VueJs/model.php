@@ -38,6 +38,7 @@ switch ($requestBody['action']) {
             case null: // insert new profile
                 // set the value to the description
                 $profile->descrizione = $requestBody['description'];
+                $profile->attivo = $requestBody['active'];
                 // check if this description is already used
                 $description = $profile->check_description();
                 if (isset($description['catchError'])) {
@@ -153,6 +154,11 @@ switch ($requestBody['action']) {
         } else {
             // call a method in pages_VueJs/model.php 
             include_once('../pages_VueJs/model.php');
+            // report profile registred successfully
+            $data['code'] = '200';
+            $data['state'] = 'Success';
+            $data['message'] = 'profile pronto per essere aggiornato';
+            $data['profile'] = $profile['descrizione'];
         }
         echo json_encode($data);
         break;   
@@ -166,9 +172,10 @@ switch ($requestBody['action']) {
             $data['state'] = 'Internal Server Error';
             $data['message'] = $pages['catchError'];
         } else {
-            $data['pages'] = $pages;
             $data['code'] = '200';
-            $data['id'] = $requestBody['id_profile'];
+            $data['state'] = 'Success';
+            $data['message'] = 'All pages found';
+            $data['pages'] = $pages;
         }
 
         echo json_encode($data);
@@ -186,6 +193,39 @@ switch ($requestBody['action']) {
         // devo ir para access_profile
         // pego as paginas e retono a autenticazione/model.php
         $permissione = $profile->get_utente_profile();
+        break;
+    case "toggle_profile_active":
+        // get profile id from the session
+        $profile->id_profile = $requestBody['id_profile'];
+        // get the profile attivo value
+        $attivo = $profile->get_profile_attivo();
+        if (isset($attivo['catchError'])) {
+            // report a try catch error
+            $data['code'] = '500';
+            $data['state'] = 'Internal Server Error';
+            $data['message'] = $attivo['catchError'];
+        } else {
+            // set the profile attivo value
+            $profile->attivo = $attivo['attivo'];
+            // toggle the value into database
+            $result = $profile->toggle_profile_attivo();
+            if (isset($result['catchError'])) {
+                // report a try catch error
+                $data['code'] = '500';
+                $data['state'] = 'Internal Server Error';
+                $data['message'] = $result['catchError'];
+            } else {
+                // report the success message
+                if ($profile->attivo) {
+                    $data['message'] = "L'profilo è disabilitato";
+                } else {
+                    $data['message'] = "L'profilo è attivo";
+                }
+                $data['state'] = 'Success';
+                $data['code'] = '200';
+            }
+        }
+        echo json_encode($data);
         break;
 
     default:

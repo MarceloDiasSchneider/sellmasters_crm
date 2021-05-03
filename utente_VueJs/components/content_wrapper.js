@@ -45,7 +45,7 @@ app.component('content_wrapper', {
         },
         // send to the main js which page must appear as active on sidebar
         send_page(){
-            this.$emit('page', 'utente_VueJs')
+            this.$emit('page', 'Gestire Utenti', 'utente_VueJs')
         }
     },
     beforeMount() {

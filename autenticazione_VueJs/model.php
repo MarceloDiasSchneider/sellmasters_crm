@@ -248,6 +248,9 @@ switch ($action) {
             $data['message'] = 'La sessione non è attiva, fa l\'accesso un\'altra volta';
             $data['url'] = '../autenticazione_VueJs';
         } else {
+            // get pages to set the menu
+            include_once('../pages_VueJs/model.php');
+            
             $data['code'] = '200';
             $data['state'] = 'Success';
             $data['message'] = 'Session is defined';

@@ -18,7 +18,6 @@ app.component('profile', {
                     </div>
                     </div>
                     <div class="card-body">
-                        <button type="button" @click="log">LOG</button>
                         <form action="#" id="description" @submit.prevent="insert_or_update_profile">
                             <div class="row">
                                 <div class="col-md-4">
@@ -42,7 +41,7 @@ app.component('profile', {
                                     </div>
                                 </div>
                             </div>
-                            <input type="hidden" id="attivo" name="attivo" v-model="attivo">
+                            <input type="hidden" id="active" name="active" v-model="active">
                             <input v-if="id_profile" type="hidden" id="id_utente" name="id_utente" :value="id_profile">
                             <input type="hidden" id="codiceSessione" name="codiceSessione" :value="codice_sessione">
 
@@ -69,7 +68,7 @@ app.component('profile', {
             // variable to bind the form
             id_profile: null,
             description: null,
-            attivo: 1,
+            active: 1,
             // variable to hold al pages and children pages
             mainPages: [],
             // variable to control the loading card
@@ -87,6 +86,7 @@ app.component('profile', {
                 body: JSON.stringify({ 
                     'action': 'insert_or_update_profile', 
                     'id_profile': this.id_profile,
+                    'active': this.active,
                     'description': this.description,
                     'checked_pages': this.mainPages,
                     'codiceSessione': this.codice_sessione 
@@ -197,7 +197,7 @@ app.component('profile', {
                 method: 'POST',
                 mode: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 'action': 'pages_permission', 'id_profile': this.id_profile })
+                body: JSON.stringify({ 'action': 'pages_permission'})
             };
             fetch('model.php', requestOptions)
                 // process the backend response
@@ -233,9 +233,6 @@ app.component('profile', {
                 pages.forEach(page => page.checked = false)
             }
         },
-        log(){
-            console.log(this.mainPages);
-        }
     },
     computed: {
         pages() {

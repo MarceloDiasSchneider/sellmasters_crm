@@ -20,7 +20,7 @@ $page = new pagesClass();
 
 switch ($requestBody['action']) {
     // this class is called from profile_VueJs/model.php to get all pages to create or update a profile
-    case 'pages_permission': 
+    case 'pages_permission':
         // create the variable pages with all pages
         $pages = $page->get_pages();
         break;
@@ -69,19 +69,19 @@ switch ($requestBody['action']) {
                 } else {
                     $checked_pages = $requestBody['checked_pages'];
                     // create an array only with the registered pages id
+                    $registered_ids = [];
                     foreach ($registered_pages as $key => $registered_page) {
                         $registered_ids[] = $registered_page['id_page'];
                     }
                     // create an array only with the checked pages id
+                    $checked_ids = [];
                     foreach ($checked_pages as $key => $checked_page) {
                         $checked_ids[] = $checked_page['idPage'];
                     }
                     // compare the arrays and update the pages already registered
-                    if(isset($checked_ids)){
-                        $to_update = array_intersect($checked_ids, $registered_ids);
-                    }
+                    $to_update = array_intersect($checked_ids, $registered_ids);
                     foreach ($to_update as $key => $value) {
-                        $page->id_page = $checked_pages[$key]['idPage']; 
+                        $page->id_page = $checked_pages[$key]['idPage'];
                         $page->access = $checked_pages[$key]['checked'];
                         $updated_page = $page->update_page_access();
                         if (isset($updated_page['catchError'])) {
@@ -92,14 +92,12 @@ switch ($requestBody['action']) {
 
                             echo json_encode($data);
                             exit;
-                        } elseif ($updated_page) {
-                            # code.. 
                         }
                     }
                     // compare the arrays and insert the pages not registered
                     $to_insert = array_diff($checked_ids, $registered_ids);
                     foreach ($to_insert as $key => $value) {
-                        $page->id_page = $checked_pages[$key]['idPage']; 
+                        $page->id_page = $checked_pages[$key]['idPage'];
                         $page->access = $checked_pages[$key]['checked'];
                         $inserted_page = $page->insert_page_access();
                         if (isset($inserted_page['catchError'])) {
@@ -110,11 +108,10 @@ switch ($requestBody['action']) {
 
                             echo json_encode($data);
                             exit;
-                        } elseif ($inserted_page) {
-                            # code.. 
                         }
                     }
-                    
+
+                    $data['to_update'] = array_intersect($checked_ids, $registered_ids);
                     $data['to_update'] = array_intersect($checked_ids, $registered_ids);
                     $data['to_insert'] = array_diff($checked_ids, $registered_ids);
                     $data['registered_ids'] = $registered_ids;
@@ -133,6 +130,7 @@ switch ($requestBody['action']) {
 
         break;
 
+        // this class is called from autenticazione_VueJs/model.php 
     case 'get_profile_data':
         $page->id_profile = $requestBody['id_profile'];
         $pages = $page->get_pages_by_id_profile();
@@ -141,12 +139,31 @@ switch ($requestBody['action']) {
             $data['code'] = '500';
             $data['state'] = 'Internal Server Error';
             $data['message'] = $pages['catchError'];
+
+            echo json_encode($data);
+            exit;
         } else {
-            // report profile registred successfully
-            $data['code'] = '200';
-            $data['state'] = 'Success';
-            $data['message'] = 'profile pronto per essere aggiornato';
-            $data['profile'] = $profile['descrizione'];
+            // set the array data with the pages 
+            $data['pages'] = $pages;
+        }
+
+        break;
+
+        // this class is called from profile_VueJs/model.php
+    case 'get_session':
+        $page->id_profile = $_SESSION['id_profile'];
+        $page->access = 1;
+        $pages = $page->get_access_pages_by_id_profile();
+        if (isset($pages['catchError'])) {
+            // report a try catch error
+            $data['code'] = '500';
+            $data['state'] = 'Internal Server Error';
+            $data['message'] = $pages['catchError'];
+
+            echo json_encode($data);
+            exit;
+        } else {
+            // set the array data with the pages 
             $data['pages'] = $pages;
         }
 

@@ -45,7 +45,7 @@ app.component('all_merchants', {
                     url: "../merchants/model.php",
                     data: { 'action': 'get_merchants' },
                     dataType: "json",
-                    async: false,
+                    async: true,
                     dataSrc: ""
                 },
                 columns: [

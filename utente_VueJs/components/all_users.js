@@ -46,7 +46,7 @@ app.component('all_users', {
                     url: "../utente/model.php",
                     data: { 'action': 'get_utenti' },
                     dataType: "json",
-                    async: false,
+                    async: true,
                     dataSrc: ""
                 },
                 columns: [

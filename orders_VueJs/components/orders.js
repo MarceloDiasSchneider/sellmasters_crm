@@ -21,7 +21,7 @@ app.component('orders', {
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="start_date">Data inizio</label>
-                                        <input type="date" class="form-control" id="start_date" name="start_date" v-model="startDate" :max="endDate">
+                                        <input type="date" class="form-control" id="start_date" name="start_date" v-model="startDate">
                                     </div>
                                 </div>
                                 <div class="col-md-4">
@@ -180,7 +180,7 @@ app.component('orders', {
                         }
                     },
                     dataType: "json",
-                    async: false,
+                    async: true,
                     dataSrc: ""
                 },
                 searchPanes: {

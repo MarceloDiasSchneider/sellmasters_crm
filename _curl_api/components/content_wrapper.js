@@ -1,4 +1,9 @@
 app.component('content_wrapper', {
+    props: {
+		codice_sessione: {
+			type: String
+		}
+	},
     template:
         /*html*/
         `<!-- Content Wrapper. Contains page content -->
@@ -46,7 +51,7 @@ app.component('content_wrapper', {
             // console.log(this.$refs);
         },
         send_page(){
-            this.$emit('page', '_curl_api')
+            this.$emit('page', 'Curl Api', '_curl_api')
         }
     },
     beforeMount() {

@@ -43,7 +43,7 @@ app.component('content_wrapper', {
     methods: {
         // send to the main js which page must appear as active on sidebar
         send_page(){
-            this.$emit('page', 'orders')
+            this.$emit('page', 'Gestire Ordini', 'orders_VueJs')
         }
     },
     beforeMount() {

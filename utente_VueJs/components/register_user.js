@@ -153,6 +153,7 @@ app.component('register_user', {
                             break;
                         case '200':
                             // format the data to show the selct options
+                            console.log(data);
                             data.profiles.forEach(profile => {
                                 this.select_option.push({ id: profile.id_profile, description: profile.descrizione })
                             });

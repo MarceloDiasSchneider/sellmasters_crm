@@ -45,6 +45,7 @@ class utenteClass
 
     public function update_user_no_password()
     {
+        // update the user without the password
         try {
             $query = $this->database->prepare("UPDATE `utenti` 
                 SET `nome` = :nome, `cognome` = :cognome, `email` = :email, `codice_fiscale` = :codice_fiscale, `telefono` = :telefono, `data_nascita` = :data_nascita, `id_profile` = :profile 
@@ -68,6 +69,7 @@ class utenteClass
     }
     public function update_user_with_password()
     {
+        // update the user with the password
         try {
             $query = $this->database->prepare("UPDATE `utenti` 
                 SET `nome` = :nome, `cognome` = :cognome, `email` = :email, `codice_fiscale` = :codice_fiscale, `telefono` = :telefono, `data_nascita` = :data_nascita, `id_profile` = :profile, `password` = :password 
@@ -93,6 +95,7 @@ class utenteClass
 
     public function check_email()
     {
+        // check if the email is already registered 
         try {
             $query = $this->database->prepare("SELECT email FROM `utenti` WHERE email = :email");
             $query->bindValue(":email", $this->email);
@@ -110,6 +113,7 @@ class utenteClass
     public function insert_user()
     {
         try {
+            // insert a new user
             $query = $this->database->prepare("INSERT INTO `utenti` (`nome`, `cognome`, `email`, `codice_fiscale`, `telefono`, `data_nascita`, `password`, `id_profile`, `attivo`) 
             VALUES (:nome, :cognome, :email, :codice_fiscale, :telefono, :data_nascita, :password, :profile, :attivo) ");
             $query->bindValue(":nome", $this->nome);
@@ -134,7 +138,7 @@ class utenteClass
 
     public function get_all_users()
     {
-        // cerca tutti gli utenti
+        // get all users
         try {
             $query = $this->database->prepare("SELECT id_utente, nome, cognome, email, codice_fiscale, telefono, data_nascita, id_profile, attivo  FROM `utenti`");
             $query->execute();
@@ -150,6 +154,7 @@ class utenteClass
 
     public function get_user_data()
     {
+        // get the user data
         try {
             $query = $this->database->prepare("SELECT `nome`, `cognome`, `email`, `codice_fiscale`, `data_nascita`, `telefono`, `id_profile` FROM `utenti` WHERE id_utente = :id_utente");
             $query->bindValue(":id_utente", $this->id_utente);
@@ -165,7 +170,7 @@ class utenteClass
 
     public function get_user_attivo()
     {
-        // controlla se l'utente è attivo 
+        // get the user active
         try {
             $query = $this->database->prepare("SELECT attivo FROM `utenti` WHERE id_utente = :id_utente");
             $query->bindValue(":id_utente", $this->id_utente);
@@ -180,6 +185,7 @@ class utenteClass
     }
     public function toggle_user_attivo()
     {
+        // toggle the user active
         try {
             $query = $this->database->prepare("UPDATE `utenti` SET attivo = :attivo WHERE id_utente = :id_utente");
             $query->bindValue(":attivo", !$this->attivo);

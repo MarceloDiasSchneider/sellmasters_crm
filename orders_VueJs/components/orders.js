@@ -113,7 +113,7 @@ app.component('orders', {
                 method: 'POST',
                 mode: 'same-origin',
                 headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ 'action': 'get_merchants' })
+                body: JSON.stringify({ 'action': 'get_merchants_active' })
             }
             fetch('model.php', requestOptions)
                 // process the backend response
@@ -170,14 +170,15 @@ app.component('orders', {
                 // P search panes Q custom search
                 "dom": 'l<"row mb-2"<"col-sm-12 col-md-8"B><"col-sm-12 col-md-4"f>><"row mb-2"<"col-sm-12"rt>><"row mb-2"<"col-sm-12 col-md-6"i><"col-sm-12 col-md-6"p>>RQ', 
                 'ajax': {
-                    type: "GET",
+                    type: "POST",
                     url: "orders_manipulator_class.php",
-                    data: function() {
-                        return {
+                    contentType: "application/json",
+                    data() {
+                        return JSON.stringify({
                             'startDate': self.startDate,
                             'endDate': self.endDate,
                             'merchant_id': self.merchants_id
-                        }
+                        })
                     },
                     dataType: "json",
                     async: true,
@@ -187,7 +188,10 @@ app.component('orders', {
                     cascadePanes: true
                 },
                 "pageLength": 10,
-                select: true,
+                select: {
+                    style:    'multi',
+                    selector: '.select-on'
+                },
                 // rowGroup: {
                 //     dataSrc: 'purchase_date',
                 // },
@@ -200,41 +204,41 @@ app.component('orders', {
                         "data": null,
                         "defaultContent": "<i class='fas fa-plus-square'></i>"
                     },
-                    { "title": "Order id", data: "order_id"},
-                    { "title": "Merchant id", data: "merchant_id" },
-                    { "title": "Purchase date", data: "purchase_date" },
-                    { "title": "Account id", data: "account_id" },
-                    { "title": "Market status", data: "market_status" },
-                    { "title": "Paese", data: "paese" },
-                    { "title": "Recipient name", data: "recipient_name" },
-                    { "title": "Currency", data: "currency" },
-                    { "title": "Item price", data: "item_price" },
-                    { "title": "Shipping price", data: "shipping_price" },
-                    { "title": "Item promotion discount", data: "item_promotion_discount" },
-                    { "title": "Total order", data: "total_order" },
-                    { "title": "Quantity purchased", data: "quantity_purchased" },
-                    { "title": "Sku", data: "sku" },
-                    { "title": "Manufacturer", data: "manufacturer" },
-                    { "title": "Category", data: "category" },
-                    { "title": "Marketplace", data: "marketplace" },
-                    { "title": "Weight", data: "weight" },
-                    { "title": "Fee people amazon it", data: "fee_people_amazon_it" },
-                    { "title": "Is business order", data: "is_business_order" },
-                    { "title": "Title", data: "title" },
-                    { "title": "Is prime", data: "isprime" },
-                    { "title": "Fulfillment channel", data: "fulfillment_channel" },
-                    { "title": "Group price", data: "group_price" },
-                    { "title": "Numberofitems shipped", data: "numberofitems_shipped" },
-                    { "title": "Numberofitems unshipped", data: "numberofitems_unshipped" },
-                    { "title": "Fee people amazon de", data: "fee_people_amazon_de" },
-                    { "title": "Fee people amazon es", data: "fee_people_amazon_es" },
-                    { "title": "Fee people amazon fr", data: "fee_people_amazon_fr" },
-                    { "title": "Fee people amazon uk", data: "fee_people_amazon_uk" },
-                    { "title": "Shipping tax", data: "shipping_tax" },
-                    { "title": "Commission by lengow", data: "commission_by_lengow" },
-                    { "title": "Tracking number", data: "tracking_number" },
-                    { "title": "Carrier", data: "carrier" },
-                    { "title": "Price", data: "price" },
+                    { "title": "Order id", data: "order_id", "className": "select-on"},
+                    { "title": "Merchant id", data: "merchant_id", "className": "select-on"},
+                    { "title": "Purchase date", data: "purchase_date", "className": "select-on"},
+                    { "title": "Account id", data: "account_id", "className": "select-on"},
+                    { "title": "Market status", data: "market_status", "className": "select-on"},
+                    { "title": "Paese", data: "paese", "className": "select-on"},
+                    { "title": "Recipient name", data: "recipient_name", "className": "select-on"},
+                    { "title": "Currency", data: "currency", "className": "select-on"},
+                    { "title": "Item price", data: "item_price", "className": "select-on"},
+                    { "title": "Shipping price", data: "shipping_price", "className": "select-on"},
+                    { "title": "Item promotion discount", data: "item_promotion_discount", "className": "select-on"},
+                    { "title": "Total order", data: "total_order", "className": "select-on"},
+                    { "title": "Quantity purchased", data: "quantity_purchased", "className": "select-on"},
+                    { "title": "Sku", data: "sku", "className": "select-on"},
+                    { "title": "Manufacturer", data: "manufacturer", "className": "select-on"},
+                    { "title": "Category", data: "category", "className": "select-on"},
+                    { "title": "Marketplace", data: "marketplace", "className": "select-on"},
+                    { "title": "Weight", data: "weight", "className": "select-on"},
+                    { "title": "Fee people amazon it", data: "fee_people_amazon_it", "className": "select-on"},
+                    { "title": "Is business order", data: "is_business_order", "className": "select-on"},
+                    { "title": "Title", data: "title", "className": "select-on"},
+                    { "title": "Is prime", data: "isprime", "className": "select-on"},
+                    { "title": "Fulfillment channel", data: "fulfillment_channel", "className": "select-on"},
+                    { "title": "Group price", data: "group_price", "className": "select-on"},
+                    { "title": "Numberofitems shipped", data: "numberofitems_shipped", "className": "select-on"},
+                    { "title": "Numberofitems unshipped", data: "numberofitems_unshipped", "className": "select-on"},
+                    { "title": "Fee people amazon de", data: "fee_people_amazon_de", "className": "select-on"},
+                    { "title": "Fee people amazon es", data: "fee_people_amazon_es", "className": "select-on"},
+                    { "title": "Fee people amazon fr", data: "fee_people_amazon_fr", "className": "select-on"},
+                    { "title": "Fee people amazon uk", data: "fee_people_amazon_uk", "className": "select-on"},
+                    { "title": "Shipping tax", data: "shipping_tax", "className": "select-on"},
+                    { "title": "Commission by lengow", data: "commission_by_lengow", "className": "select-on"},
+                    { "title": "Tracking number", data: "tracking_number", "className": "select-on"},
+                    { "title": "Carrier", data: "carrier", "className": "select-on"},
+                    { "title": "Price", data: "price", "className": "select-on"},
                     // { "title": "Dati finanziari", data: "dati_finanziari" },
                 ],
                 "order": [[ 3, "desc" ]],

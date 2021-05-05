@@ -25,25 +25,26 @@ const app = Vue.createApp({
                 .then(async response => {
                     const data = await response.json()
                     switch (data.code) {
-                        case '500':
+                        case 500:
                             // reporting an internal server error. ex: try catch
                             alert(data.state)
                             console.log(data.message)
                             break;
-                        case '204':
-                            // show an aleter to the user and redirect to login page
+                        case 406:
+                            // redirect the page to new authentication
                             document.location.href = data.url;
                             break;
-                        case '200':
+                        case 200:
                             // set all data session to variables
                             this.codice_sessione = data.codiceSessione
                             this.id_utente = data.id_utente
                             this.nome = data.nome
                             this.data = data.data
-                            this.id_profile = data.id_profile
-                            this.menu_pages = _.groupBy(data.pages , "main");
+                            this.menu_pages = _.groupBy(data.accessPages , "main");
                             break;
                         default:
+                            // redirect the page to new authentication
+                            document.location.href = '../autenticazione_VueJs';
                             break;
                     }
                 })

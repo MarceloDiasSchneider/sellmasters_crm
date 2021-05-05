@@ -41,8 +41,11 @@ app.component('users_log', {
             $("#registri_accessi").DataTable({
                 'ajax': {
                     type: "POST",
-                    url: "../registro_accesso/model.php",
-                    data: { 'action': 'registri_accessi' },
+                    url: "model.php",
+                    contentType: "application/json",
+                    data() {
+                        return JSON.stringify({ 'action': 'registri_accessi' });
+                    },
                     dataType: "json",
                     async: true,
                     dataSrc: ""

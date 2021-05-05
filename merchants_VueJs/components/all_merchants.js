@@ -42,8 +42,11 @@ app.component('all_merchants', {
             $("#merchants").DataTable({
                 'ajax': {
                     type: "POST",
-                    url: "../merchants/model.php",
-                    data: { 'action': 'get_merchants' },
+                    url: "model.php",
+                    contentType: "application/json",
+                    data(){
+                        return JSON.stringify({ 'action': 'get_merchants' })
+                    },
                     dataType: "json",
                     async: true,
                     dataSrc: ""
@@ -70,7 +73,7 @@ app.component('all_merchants', {
                 "lengthChange": false,
                 "autoWidth": false,
                 "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-            }).buttons().container().appendTo('#utenti_wrapper .col-md-6:eq(0)');
+            }).buttons().container().appendTo('#merchants_wrapper .col-md-6:eq(0)');
         },
         // refresh the datatables
         refresh_datatables() {
@@ -78,19 +81,19 @@ app.component('all_merchants', {
         },
         // call method get user data from component register user
         user_edit() {
-            // set the variable proxy to use Vue Js in jQuery
-            let proxy = this
+            // set the variable self to use Vue Js in jQuery
+            let self = this
             $('#merchants').on('click', '.update', function () {
                 let id = $(this).attr('id');
                 // get the user's id
                 id = Number(id.replace(/^\D+/g, ''));
                 // call a method get user data from component register user
-                proxy.$emit('merchant_data', id)
+                self.$emit('merchant_data', id)
             });
         },
         // toggle to active or disabled
         toggle_active_desable_merchant() {
-            let proxy = this
+            let self = this
             $("#merchants").on("click", ".able_disable", function () {
                 // get the merchant id
                 let id_to_toggle = $(this).attr('id');
@@ -107,17 +110,18 @@ app.component('all_merchants', {
                     .then(async response => {
                         const data = await response.json()
                         switch (data.code) {
-                            case '500':
+                            case 500:
                                 // reporting an internal server error. ex: try catch
                                 alert(data.state)
                                 console.log(data.message);
                                 break;
-                            case '200':
+                            case 200:
                                 // show a success message. ex: merchant updated
                                 toastr.success(data.message)
-                                proxy.refresh_datatables()
+                                self.refresh_datatables()
                                 break;
                             default:
+                                break;
                         }
                     })
                     // report an error if there is

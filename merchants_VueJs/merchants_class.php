@@ -145,6 +145,25 @@ class merchantsClass
         return $result;
     }
 
+    public function get_merchants_active()
+    {
+        // get all merchants
+        try {
+            $query = $this->database->prepare("SELECT `id`,`nome`, `merchant_id` 
+            FROM `merchants`
+            WHERE `attivo` = :attivo
+            ");
+            $query->bindValue(":attivo", $this->attivo);
+            $query->execute();
+            $result = $query->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
+            error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
+        }
+
+        return $result;
+    }
+
     public function get_merchant_data()
     {
         try {
@@ -164,10 +183,10 @@ class merchantsClass
     {
         // get the merchant attivo value 
         try {
-            $query = $this->database->prepare("SELECT attivo FROM `merchants` WHERE id = :id");
+            $query = $this->database->prepare("SELECT attivo, nome FROM `merchants` WHERE id = :id");
             $query->bindValue(":id", $this->id);
             $query->execute();
-            $result = $query->fetchColumn(0);
+            $result = $query->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");

@@ -128,19 +128,44 @@ switch ($requestBody['action']) {
     case "get_profiles":
         // get profile to set option on the form | called from utente/model.php
         $profiles = $profile->get_profiles();
-        if (isset($profiles['catchError'])) {
-            // report a try catch error
-            $data['code'] = '500';
+        if (isset($profiles['catchError'])){
+            $data['code'] = '500'; 
             $data['state'] = 'Internal Server Error';
             $data['message'] = $profiles['catchError'];
         } else {
-            // return the data
-            $data['code'] = '200';
-            $data['state'] = 'Success';
-            $data['message'] = 'All options was found';
-            $data['profiles'] = $profiles;
+            foreach ($profiles as $key => $value) {
+                $fa_lock = $value['attivo'] ? 'fas fa-lock-open' : 'fas fa-lock';
+                $title = $value['attivo'] ? 'disabilitare' : 'attivare';
+                foreach ($value as $k => $v) {
+                    if ($k == 'id_profile') {
+                        $profileData['azione'] = "
+                             <span class='update_profile' id='lv_$v'><i class='fas fa-edit' title='modificare'></i></span> 
+                             <span class='disable_profile' id='lv_$v'><i class='$fa_lock' title='$title'></i></span>";
+                    } else if ($k == 'attivo') {
+                        if ($v == 1) {
+                            $profileData[$k] = 'Sì';
+                        } else {
+                            $profileData[$k] = 'No';
+                        }
+                    } else if ($k == 'id_profile') {
+                        $profileData[$k] = $descrizioni[$v];
+                    } else {
+                        $profileData[$k] = $v;
+                    }
+                }
+                $data[] = $profileData;
+            }
         }
         echo json_encode($data);
+
+        break;
+
+    case "get_profiles_active":
+        // set the attivo
+        $profile->attivo = 1;
+        // get profile to set option on the form | called from utente/model.php
+        $profiles = $profile->get_profiles_active();
+        
         break;
 
     case "get_profile_data":
@@ -188,11 +213,9 @@ switch ($requestBody['action']) {
         break;
 
     case "autenticazione":
-        // this class is called from autenticazione/model.php to verify if the user has permission
+        // this method is called from autenticazione/model.php to check if the user's profile is active
         $profile->id_profile = $autenticazione->id_profile;
-        // devo ir para access_profile
-        // pego as paginas e retono a autenticazione/model.php
-        $permissione = $profile->get_utente_profile();
+        $profileActive = $profile->get_utente_profile();
         break;
     case "toggle_profile_active":
         // get profile id from the session

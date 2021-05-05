@@ -201,37 +201,34 @@ app.component('register_merchant', {
                     .then(async response => {
                         const data = await response.json()
                         switch (data.code) {
-                            case '500':
+                            case 500:
                                 // reporting an internal server error. ex: try catch
                                 alert(data.state)
                                 console.log(data.message);
                                 break;
-                            case '409':
-                                // reporting already inserted data. ex: nome and merchants already used
+                            case 406:
+                                // reporting a forbidden request. ex: session code doesn't match
+                                alert(data.message)
+                                document.location.href = '../autenticazione_VueJs';
+                                break;
+                            case 401:
+                                // reporting an unauthorized error. ex: merchant already registered
                                 toastr.warning(data.message)
                                 break;
-                            case '406':
-                                // reporting already inserted data. ex: update is the same as in database
-                                toastr.warning(data.message)
-                                break;
-                            case '401':
-                                // reporting an unauthorized error. ex: session code doesn't match 
-                                alert(data.state)
-                                console.log(data.message);
-                                break;
-                            case '201':
+                            case 201:
                                 // show a success message. ex: merchant inserted
                                 toastr.success(data.message)
                                 this.$emit('refresh_datatables')
                                 this.reset_form()
                                 break;
-                            case '200':
+                            case 200:
                                 // show a success message. ex: merchant updated
                                 toastr.success(data.message)
                                 this.$emit('refresh_datatables')
                                 this.reset_form()
                                 break;
                             default:
+                                break;
                         }
                         this.loading = false
                     })
@@ -260,12 +257,16 @@ app.component('register_merchant', {
                 .then(async response => {
                     const data = await response.json();
                     switch (data.code) {
-                        case '500':
+                        case 500:
                             // reporting an internal server error. ex: try catch
                             alert(data.state)
                             console.log(data.message)
                             break;
-                        case '200':
+                        case 400:
+                            // report a bad request. ex: merchant not found
+                            toastr.error(data.message)
+                            break;
+                        case 200:
                             // reporting a success message
                             toastr.success(data.message)
                             // set the value to the inputs

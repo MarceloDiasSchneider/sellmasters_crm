@@ -1,18 +1,19 @@
 <?php
 
-if (isset($_SERVER['REQUEST_METHOD'])) {
-    // get resquet body data  
-    if (!isset($requestBody)) {
-        $requestBody = json_decode(file_get_contents('php://input'), true);
-    }
-} else {
-    // report an error if there is no request method
-    $data['code'] = '406';
-    $data['state'] = 'Not Acceptable';
-    $data['message'] = 'Request method not defined';
+include_once('../common_VueJs/reportException.php');
 
-    echo json_encode($data);
-    exit;
+// check if the request method is setted
+try {
+    if (isset($_SERVER['REQUEST_METHOD'])) {
+        // get resquet body data  
+        if (!isset($requestBody)) {
+            $requestBody = json_decode(file_get_contents('php://input'), true);
+        }
+    } else {
+        throw new reportException('Request method not defined', 406);
+    }
+} catch (reportException $e) {
+    $e->reportError();
 }
 
 include_once('utente_class.php');
@@ -20,36 +21,29 @@ $utente = new utenteClass();
 
 switch ($requestBody['action']) {
     case 'insert_or_update_user':
-        // get the code session to verify if is the same 
-        $form = $requestBody['codiceSessione'];
-        $session = $_SESSION['codiceSessione'];
-
-        // if the code session does not match, unauthorized the insert or update
-        if ($form != $session) {
-            $data['state'] = 'Unauthorized';
-            $data['code'] = '406';
-            $data['message'] = 'Session code doesn\'t match';
-
-            echo json_encode($data);
-            exit;
+        try { // get the session code to check if match
+            $form = $requestBody['codiceSessione'];
+            $session = $_SESSION['codiceSessione'];
+            // if the session code doesn't match throw a exception
+            if ($form != $session) {
+                throw new reportException('Session code doesn\'t match', 406);
+            }
+        } catch (reportException $e) {
+            $e->reportError();
+        }
+        
+        try { // check if the passwords match 
+            if ($requestBody['password'] != $requestBody['verificaPassword']) {
+                throw new reportException('Le password non corrispondono', 401);
+            }
+        } catch (reportException $e) {
+            $e->reportError();
         }
 
-        // check if the password is not blank
-        if ($requestBody['password'] != $requestBody['verificaPassword']) {
-            $data['code'] = '401';
-            $data['state'] = 'Unauthorized';
-            $data['message'] = 'Le password non corrispondono';
-
-            echo json_encode($data);
-            exit;
-        }
-        // Check if it's have an ID to perform an update instead of insert 
+        // check if it's have an ID to perform an update instead of insert 
         switch ($requestBody['user_id']) {
-            case null: //Inser a new user
-                // Set the value to the variables class
-                // Use an authentication method to encrypt the password. 
-                include_once('../autenticazione_VueJs/model.php');
-                $utente->password = $autenticazione->password;
+            case null: // insert a new user
+                // set the value to the variables class
                 $utente->nome = $requestBody['nome'];
                 $utente->cognome = $requestBody['cognome'];
                 $utente->email = $requestBody['email'];
@@ -58,46 +52,40 @@ switch ($requestBody['action']) {
                 $utente->data_nascita = $requestBody['data_nascita'];
                 $utente->profile = $requestBody['profile'];
                 $utente->attivo = $requestBody['attivo'];
-                // check if email is already registered
-                $email = $utente->check_email();
-                if (isset($email['catchError'])) {
-                    // report a try catch error
-                    $data['code'] = '500';
-                    $data['state'] = 'Internal Server Error';
-                    $data['message'] = $email['catchError'];
-                } else if (isset($email['email'])) {
-                    // report that the email is already used
-                    $data['code'] = '401';
-                    $data['state'] = 'Unauthorized';
-                    $data['message'] = 'Email già registrato';
-                } else {
-                    $rows = $utente->insert_user();
-                    if (isset($rows['catchError'])) {
-                        // report a try catch error
-                        $data['code'] = '500';
-                        $data['state'] = 'Internal Server Error';
-                        $data['message'] = $rows['catchError'];
-                    } else if ($rows > 0) {
-                        // report user registred successfully
-                        $data['code'] = '201';
-                        $data['state'] = 'Success';
-                        $data['message'] = 'Nuovo utente registrato';
-                    } else {
-                        $data['code'] = '400';
-                        $data['state'] = 'Bad request';
-                        $data['message'] = 'Problema!! utente non registrato';
-                    }
-                }
-                echo json_encode($data);
-                break;
-
-            case true: // Update an user
-                // Set the value to the variables class
-                // Use an authentication method to encrypt the password. 
+                // use an authentication method to encrypt the password. 
                 include_once('../autenticazione_VueJs/model.php');
-                if ($requestBody['password'] != null) {
-                    $utente->password = $autenticazione->password;
+                $utente->password = $autenticazione->password;
+                try { 
+                    // check if email is already registered
+                    $email = $utente->check_email();
+                    if (isset($email['catchError'])) {
+                        // report a try catch error on database
+                        throw new reportException($email['catchError'], 500);
+                    } 
+                    if (isset($email['email'])) {
+                        // report that the email is already used
+                        throw new reportException('Email già registrato', 401);
+                    }
+                    $newUser = $utente->insert_user();
+                    if (isset($newUser['catchError'])) {
+                        // report a try catch error on database
+                        throw new reportException($newUser['catchError'], 500);
+                    } 
+                    if (!$newUser) {
+                        // report user is not registred
+                        throw new reportException('Problema! utente non registrato', 400);
+                    }
+                    // report user registred successfully
+                    $data['code'] = 201;
+                    $data['state'] = 'Success';
+                    $data['message'] = 'Nuovo utente registrato';
+                    echo json_encode($data);
+                } catch (reportException $e) {
+                    $e->reportError();
                 }
+                break;
+            case true: // update an user
+                // set the value to the variables class
                 $utente->id_utente = $requestBody['user_id'];
                 $utente->nome = $requestBody['nome'];
                 $utente->cognome = $requestBody['cognome'];
@@ -107,71 +95,72 @@ switch ($requestBody['action']) {
                 $utente->profile = $requestBody['profile'];
                 $utente->email = $requestBody['email'];
                 $utente->attivo = $requestBody['attivo'];
-                // check if the email is already used from another user
-                $email = $utente->check_email_other_user();
-                if (isset($email['catchError'])) {
-                    // report a try catch error
-                    $data['code'] = '500';
-                    $data['state'] = 'Internal Server Error';
-                    $data['message'] = $email['catchError'];
-                } else if (isset($email['email'])) {
-                    // report an error if the email has already been used from another user
-                    $data['state'] = 'Unauthorized';
-                    $data['code'] = '401';
-                    $data['message'] = 'Email già registrato per altro utente';
-                } else {
-                    // executer the update
-                    if ($requestBody['password'] != null) {
-                        $result = $utente->update_user_with_password();
-                        $data['password'] = 'true';
-                    } else {
-                        $result = $utente->update_user_no_password();
-                        $data['password'] = 'false';
-                    }
-                    $data['$result'] = $result;
-
-                    if (isset($result['catchError'])) {
-                        // report a try catch error
-                        $data['code'] = '500';
-                        $data['state'] = 'Internal Server Error';
-                        $data['message'] = $result['catchError'];
-                    } else if ($result > 0) {
-                        // check if the user was updated successfully
-                        $data['state'] = 'Success';
-                        $data['code'] = '200';
-                        $data['message'] = 'Utente aggiornato';
-                    } else {
-                        $data['code'] = '400';
-                        $data['state'] = 'Bad request';
-                        $data['message'] = 'Utente non aggiornato';
-                    }
+                // use an authentication method to encrypt the password. 
+                include_once('../autenticazione_VueJs/model.php');
+                if ($requestBody['password'] != null) {
+                    $utente->password = $autenticazione->password;
                 }
-                echo json_encode($data);
+                try {
+                    // check if the email is already used from another user
+                    $email = $utente->check_email_other_user();
+                    if (isset($email['catchError'])) {
+                        // report a try catch error on database
+                        throw new reportException($email['catchError'], 500);
+                    }
+                    if (isset($email['email'])) {
+                        // report an error if the email has already been used from another user
+                        throw new reportException('Email già registrato per altro utente', 401);
+                    } 
+                    // executer the update 
+                    if ($requestBody['password'] != null) {
+                        $userUpdated = $utente->update_user_with_password();
+                    } else {
+                        $userUpdated = $utente->update_user_no_password();
+                    }
+                    if (isset($userUpdated['catchError'])) {
+                        // report a try catch error on database
+                        throw new reportException($userUpdated['catchError'], 500);
+                    } 
+                    if (!$userUpdated) {
+                        // report user is not updated
+                        throw new reportException('Problema! utente non aggiornato', 400);
+                    }
+                    // check if the user was updated successfully
+                    $data['state'] = 'Success';
+                    $data['code'] = 200;
+                    $data['message'] = 'Utente aggiornato';
+                    echo json_encode($data);
+                } catch (reportException $e) {
+                    $e->reportError();
+                }
                 break;
 
             default:
-                # code...
+                try {
+                    throw new reportException('Problema nell\'identificazione dell\'utente', 400);
+                } catch (reportException $e) {
+                    $e->reportError();
+                }
                 break;
         }
-
         break;
     case 'get_all_users':
-        $utenti = $utente->get_all_users();
-
-        // get profile to show description on the datatables
-        include_once('../profile_VueJs/model.php');
-        if (isset($profiles['catchError'])) {
-            // check if an error occurred on try catch
-            $data['code'] = '500';
-            $data['state'] = 'error';
-            $data['message'] = $profiles['catchError'];
-
-            echo json_encode($data);
-        } else {
+        try {
+            $utenti = $utente->get_all_users();
+            if(isset($utenti['catchError'])){
+                // report a try catch error on database
+                throw new reportException($utenti['catchError'], 500);
+            }
+            // get profile to show description on the datatables
+            include_once('../profile_VueJs/model.php');
+            if(isset($profiles['catchError'])){
+                // report a try catch error on database
+                throw new reportException($profiles['catchError'], 500);
+            }
             foreach ($profiles as $key => $value) {
                 $descrizioni[$value['id_profile']] = $value['descrizione'];
             }
-            // prepare i dati per creare il json
+            // format the data to datatables
             $dati = array();
             $data = array();
             foreach ($utenti as $key => $value) {
@@ -180,9 +169,9 @@ switch ($requestBody['action']) {
                 foreach ($value as $k => $v) {
                     if ($k == 'id_utente') {
                         $data['azione'] = "
-                             <span class='update_user' id='ut_$v'><i class='fas fa-edit' title='modificare'></i></span> 
-                             <span class='disable_user' id='ut_$v'><i class='$fa_lock' title='$title'></i></span>";
-                    } else if ($k == 'data_nascita' && $v != '0000-00-00') {
+                            <span class='update_user' id='ut_$v'><i class='fas fa-edit' title='modificare'></i></span>
+                            <span class='disable_user' id='ut_$v'><i class='$fa_lock' title='$title'></i></span>";
+                    } else if ($k == 'data_nascita' && $v != '0000-00-00' && $v != null) {
                         $data[$k] = date('d/m/Y', strtotime($v));
                     } else if ($k == 'attivo') {
                         if ($v == 1) {
@@ -199,78 +188,92 @@ switch ($requestBody['action']) {
                 $dati[] = $data;
             }
             echo json_encode($dati);
+        } catch (reportException $e) {
+            $e->reportError();
         }
-
         break;
+
     case 'get_user_data':
-        // set the value to class variable
-        $utente->id_utente = $requestBody['id_utente'];
-        // call the class to get the data 
-        $result = $utente->get_user_data();
-        if (isset($result['catchError'])) {
-            // report a try catch error
-            $data['code'] = '500';
-            $data['state'] = 'Internal Server Error';
-            $data['message'] = $result['catchError'];
-        } else {
-            // prepare the data to return to front-end
-            foreach ($result as $key => $value) {
-                // format the date
+        try {
+            // set the user id
+            $utente->id_utente = $requestBody['id_utente'];
+            // get the user data
+            $userData = $utente->get_user_data();
+            if (isset($userData['catchError'])) {
+                // report a try catch error on database
+                throw new reportException($userData['catchError'], 500);
+            } 
+            // format the user data
+            foreach ($userData as $key => $value) {
                 if ($key == 'data_nascita') {
+                    // format the date
                     if ($value != '0000-00-00') {
                         $user[$key] = $value;
                     }
-                    // fill all value as null
                 } else if ($value != '' || $value != null) {
+                    // fill all value as null
                     $user[$key] = $value;
                 }
             }
-            $data['code'] = '200';
+            $data['code'] = 200;
             $data['state'] = 'Success';
             $data['message'] = 'Utente pronto per essere aggiornato';
             $data['user'] = $user;
+            echo json_encode($data);
+        } catch (reportException $e) {
+            $e->reportError();
         }
-        echo json_encode($data);
-
         break;
+
     case 'toggle_user_active':
-        // get user id from the session
-        $utente->id_utente = $requestBody['id_utente'];
-        // get the user attivo value
-        $attivo = $utente->get_user_attivo();
-        if (isset($attivo['catchError'])) {
-            // report a try catch error
-            $data['code'] = '500';
-            $data['state'] = 'Internal Server Error';
-            $data['message'] = $attivo['catchError'];
-        } else {
+        try {
+            // set the user id
+            $utente->id_utente = $requestBody['id_utente'];
+            // get the user attivo value
+            $attivo = $utente->get_user_attivo();
+            if (isset($attivo['catchError'])) {
+                // report a try catch error on database
+                throw new reportException($attivo['catchError'], 500);
+            }
             // set the user attivo value
             $utente->attivo = $attivo;
             // toggle the value into database
             $result = $utente->toggle_user_attivo();
             if (isset($result['catchError'])) {
-                // report a try catch error
-                $data['code'] = '500';
-                $data['state'] = 'Internal Server Error';
-                $data['message'] = $result['catchError'];
+                // report a try catch error on database
+                throw new reportException($result['catchError'], 500);
+            } 
+            // report the success message
+            if ($utente->attivo) {
+                $data['message'] = "L'utente è disabilitato";
             } else {
-                // report the success message
-                if ($utente->attivo) {
-                    $data['message'] = "L'utente è disabilitato";
-                } else {
-                    $data['message'] = "L'utente è attivo";
-                }
-                $data['state'] = 'Success';
-                $data['code'] = '200';
+                $data['message'] = "L'utente è attivo";
             }
+            $data['state'] = 'Success';
+            $data['code'] = 200;
+            echo json_encode($data);
+        } catch (reportException $e) {
+            $e->reportError();
         }
-
-        echo json_encode($data);
         break;
-    case 'get_profiles':
+
+    case 'get_profiles_active':
         // call a profile method return the options to the select
         include_once('../profile_VueJs/model.php');
-
+        try {
+            if (isset($profiles['catchError'])){
+                // report a try catch error on database
+                throw new reportException($profiles['catchError'], 500);
+            } 
+            // return the data
+            $data['code'] = 200;
+            $data['state'] = 'Success';
+            $data['message'] = 'All profiles active was found';
+            $data['profiles'] = $profiles;
+            echo json_encode($data);
+        } catch (reportException $e) {
+            $e->reportError();
+        }
         break;
     default:
         # code...

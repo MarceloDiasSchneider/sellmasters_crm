@@ -152,14 +152,33 @@ class profileClass
     public function get_profiles()
     {
         try {
-            $query = $this->database->prepare("SELECT `id_profile`, `descrizione` FROM `profiles`");
+            $query = $this->database->prepare("SELECT `id_profile`, `descrizione`, `attivo` FROM `profiles`");
             $query->execute();
+            $query->setFetchMode(PDO::FETCH_ASSOC);
             $result = $query->fetchAll();
         } catch (PDOException $e) {
-            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage() ;
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
+        
+        return $result;
+    }
 
+    public function get_profiles_active()
+    {
+        try {
+            $query = $this->database->prepare("SELECT `id_profile`, `descrizione` 
+                FROM `profiles`
+                WHERE `attivo` = :attivo");
+            $query->bindValue(":attivo", $this->attivo);
+            $query->execute();
+            $query->setFetchMode(PDO::FETCH_ASSOC);
+            $result = $query->fetchAll();
+        } catch (PDOException $e) {
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage() ;
+            error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
+        }
+        
         return $result;
     }
 
@@ -167,7 +186,7 @@ class profileClass
     {
         // cerca il profile del'utente 
         try {
-            $query = $this->database->prepare("SELECT id_profile FROM `profiles` WHERE `id_profile` = :id_profile");
+            $query = $this->database->prepare("SELECT `attivo` FROM `profiles` WHERE `id_profile` = :id_profile");
             $query->bindValue(":id_profile", $this->id_profile);
             $query->execute();
             $result = $query->fetch(PDO::FETCH_ASSOC);

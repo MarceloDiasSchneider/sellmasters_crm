@@ -19,14 +19,15 @@ include_once('pages_class.php');
 $page = new pagesClass();
 
 switch ($requestBody['action']) {
-    // this class is called from profile_VueJs/model.php to get all pages to create or update a profile
-    case 'pages_permission':
+    case 'pages_permission': 
+        // this method is called from profile_VueJs/model.php to get all pages to create or update a profile
         // create the variable pages with all pages
         $pages = $page->get_pages();
         break;
 
-    // this class is called from profile_VueJs/model.php create and bind all pages
-    case 'insert_or_update_profile':
+    
+    case 'insert_or_update_profile': 
+        // this method is called from profile_VueJs/model.php create and bind all pages
         switch ($requestBody['id_profile']) {
             case null:
                 // insert all pages
@@ -148,25 +149,11 @@ switch ($requestBody['action']) {
         }
 
         break;
-
-        // this class is called from profile_VueJs/model.php
-    case 'get_session':
-        $page->id_profile = $_SESSION['id_profile'];
+    case 'autenticazione': 
+        // this method is called from autunticazione/model.php
+        $page->id_profile = $autenticazione->id_profile;
         $page->access = 1;
-        $pages = $page->get_access_pages_by_id_profile();
-        if (isset($pages['catchError'])) {
-            // report a try catch error
-            $data['code'] = '500';
-            $data['state'] = 'Internal Server Error';
-            $data['message'] = $pages['catchError'];
-
-            echo json_encode($data);
-            exit;
-        } else {
-            // set the array data with the pages 
-            $data['pages'] = $pages;
-        }
-
+        $accessPages = $page->get_access_pages_by_id_profile();
         break;
 
     default:

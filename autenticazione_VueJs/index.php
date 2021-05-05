@@ -4,7 +4,7 @@
 <?php include_once('style_sheet.html'); ?>
 
 <body class="hold-transition login-page">
-	<div id="app">
+	<div id="app" class="login-box">
 		<login :login="login" @forgot-password-page="forgotPasswordPage"></login>
 		<forgot-password :forgot_password="forgot_password" @login-page="loginPage"></forgot-password>
 		<password-recovery :password_recovery="password_recovery" :email="email" :code="code" @login-page="loginPage"></password-recovery>

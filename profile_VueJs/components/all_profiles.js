@@ -39,8 +39,11 @@ app.component('all_profiles', {
             $("#profiles").DataTable({
                 'ajax': {
                     type: "POST",
-                    url: "../profile/model.php",
-                    data: { 'action': 'get_profiles' },
+                    url: "model.php",
+                    contentType: "application/json",
+                    data(){
+                        return JSON.stringify({ 'action': 'get_profiles' })
+                    },
                     dataType: "json",
                     async: true,
                     dataSrc: ""

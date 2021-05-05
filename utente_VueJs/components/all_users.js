@@ -43,8 +43,11 @@ app.component('all_users', {
             $("#utenti").DataTable({
                 'ajax': {
                     type: "POST",
-                    url: "../utente/model.php",
-                    data: { 'action': 'get_utenti' },
+                    url: "model.php",
+                    contentType: "application/json",
+                    data() {
+                        return JSON.stringify({"action":"get_all_users"});
+                    },
                     dataType: "json",
                     async: true,
                     dataSrc: ""
@@ -72,18 +75,20 @@ app.component('all_users', {
         },
         // call method get user data from component register user
         user_edit() {
-            // set the variable proxy to use Vue Js in jQuery
-            let proxy = this
+            // set the variable self to use Vue Js in jQuery
+            let self = this
             $('#utenti').on('click', '.update_user', function () {
                 let id_utente = $(this).attr('id');
                 // get the user's id
                 id_utente = Number(id_utente.replace(/^\D+/g, ''));
                 // call a method get user data from component register user
-                proxy.$emit('user_data', id_utente)
+                self.$emit('user_data', id_utente)
             });
         },
         // toggle user to active or disabled
         toggle_user_active() {
+            // set the variable self to use Vue Js in jQuery
+            let self = this
             $("#utenti").on("click", ".disable_user", function () {
                 // get the user id
                 var id_to_toggle = $(this).attr('id');
@@ -100,16 +105,16 @@ app.component('all_users', {
                     .then(async response => {
                         const data = await response.json()
                         switch (data.code) {
-                            case '500':
+                            case 500:
                                 // reporting an internal server error. ex: try catch
                                 alert(data.state)
                                 console.log(data.message)
                                 break;
-                            case '200':
+                            case 200:
                                 // reporting an internal server error. ex: try catch
                                 toastr.success(data.message)
-                                // call datatables refresh
-                                app.component('all_users').methods.refresh_datatables()
+                                // call method datatables refresh
+                                self.refresh_datatables()
                                 break
                             default:
                                 break;

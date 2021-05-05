@@ -139,21 +139,20 @@ app.component('register_user', {
                 method: 'POST',
                 mode: 'same-origin',
                 headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ 'action': 'get_profiles' })
+                body: JSON.stringify({ 'action': 'get_profiles_active' })
             }
             fetch('model.php', requestOptions)
                 // process the backend response
                 .then(async response => {
                     const data = await response.json()
                     switch (data.code) {
-                        case '500':
+                        case 500:
                             // reporting an internal server error. ex: try catch
                             alert(data.state)
                             console.log(data.message)
                             break;
-                        case '200':
+                        case 200:
                             // format the data to show the selct options
-                            console.log(data);
                             data.profiles.forEach(profile => {
                                 this.select_option.push({ id: profile.id_profile, description: profile.descrizione })
                             });
@@ -200,31 +199,31 @@ app.component('register_user', {
                     .then(async response => {
                         const data = await response.json()
                         switch (data.code) {
-                            case '500':
+                            case 500:
                                 // reporting an internal server error. ex: try catch
                                 alert(data.state)
                                 console.log(data.message)
                                 break;
-                            case '406':
+                            case 406:
                                 // reporting a forbidden request. ex: session code doesn't match
                                 alert(data.message)
                                 document.location.href = '../autenticazione_VueJs';
                                 break;
-                            case '401':
+                            case 401:
                                 // reporting an unauthorized error. ex: password dasen't match 
                                 toastr.warning(data.message)
                                 break;
-                            case '400':
+                            case 400:
                                 // repoting a bad request
                                 toastr.error(data.message)
                                 break;
-                            case '201':
+                            case 201:
                                 // reporting a success message
                                 toastr.success(data.message)
                                 this.$emit('refresh_datatables')
                                 this.reset_form()
                                 break;
-                            case '200':
+                            case 200:
                                 // reporting a success message
                                 toastr.success(data.message)
                                 this.$emit('refresh_datatables')
@@ -261,12 +260,12 @@ app.component('register_user', {
                 .then(async response => {
                     const data = await response.json();
                     switch (data.code) {
-                        case '500':
+                        case 500:
                             // reporting an internal server error. ex: try catch
                             alert(data.state)
                             console.log(data.message)
                             break;
-                        case '200':
+                        case 200:
                             // reporting a success message
                             toastr.success(data.message)
                             // set the value to the inputs

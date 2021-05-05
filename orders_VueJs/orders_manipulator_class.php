@@ -1,8 +1,24 @@
 <?php
 
-$merchant_id = $_REQUEST['merchant_id'];
-$startDate = $_REQUEST['startDate'];
-$endDate = $_REQUEST['endDate'];
+if (isset($_SERVER['REQUEST_METHOD'])) {
+    // get resquet body data  
+    if (!isset($requestBody)) {
+        $requestBody = json_decode(file_get_contents('php://input'), true);
+    }
+} else {
+    // report an error if there is no request method
+    $data['code'] = '406';
+    $data['state'] = 'Not Acceptable';
+    $data['message'] = 'Request method not defined';
+    
+    echo json_encode($data);
+    exit;
+}
+
+// set the data to variables
+$merchant_id = $requestBody['merchant_id'];
+$startDate = $requestBody['startDate'];
+$endDate = $requestBody['endDate'];
 $url = 'http://51.91.97.200/sellmaster/api_sellmasters/ordini_mondotop.php';
 
 class ordersManipulatorClass

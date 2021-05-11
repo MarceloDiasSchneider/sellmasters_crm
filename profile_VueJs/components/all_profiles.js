@@ -94,12 +94,12 @@ app.component('all_profiles', {
                     .then(async response => {
                         const data = await response.json()
                         switch (data.code) {
-                            case '500':
+                            case 500:
                                 // reporting an internal server error. ex: try catch
                                 alert(data.state)
                                 console.log(data.message)
                                 break;
-                            case '200':
+                            case 200:
                                 // reporting an internal server error. ex: try catch
                                 toastr.success(data.message)
                                 // call datatables refresh

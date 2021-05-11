@@ -192,6 +192,7 @@ app.component('orders', {
                     style:    'multi',
                     selector: '.select-on'
                 },
+                keys: true,
                 // rowGroup: {
                 //     dataSrc: 'purchase_date',
                 // },

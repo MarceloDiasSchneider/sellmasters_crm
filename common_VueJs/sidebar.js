@@ -65,7 +65,7 @@ app.component('sidebar', {
 							<ul class="nav nav-treeview" :style="[page_data.main == main[0].main ? 'display: block;' : 'display: none;']" v-for="subpage of main">
 								<li class="nav-item" :id="subpage.subpage">
 									<a :href="'../' + subpage.link" class="nav-link" :class="[page_data.subpage == subpage.link ? 'active ' : '' ]">
-										<i :class="[page_data.subpage == subpage.link ? 'far fa-dot-circle nav-icon text-warning' : 'far fa-circle nav-icon' ]" :for="subpage.subpage">
+										<i :class="[page_data.subpage == subpage.link ? 'far fa-dot-circle nav-icon text-lightblue' : 'far fa-circle nav-icon' ]" :for="subpage.subpage">
 										</i>
 										<p :for="subpage.subpage">{{ subpage.subpage }}</p>
 									</a>

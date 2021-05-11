@@ -31,11 +31,11 @@ app.component('profile', {
                                     <label for="description">Autorizzazioni della pagina</label>
                                     <div class="form-group">
                                         <div class="custom-control custom-checkbox mb-3" v-for="main in pages">
-                                            <input type="checkbox" :id="main[0].main" class="custom-control-input" :checked="!mainPages.find(pages => pages.main == main[0].main && !pages.checked)" @click="clickParent(main)"> 
-                                            <label class="custom-control-label" :for="main[0].main">{{ main[0].main }}</label>
+                                            <input type="checkbox" :id="main[0].main.toLowerCase()" class="custom-control-input" :checked="!mainPages.find(pages => pages.main == main[0].main && !pages.checked)" @click="clickParent(main)"> 
+                                            <label class="custom-control-label" :for="main[0].main.toLowerCase()">{{ main[0].main }}</label>
                                                 <div class="form-check" v-for="pages of main">
-                                                    <input type="checkbox" class="form-check-input" :id="pages.subpage" v-model="pages.checked"> 
-                                                    <label class="form-check-label" :for="pages.subpage">{{ pages.subpage }}</label>
+                                                    <input type="checkbox" class="form-check-input" :id="pages.subpage.toLowerCase()" v-model="pages.checked"> 
+                                                    <label class="form-check-label" :for="pages.subpage.toLowerCase()">{{ pages.subpage }}</label>
                                                 </div>
                                         </div>
                                     </div>
@@ -45,11 +45,11 @@ app.component('profile', {
                             <input v-if="id_profile" type="hidden" id="id_utente" name="id_utente" :value="id_profile">
                             <input type="hidden" id="codiceSessione" name="codiceSessione" :value="codice_sessione">
 
-                            <div class="float-sm-right ml-1 mb-1">
+                            <div class="float-right ml-1 mt-1">
                                 <button v-if="id_profile" type="submit" id="insert" class="btn btn-primary">Aggiorna</button>
                                 <button v-else type="submit" id="update" class="btn btn-primary">Registra</button>
                             </div>
-                            <div class="float-sm-right ml-1 mb-1">
+                            <div class="float-right ml-1 mt-1">
                                 <button type="submit" id="reset_form" class="btn btn-primary" :class=" [id_profile ? '' : 'd-none']" @click.prevent="reset_form">Indietro a nuovo utente</button>
                             </div>
                         </form>
@@ -97,31 +97,31 @@ app.component('profile', {
                 .then(async response => {
                     const data = await response.json();
                     switch (data.code) {
-                        case '500':
+                        case 500:
                             // reporting an internal server error. ex: try catch
                             alert(data.state)
                             console.log(data.message)
                             break;
-                        case '406':
+                        case 406:
                             // reporting a forbidden request. ex: session code doesn't match
                             alert(data.message)
                             document.location.href = '../autenticazione_VueJs';
                             break;
-                        case '401':
+                        case 401:
                             // reporting an unauthorized error. ex: profile already registered 
                             toastr.warning(data.message)
                             break;
-                        case '400':
+                        case 400:
                             // reporting an unauthorized error. ex: profile already registered 
                             toastr.warning(data.message)
                             break;
-                        case '201':
+                        case 201:
                             // reporting a success message. ex: profile inserted
                             toastr.success(data.message)
                             this.$emit('refresh_datatables')
                             this.reset_form()
                             break;
-                        case '200':
+                        case 200:
                             // reporting a success message. ex: profile updated
                             toastr.success(data.message)
                             this.$emit('refresh_datatables')
@@ -154,12 +154,12 @@ app.component('profile', {
                 .then(async response => {
                     const data = await response.json();
                     switch (data.code) {
-                        case '500':
+                        case 500:
                             // reporting an internal server error. ex: try catch
                             alert(data.state)
                             console.log(data.message)
                             break;
-                        case '200':
+                        case 200:
                             // reporting a success message
                             toastr.success(data.message)
                             // set the value to the inputs
@@ -170,7 +170,6 @@ app.component('profile', {
                                 mainPage.checked = Number(page.access) ? true : false
                             })
                             break;
-
                         default:
                             break;
                     }
@@ -204,12 +203,12 @@ app.component('profile', {
                 .then(async response => {
                     const data = await response.json();
                     switch (data.code) {
-                        case '500':
+                        case 500:
                             // reporting an internal server error. ex: try catch
                             alert(data.state)
                             console.log(data.message)
                             break;
-                        case '200':
+                        case 200:
                             // reporting a success message
                             this.mainPages = data.pages
                             break;

@@ -13,9 +13,7 @@ app.component('get_post_by_id', {
                                 <label for="id_post">Set the ID number</label>
                                 <input type="number" class="form-control" id="id_post" min="0" max="100" placeholder="1 to 100" v-model="post_id">
                             </div>
-                        </div>
-                        <div class="card-footer float-sm-right">
-                            <div class="float-sm-right ml-1">
+                            <div class="float-right ml-1">
                                 <button type="submit" class="btn btn-primary">Refresh</button>
                             </div>
                         </div>

@@ -2,24 +2,25 @@ app.component('register_user', {
     props: {
         codice_sessione: {
             type: String
+        },
+        selected_row: {
+            type: String
         }
     },
     template:
         /*html*/
-        `<div class="row">
-            <div class="col-md-12">
+        `<div class="modal fade" id="modal-xl">
+            <div class="modal-dialog modal-xl">
                 <!-- form registra utente -->
-                <div class="card card-primary">
-                    <div class="card-header">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary">
                         <h3 class="card-title">Nuovo utente</h3>
-                        <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                        </div>
+                        <button type="button" class="btn btn-tool" data-toggle="modal" data-target="#modal-xl">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                     <!-- /.card-header -->
-                    <div class="card-body">
+                    <div class="modal-body">
                         <!-- form start -->
                         <form action='#' id='user_form' name='user_form' method='post' @submit.prevent="insert_or_update_user">
                             <div class="row">
@@ -89,21 +90,13 @@ app.component('register_user', {
                             <input v-if="user_id" type="hidden" id="id_utente" name="id_utente" :value="user_id">
                             <input type="hidden" id="codiceSessione" name="codiceSessione" :value="codice_sessione">
 
-                            <div class="float-sm-right ml-1">
+                            <div class="float-right ml-1 mt-1">
                                 <button v-if="user_id" type="submit" id="insert" class="btn btn-primary">Aggiorna</button>
                                 <button v-else type="submit" id="update" class="btn btn-primary">Registra</button>
-                            </div>
-                            <div class="float-sm-right ml-1">
-                                <button type="submit" id="reset_form" class="btn btn-primary" :class=" [user_id ? '' : 'd-none']" @click.prevent="reset_form">Indietro a nuovo utente</button>
                             </div>
                         </form>
                     </div>
                     <!-- /.card-body -->
-                    <!-- loading -->
-                    <div class="overlay dark" v-show="loading">
-                        <i class="fas fa-2x fa-sync-alt fa-spin"></i>
-                    </div>
-                    <!-- /.loading -->
                 </div>
                 <!-- /.card -->
             </div>
@@ -220,14 +213,18 @@ app.component('register_user', {
                             case 201:
                                 // reporting a success message
                                 toastr.success(data.message)
-                                this.$emit('refresh_datatables')
+                                this.emit_refresh_datatables()
+                                this.emit_selected_row(null)
                                 this.reset_form()
+                                this.hide_modal()
                                 break;
                             case 200:
                                 // reporting a success message
                                 toastr.success(data.message)
-                                this.$emit('refresh_datatables')
+                                this.emit_refresh_datatables()
+                                this.emit_selected_row(null)
                                 this.reset_form()
+                                this.hide_modal()
                                 break;
                             default:
                                 break;
@@ -253,7 +250,7 @@ app.component('register_user', {
                 method: 'POST',
                 mode: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 'action': 'get_user_data', 'id_utente': user_id })
+                body: JSON.stringify({ 'action': 'get_user_data', 'id_utente': this.selected_row })
             };
             fetch('model.php', requestOptions)
                 // process the backend response
@@ -269,7 +266,6 @@ app.component('register_user', {
                             // reporting a success message
                             toastr.success(data.message)
                             // set the value to the inputs
-                            this.user_id = user_id
                             if (data.user.nome != undefined) { this.nome = data.user.nome } else { this.nome = null }
                             if (data.user.cognome != undefined) { this.cognome = data.user.cognome } else { this.cognome = null }
                             if (data.user.data_nascita != undefined) { this.data_nascita = data.user.data_nascita } else { this.data_nascita = null }
@@ -277,6 +273,7 @@ app.component('register_user', {
                             if (data.user.telefono != undefined) { this.telefono = data.user.telefono } else { this.telefono = null }
                             if (data.user.id_profile != undefined) { this.profile = data.user.id_profile } else { this.profile = null }
                             if (data.user.email != undefined) { this.email = data.user.email } else { this.email = null }
+                            this.show_modal()
                             break;
                         default:
                             break;
@@ -304,8 +301,25 @@ app.component('register_user', {
             this.verificaPassword = null
             this.loading = false
         },
+        emit_refresh_datatables() {
+            this.$emit('refresh_datatables')
+        },
+        emit_selected_row(data){
+            this.$emit('set_selected_row', data)
+        },
+        show_modal(){
+            $('#modal-xl').modal('show')
+        },
+        hide_modal(){
+            $('#modal-xl').modal('hide')
+        },
     },
     beforeMount() {
         this.select_options()
     },
+    watch: { 
+        selected_row: function(newVal) { 
+            this.user_id = newVal
+        }
+    }
 })

@@ -119,12 +119,12 @@ app.component('register_merchant', {
                             <input v-if="merchant_primary_id" type="hidden" id="id_merchant" name="id_merchant" :value="merchant_primary_id">
                             <input type="hidden" id="codiceSessione" name="codiceSessione" :value="codice_sessione">
 
-                            <div class="float-sm-right ml-1">
+                            <div class="float-right ml-1 mt-1">
                                 <button v-if="merchant_primary_id" type="submit" id="insert" class="btn btn-primary">Aggiorna</button>
                                 <button v-else type="submit" id="update" class="btn btn-primary">Registra</button>
                             </div>
                             
-                            <div class="float-sm-right ml-1">
+                            <div class="float-right ml-1 mt-1">
                                 <button type="submit" id="reset_form" class="btn btn-primary" :class=" [merchant_primary_id ? '' : 'd-none']" @click.prevent="reset_form">Indietro a nuovo utente</button>
                             </div>
                         </form>

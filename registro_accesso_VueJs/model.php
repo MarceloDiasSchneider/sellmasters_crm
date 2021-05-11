@@ -1,6 +1,6 @@
 <?php
 
-include_once('../common_VueJs/reportException.php');
+include_once('../common_VueJs/report_exception_class.php');
 
 // check if the request method is setted
 try {

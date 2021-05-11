@@ -1,18 +1,19 @@
 <?php
 
-if (isset($_SERVER['REQUEST_METHOD'])) {
-    // get resquet body data
-    if (!isset($requestBody)) {
-        $requestBody = json_decode(file_get_contents('php://input'), true);
-    }
-} else {
-    // report an error if there is no request method
-    $data['code'] = '406';
-    $data['state'] = 'Not Acceptable';
-    $data['message'] = 'Request method not defined';
+include_once('../common_VueJs/report_exception_class.php');
 
-    echo json_encode($data);
-    exit;
+// check if the request method is setted
+try {
+    if (isset($_SERVER['REQUEST_METHOD'])) {
+        // get resquet body data  
+        if (!isset($requestBody)) {
+            $requestBody = json_decode(file_get_contents('php://input'), true);
+        }
+    } else {
+        throw new reportException('Request method not defined', 406);
+    }
+} catch (reportException $e) {
+    $e->reportError();
 }
 
 include_once('orders_class.php');

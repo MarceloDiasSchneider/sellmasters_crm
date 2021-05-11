@@ -37,16 +37,45 @@ class pagesClass
         return $result;
     }
 
-    public function insert_page_access()
+    public function insert_page_access($allPages)
     {
         try {
             $query = $this->database->prepare("INSERT INTO `access_profile` (`id_page`, `id_profile`, `access`)
-                VALUES ( :id_page, :id_profile, :access )");
-            $query->bindValue(":id_page", $this->id_page);
-            $query->bindValue(":id_profile", $this->id_profile);
-            $query->bindValue(":access", $this->access);
-            $query->execute();
-            $result = $this->database->lastInsertId();
+            VALUES ( :id_page, :id_profile, :access )");
+            $this->database->beginTransaction();
+            foreach ($allPages as $key => $value) {
+                $this->id_page = $value['idPage'];
+                $this->access =  isset($value['checked']) ? $value['checked'] : 0;
+                $query->bindValue(":id_page", $this->id_page);
+                $query->bindValue(":id_profile", $this->id_profile);
+                $query->bindValue(":access", $this->access);
+                $query->execute();
+                $result = $query->rowCount();
+            }
+            $this->database->commit();
+        } catch (PDOException $e) {
+            $this->database->rollback();
+            $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
+            error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
+        }
+        return $result;
+    }
+
+    public function update_page_access($to_update, $checked_pages)
+    {
+        try {
+            $query = $this->database->prepare("UPDATE `access_profile` 
+                SET `access` = :access
+                WHERE id_page = :id_page AND id_profile = :id_profile");
+            foreach ($to_update as $key => $value) {
+                $this->id_page = $checked_pages[$key]['idPage'];
+                $this->access = $checked_pages[$key]['checked'];
+                $query->bindValue(":id_page", $this->id_page);
+                $query->bindValue(":id_profile", $this->id_profile);
+                $query->bindValue(":access", $this->access);
+                $query->execute();
+                $result = $query->rowCount();
+            }
         } catch (PDOException $e) {
             $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
@@ -55,22 +84,24 @@ class pagesClass
         return $result;
     }
 
-    public function update_page_access()
+    public function insert_missing_page_access($to_insert, $checked_pages)
     {
         try {
-            $query = $this->database->prepare("UPDATE `access_profile` 
-                SET `access` = :access
-                WHERE id_page = :id_page AND id_profile = :id_profile");
-            $query->bindValue(":id_page", $this->id_page);
-            $query->bindValue(":id_profile", $this->id_profile);
-            $query->bindValue(":access", $this->access);
-            $query->execute();
-            $result = $query->rowCount();
+            $query = $this->database->prepare("INSERT INTO `access_profile` (`id_page`, `id_profile`, `access`)
+            VALUES ( :id_page, :id_profile, :access )");
+            foreach ($to_insert as $key => $value) {
+                $this->id_page = $checked_pages[$key]['idPage'];
+                $this->access = $checked_pages[$key]['checked'];
+                $query->bindValue(":id_page", $this->id_page);
+                $query->bindValue(":id_profile", $this->id_profile);
+                $query->bindValue(":access", $this->access);
+                $query->execute();
+                $result = $query->rowCount();
+            }
         } catch (PDOException $e) {
             $result['catchError'] = 'code => ' . $e->getCode() . ' | message => ' . $e->getMessage();
             error_log("Errore" . __LINE__ . __FILE__ . __FUNCTION__ . " errore " . $e->getMessage(), 3, "/var/www/html/sellma_crm/sellmaster_errors.log");
         }
-
         return $result;
     }
 

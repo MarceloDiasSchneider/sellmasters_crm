@@ -1,31 +1,25 @@
 <?php
 
-if (isset($_SERVER['REQUEST_METHOD'])) {
-    // get resquet body data
-    if (!isset($requestBody)) {
-        $requestBody = json_decode(file_get_contents('php://input'), true);
-    }
-} else {
-    // report an error if there is no request method
-    $data['code'] = '406';
-    $data['state'] = 'Not Acceptable';
-    $data['message'] = 'Request method not defined';
+include_once('../common_VueJs/report_exception_class.php');
 
-    echo json_encode($data);
-    exit;
+// check if the request method is setted
+try {
+    if (isset($_SERVER['REQUEST_METHOD'])) {
+        // get resquet body data  
+        if (!isset($requestBody)) {
+            $requestBody = json_decode(file_get_contents('php://input'), true);
+        }
+    } else {
+        throw new reportException('Request method not defined', 406);
+    }
+} catch (reportException $e) {
+    $e->reportError();
 }
 
 include_once('pages_class.php');
 $page = new pagesClass();
 
 switch ($requestBody['action']) {
-    case 'pages_permission': 
-        // this method is called from profile_VueJs/model.php to get all pages to create or update a profile
-        // create the variable pages with all pages
-        $pages = $page->get_pages();
-        break;
-
-    
     case 'insert_or_update_profile': 
         // this method is called from profile_VueJs/model.php create and bind all pages
         switch ($requestBody['id_profile']) {
@@ -33,41 +27,18 @@ switch ($requestBody['action']) {
                 // insert all pages
                 $allPages = $requestBody['checked_pages'];
                 $page->id_profile = $id_profile;
-                foreach ($allPages as $key => $value) {
-                    $page->id_page = $value['idPage'];
-                    $page->access =  isset($value['checked']) ? $value['checked'] : 0;
-                    $result = $page->insert_page_access();
-                    if (isset($result['catchError'])) {
-                        // report a try catch error
-                        $data['code'] = '500';
-                        $data['state'] = 'Internal Server Error';
-                        $data['message'] = $result['catchError'];
-                        break;
-                    } elseif ($result) {
-                        // report profile registred successfully
-                        $data['code'] = '201';
-                        $data['state'] = 'Success';
-                        $data['message'] = 'Nuovo profile registrato';
-                    } else {
-                        // report a try catch error
-                        $data['code'] = '500';
-                        $data['state'] = 'Internal Server Error';
-                        $data['message'] = 'Nuovo profile non registrato';
-                    }
-                }
-
+                $pagesInserted = $page->insert_page_access($allPages);           
                 break;
-
             case true:
+                // set the id profile
                 $page->id_profile = $requestBody['id_profile'];
-                // select all pages already registered to this profile
-                $registered_pages = $page->get_pages_by_id_profile();
-                if (isset($registered_pages['catchError'])) {
-                    // report a try catch error
-                    $data['code'] = '500';
-                    $data['state'] = 'Internal Server Error';
-                    $data['message'] = $registered_pages['catchError'];
-                } else {
+                try {
+                    // select all pages already registered to this profile
+                    $registered_pages = $page->get_pages_by_id_profile();
+                    if (isset($registered_pages['catchError'])) {
+                        // report a try catch error on database
+                        throw new reportException($registered_pages['catchError'], 500);
+                    }
                     $checked_pages = $requestBody['checked_pages'];
                     // create an array only with the registered pages id
                     $registered_ids = [];
@@ -79,51 +50,38 @@ switch ($requestBody['action']) {
                     foreach ($checked_pages as $key => $checked_page) {
                         $checked_ids[] = $checked_page['idPage'];
                     }
+                    $page->database->beginTransaction();
                     // compare the arrays and update the pages already registered
                     $to_update = array_intersect($checked_ids, $registered_ids);
-                    foreach ($to_update as $key => $value) {
-                        $page->id_page = $checked_pages[$key]['idPage'];
-                        $page->access = $checked_pages[$key]['checked'];
-                        $updated_page = $page->update_page_access();
-                        if (isset($updated_page['catchError'])) {
-                            // report a try catch error
-                            $data['code'] = '500';
-                            $data['state'] = 'Internal Server Error';
-                            $data['message'] = $updated_page['catchError'];
-
-                            echo json_encode($data);
-                            exit;
+                    if (count($to_update)) {
+                        $updated_pages = $page->update_page_access($to_update, $checked_pages);
+                        if (isset($updated_pages['catchError'])) {
+                            $page->database->rollback();
+                            // report a try catch error on database
+                            throw new reportException($updated_pages['catchError'], 500);
                         }
                     }
                     // compare the arrays and insert the pages not registered
                     $to_insert = array_diff($checked_ids, $registered_ids);
-                    foreach ($to_insert as $key => $value) {
-                        $page->id_page = $checked_pages[$key]['idPage'];
-                        $page->access = $checked_pages[$key]['checked'];
-                        $inserted_page = $page->insert_page_access();
+                    if (count($to_insert)){
+                        $inserted_page = $page->insert_missing_page_access($to_insert, $checked_pages);
                         if (isset($inserted_page['catchError'])) {
-                            // report a try catch error
-                            $data['code'] = '500';
-                            $data['state'] = 'Internal Server Error';
-                            $data['message'] = $inserted_page['catchError'];
-
-                            echo json_encode($data);
-                            exit;
+                            // report a try catch error on database
+                            $page->database->rollback();
+                            throw new reportException($inserted_page['catchError'], 500);
                         }
                     }
-
-                    $data['to_update'] = array_intersect($checked_ids, $registered_ids);
-                    $data['to_update'] = array_intersect($checked_ids, $registered_ids);
-                    $data['to_insert'] = array_diff($checked_ids, $registered_ids);
-                    $data['registered_ids'] = $registered_ids;
-                    $data['checked_ids'] = $checked_ids;
-                    $data['state'] = 'Success';
-                    $data['code'] = '200';
-                    $data['message'] = 'profile aggiornato';
+                    $commit = $page->database->commit();
+                    // $data['$registered_pages'] = $registered_pages;
+                    // $data['Re Bo checked_pages'] = $checked_pages;
+                    // $data['to_update'] = array_intersect($checked_ids, $registered_ids);
+                    // $data['to_insert'] = array_diff($checked_ids, $registered_ids);
+                    // $data['registered_ids'] = $registered_ids;
+                    // $data['checked_ids'] = $checked_ids;
+                } catch (reportException $e) {
+                    $e->reportError();
                 }
-
                 break;
-
             default:
                 # code..
                 break;
@@ -131,23 +89,9 @@ switch ($requestBody['action']) {
 
         break;
 
-        // this class is called from autenticazione_VueJs/model.php 
     case 'get_profile_data':
+        // this class is called from autenticazione_VueJs/model.php 
         $page->id_profile = $requestBody['id_profile'];
-        $pages = $page->get_pages_by_id_profile();
-        if (isset($pages['catchError'])) {
-            // report a try catch error
-            $data['code'] = '500';
-            $data['state'] = 'Internal Server Error';
-            $data['message'] = $pages['catchError'];
-
-            echo json_encode($data);
-            exit;
-        } else {
-            // set the array data with the pages 
-            $data['pages'] = $pages;
-        }
-
         break;
     case 'autenticazione': 
         // this method is called from autunticazione/model.php
@@ -155,7 +99,11 @@ switch ($requestBody['action']) {
         $page->access = 1;
         $accessPages = $page->get_access_pages_by_id_profile();
         break;
-
+    case 'pages_permission': 
+        // this method is called from profile_VueJs/model.php to get all pages to create or update a profile
+        // create the variable pages with all pages
+        $pages = $page->get_pages();
+        break;
     default:
         # code...
         break;

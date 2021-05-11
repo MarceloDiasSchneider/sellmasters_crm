@@ -6,7 +6,7 @@ CREATE TABLE `pages` (
     `nav_icon` VARCHAR(100) NOT NULL,
     PRIMARY KEY (`id_page`),
     UNIQUE KEY `nodouble` (`subpage`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 ###
 
@@ -16,7 +16,7 @@ CREATE TABLE `profiles`(
     `attivo` INT NOT NULL,
 	PRIMARY KEY (`id_profile`),
     UNIQUE KEY `nodouble` (`descrizione`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 ###
 
@@ -29,7 +29,7 @@ CREATE TABLE `access_profile` (
     UNIQUE KEY `nodouble` (`id_profile`,`id_page`),
 	FOREIGN KEY (`id_page`) REFERENCES pages(`id_page`),
     FOREIGN KEY (`id_profile`) REFERENCES profiles(`id_profile`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 ###
 
@@ -47,7 +47,7 @@ CREATE TABLE `utenti`(
     `codice_recupera` VARCHAR(15),
     `scadenza` TIMESTAMP,
 	PRIMARY KEY (`id_utente`)   
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 ###
 
@@ -60,7 +60,7 @@ CREATE TABLE `accede_logs`(
     `user_agent` VARCHAR(255),
 	PRIMARY KEY (`id_log`),
 	FOREIGN KEY (`id_utente`) REFERENCES utenti(`id_utente`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 ###
 
@@ -83,7 +83,7 @@ CREATE TABLE `merchants` (
   `attivo` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `nodouble` (`nome`,`merchant_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
 
 ###
 

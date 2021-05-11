@@ -1,6 +1,6 @@
 <?php
 
-include_once('../common_VueJs/reportException.php');
+include_once('../common_VueJs/report_exception_class.php');
 
 // check if the request method is setted
 try {
@@ -167,11 +167,7 @@ switch ($requestBody['action']) {
                 $fa_lock = $value['attivo'] ? 'fas fa-lock-open' : 'fas fa-lock';
                 $title = $value['attivo'] ? 'disabilitare' : 'attivare';
                 foreach ($value as $k => $v) {
-                    if ($k == 'id_utente') {
-                        $data['azione'] = "
-                            <span class='update_user' id='ut_$v'><i class='fas fa-edit' title='modificare'></i></span>
-                            <span class='disable_user' id='ut_$v'><i class='$fa_lock' title='$title'></i></span>";
-                    } else if ($k == 'data_nascita' && $v != '0000-00-00' && $v != null) {
+                    if ($k == 'data_nascita' && $v != '0000-00-00' && $v != null) {
                         $data[$k] = date('d/m/Y', strtotime($v));
                     } else if ($k == 'attivo') {
                         if ($v == 1) {

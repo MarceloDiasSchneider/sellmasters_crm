@@ -1,4 +1,9 @@
 app.component('orders', {
+    props: {
+        access_token: {
+            type: String,
+        }
+    },
     template:
     /*html*/
         `<div class="row">
@@ -33,7 +38,7 @@ app.component('orders', {
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>Commerciante</label>
-                                        <select id="merchants_id" name="merchants_id" class="form-control" v-model="merchants_id">
+                                        <select id="merchants_id" name="merchants_id" class="form-control" v-model="merchants_id" required>
                                             <option disabled selected value="0">seleziona un commerciante</option>
                                             <option v-for="option in select_options" :value="option.id">{{ option.merchants_name }}</option>
                                         </select>
@@ -92,18 +97,20 @@ app.component('orders', {
             let yyyy = today.getFullYear();
 
             today = `${yyyy}-${mm}-${dd}`;
+            today = `2021-06-02`;
 
             this.endDate = today
             // X days ago
             let x = 2
-            let sevenDaysAgo = new Date(Date.now() - x * 24 * 60 * 60 * 1000)
-            dd = String(sevenDaysAgo.getDate()).padStart(2, '0');
-            mm = String(sevenDaysAgo.getMonth() + 1).padStart(2, '0'); //January is 0!
-            yyyy = sevenDaysAgo.getFullYear();
+            let xDaysAgo = new Date(Date.now() - x * 24 * 60 * 60 * 1000)
+            dd = String(xDaysAgo.getDate()).padStart(2, '0');
+            mm = String(xDaysAgo.getMonth() + 1).padStart(2, '0'); //January is 0!
+            yyyy = xDaysAgo.getFullYear();
 
-            sevenDaysAgo = `${yyyy}-${mm}-${dd}`;
+            xDaysAgo = `${yyyy}-${mm}-${dd}`;
+            xDaysAgo = `2021-06-01`;
 
-            this.startDate = sevenDaysAgo
+            this.startDate = xDaysAgo
         },
         // get all select options
         get_select_options() {
@@ -148,22 +155,23 @@ app.component('orders', {
             let self = this
             // formatting function for row child details 
             function format ( data ) {
-                dati_finanziari = null
-                if (data.dati_finanziari){
-                    dati_finanziari = '<table cellpadding="3" cellspacing="0" border="0" style="padding-left:50px;">'+
-                        '<tr>'+
-                            '<td>Dati finanziari:</td>'+
-                            '<td>'+data.dati_finanziari+'</td>'+
-                        '</tr>'+
-                    '</table>';
-                } else {
-                    dati_finanziari = '<table cellpadding="3" cellspacing="0" border="0" style="padding-left:50px;">'+
-                    '<tr>'+
-                        '<td>Nessun dati finanziari</td>'+
-                    '</tr>'+
-                '</table>';
-                }
-                return dati_finanziari
+                financial_issue = null
+                console.log(data.financial_issue);
+                // if (data.financial_issue){
+                //     financial_issue = '<table cellpadding="3" cellspacing="0" border="0" style="padding-left:50px;">'+
+                //         '<tr>'+
+                //             '<td>Dati finanziari:</td>'+
+                //             '<td>'+data.financial_issue+'</td>'+
+                //         '</tr>'+
+                //     '</table>';
+                // } else {
+                //     financial_issue = '<table cellpadding="3" cellspacing="0" border="0" style="padding-left:50px;">'+
+                //     '<tr>'+
+                //         '<td>Nessun dati finanziari</td>'+
+                //     '</tr>'+
+                // '</table>';
+                // }
+                return 'No data'
             }
             // set the datatables
             $("#orders").DataTable({
@@ -175,9 +183,10 @@ app.component('orders', {
                     contentType: "application/json",
                     data() {
                         return JSON.stringify({
+                            'access_token': self.access_token,
+                            'merchant_id': self.merchants_id,
                             'startDate': self.startDate,
                             'endDate': self.endDate,
-                            'merchant_id': self.merchants_id
                         })
                     },
                     dataType: "json",
@@ -208,7 +217,7 @@ app.component('orders', {
                     { "title": "Order id", data: "order_id", "className": "select-on"},
                     { "title": "Merchant id", data: "merchant_id", "className": "select-on"},
                     { "title": "Purchase date", data: "purchase_date", "className": "select-on"},
-                    { "title": "Account id", data: "account_id", "className": "select-on"},
+                    // { "title": "Account id", data: "account_id", "className": "select-on"},
                     { "title": "Market status", data: "market_status", "className": "select-on"},
                     { "title": "Paese", data: "paese", "className": "select-on"},
                     { "title": "Recipient name", data: "recipient_name", "className": "select-on"},
@@ -219,28 +228,32 @@ app.component('orders', {
                     { "title": "Total order", data: "total_order", "className": "select-on"},
                     { "title": "Quantity purchased", data: "quantity_purchased", "className": "select-on"},
                     { "title": "Sku", data: "sku", "className": "select-on"},
-                    { "title": "Manufacturer", data: "manufacturer", "className": "select-on"},
-                    { "title": "Category", data: "category", "className": "select-on"},
+                    // { "title": "Manufacturer", data: "manufacturer", "className": "select-on"},
+                    // { "title": "Category", data: "category", "className": "select-on"},
                     { "title": "Marketplace", data: "marketplace", "className": "select-on"},
-                    { "title": "Weight", data: "weight", "className": "select-on"},
-                    { "title": "Fee people amazon it", data: "fee_people_amazon_it", "className": "select-on"},
+                    // { "title": "Weight", data: "weight", "className": "select-on"},
+                    // { "title": "Fee people amazon it", data: "fee_people_amazon_it", "className": "select-on"},
                     { "title": "Is business order", data: "is_business_order", "className": "select-on"},
                     { "title": "Title", data: "title", "className": "select-on"},
                     { "title": "Is prime", data: "isprime", "className": "select-on"},
                     { "title": "Fulfillment channel", data: "fulfillment_channel", "className": "select-on"},
-                    { "title": "Group price", data: "group_price", "className": "select-on"},
+                    // { "title": "Group price", data: "group_price", "className": "select-on"},
                     { "title": "Numberofitems shipped", data: "numberofitems_shipped", "className": "select-on"},
                     { "title": "Numberofitems unshipped", data: "numberofitems_unshipped", "className": "select-on"},
-                    { "title": "Fee people amazon de", data: "fee_people_amazon_de", "className": "select-on"},
-                    { "title": "Fee people amazon es", data: "fee_people_amazon_es", "className": "select-on"},
-                    { "title": "Fee people amazon fr", data: "fee_people_amazon_fr", "className": "select-on"},
-                    { "title": "Fee people amazon uk", data: "fee_people_amazon_uk", "className": "select-on"},
+                    // { "title": "Fee people amazon de", data: "fee_people_amazon_de", "className": "select-on"},
+                    // { "title": "Fee people amazon es", data: "fee_people_amazon_es", "className": "select-on"},
+                    // { "title": "Fee people amazon fr", data: "fee_people_amazon_fr", "className": "select-on"},
+                    // { "title": "Fee people amazon uk", data: "fee_people_amazon_uk", "className": "select-on"},
                     { "title": "Shipping tax", data: "shipping_tax", "className": "select-on"},
                     { "title": "Commission by lengow", data: "commission_by_lengow", "className": "select-on"},
                     { "title": "Tracking number", data: "tracking_number", "className": "select-on"},
                     { "title": "Carrier", data: "carrier", "className": "select-on"},
-                    { "title": "Price", data: "price", "className": "select-on"},
+                    { "title": "Prezzo item catalogo", data: "prezzo_item_da_catalogo", "className": "select-on"},
+                    { "title": "Ship country", data: "ship_country", "className": "select-on"},
+                    // { "title": "Price", data: "price", "className": "select-on"},
                     // { "title": "Dati finanziari", data: "dati_finanziari" },
+                    // { "title": "Financial issue", data: "financial_issue" },
+                    { "title": "Financial issue", data: "financial_issue_html" },
                 ],
                 "order": [[ 3, "desc" ]],
                 "responsive": false,

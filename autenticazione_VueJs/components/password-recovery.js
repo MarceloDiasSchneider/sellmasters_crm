@@ -1,21 +1,21 @@
 app.component('password-recovery', {
-	props: {
-		password_recovery: {
-			type: Boolean,
-			required: true
-		},
-		email: {
-			type: String,
-			required: true
-		},
-		code: {
-			type: String,
-			required: true
-		}
-	},
-	template:
-		/*html*/
-		`<div class="card card-outline card-primary" v-show="password_recovery">
+    props: {
+        password_recovery: {
+            type: Boolean,
+            required: true
+        },
+        email: {
+            type: String,
+            required: true
+        },
+        code: {
+            type: String,
+            required: true
+        }
+    },
+    template:
+    /*html*/
+        `<div class="card card-outline card-primary" v-show="password_recovery">
 			<div class="card-header text-center">
 				<h1>Sell Masters</h1>
 			</div>
@@ -51,78 +51,83 @@ app.component('password-recovery', {
 				<p class="mt-3 mb-1">
 					<a href="#" @click.prevent="login_clicked">Accedi</a>
 				</p>
+			</div><!-- /.card-body -->
+			<div class="overlay dark" v-show="loading">
+				<i class="fas fa-2x fa-sync-alt fa-spin"></i>
 			</div>
-			<!-- /.login-card-body -->
 		</div>`,
-	data() {
-		return {
-			password_type: 'password',
-			message: null,
-			password: null,
-			confirm_password: null
-		}
-	},
-	methods: {
-		// request the recovery password to the backend
-		recover_password_clicked() {
-			// set options to send with the post request
-			const requestOptions = {
-				method: 'POST',
-				mode: 'same-origin',
-				headers: { 'content-type': 'application/json' },
-				body: JSON.stringify({
-					'action': 'recover_password',
-					'email': this.email,
-					'code': this.code,
-					'password': this.password,
-					'confirm-password': this.confirm_password
-				})
-			}
-			fetch('model.php', requestOptions)
-				// process the backend response
-				.then(async response => {
-					const data = await response.json()
-					switch (data.code) {
-						case 500:
-							// reporting an internal server error. ex: try catch
-							alert(data.state)
-							console.log(data.message)
-							break;
-						case 401:
-							// reporting an unauthorized error. ex: code to change the passord is not valid
-							toastr.warning(data.message)
-							break;
-						case 400:
-							// reporting a bad request error. ex: the password dosen't match
-							toastr.warning(data.message)
-							break;
-						case 200:
-							// reporting a success message. ex: the password is updated
-							toastr.success(data.message)
-							// go to the login page
-							setTimeout(this.login_clicked, 2000)
-							break;
-						default:
-							break;
-					}
-				})
-				// report an error if there is
-				.catch(error => {
-					this.errorMessage = error;
-					console.log('There was an error!', error);
-				});
-		},
-		// go to the login page
-		login_clicked() {
-			this.$emit('login-page')
-		},
-		// show and hidden the passowrd
-		show_password() {
-			if (this.password_type == 'password') {
-				this.password_type = 'text'
-			} else {
-				this.password_type = 'password'
-			}
-		}
-	}
+    data() {
+        return {
+            loading: false,
+            password_type: 'password',
+            message: null,
+            password: null,
+            confirm_password: null
+        }
+    },
+    methods: {
+        // request the recovery password to the backend
+        recover_password_clicked() {
+            this.loading = true
+                // set options to send with the post request
+            const requestOptions = {
+                method: 'POST',
+                mode: 'same-origin',
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify({
+                    'action': 'recover_password',
+                    'email': this.email,
+                    'code': this.code,
+                    'password': this.password,
+                    'confirm-password': this.confirm_password
+                })
+            }
+            fetch('model.php', requestOptions)
+                // process the backend response
+                .then(async response => {
+                    const data = await response.json()
+                    switch (data.code) {
+                        case 500:
+                            // reporting an internal server error. ex: try catch
+                            alert(data.state)
+                            console.log(data.message)
+                            break;
+                        case 401:
+                            // reporting an unauthorized error. ex: code to change the passord is not valid
+                            toastr.warning(data.message)
+                            break;
+                        case 400:
+                            // reporting a bad request error. ex: the password dosen't match
+                            toastr.warning(data.message)
+                            break;
+                        case 200:
+                            // reporting a success message. ex: the password is updated
+                            toastr.success(data.message)
+                                // go to the login page
+                            setTimeout(this.login_clicked, 2000)
+                            break;
+                        default:
+                            break;
+                    }
+                    this.loading = false
+                })
+                // report an error if there is
+                .catch(error => {
+                    this.errorMessage = error;
+                    console.log('There was an error!', error);
+                });
+        },
+        // go to the login page
+        login_clicked() {
+            this.$emit('login-page')
+        },
+        // show and hidden the passowrd
+        show_password() {
+            if (this.password_type == 'password') {
+                this.password_type = 'text'
+            } else {
+                this.password_type = 'password'
+            }
+        }
+    }
 })

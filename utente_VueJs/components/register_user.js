@@ -11,17 +11,15 @@ app.component('register_user', {
         /*html*/
         `<div class="modal fade" id="modal-xl">
             <div class="modal-dialog modal-xl">
-                <!-- form registra utente -->
                 <div class="modal-content">
                     <div class="modal-header bg-primary">
-                        <h3 class="card-title">Nuovo utente</h3>
+                        <h3 class="modal-title">Nuovo utente</h3>
                         <button type="button" class="btn btn-tool" data-toggle="modal" data-target="#modal-xl">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
-                    <!-- /.card-header -->
+                    <!-- /.modal-header -->
                     <div class="modal-body">
-                        <!-- form start -->
                         <form action='#' id='user_form' name='user_form' method='post' @submit.prevent="insert_or_update_user">
                             <div class="row">
                                 <div class="col-md-4">
@@ -86,21 +84,13 @@ app.component('register_user', {
                                     </div>
                                 </div>
                             </div>
-                            <input type="hidden" id="attivo" name="attivo" v-model="attivo">
-                            <input v-if="user_id" type="hidden" id="id_utente" name="id_utente" :value="user_id">
-                            <input type="hidden" id="codiceSessione" name="codiceSessione" :value="codice_sessione">
-
                             <div class="float-right ml-1 mt-1">
-                                <button v-if="user_id" type="submit" id="insert" class="btn btn-primary">Aggiorna</button>
-                                <button v-else type="submit" id="update" class="btn btn-primary">Registra</button>
+                                <button type="submit" id="button" class="btn btn-primary">{{ button }}</button>
                             </div>
                         </form>
-                    </div>
-                    <!-- /.card-body -->
-                </div>
-                <!-- /.card -->
-            </div>
-            <!--/.form registra utente -->
+                    </div><!-- /.modal-body -->
+                </div><!-- /.modal-content -->
+            </div><!--/.modal-dialog -->
         </div>`,
     data() {
         return {
@@ -316,6 +306,12 @@ app.component('register_user', {
     },
     beforeMount() {
         this.select_options()
+    },
+    computed: {
+        button(){
+            if (this.user_id) {return 'Aggiorna'}
+            return 'Registra'
+        }
     },
     watch: { 
         selected_row: function(newVal) { 

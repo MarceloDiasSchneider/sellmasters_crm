@@ -43,11 +43,14 @@ app.component('login', {
 				<p class="mb-1">
 					<a href="#" @click.prevent="forgot_password_clicked">Ho dimenticato la mia password</a>
 				</p>
+			</div><!-- /.card-body -->
+			<div class="overlay dark" v-show="loading">
+				<i class="fas fa-2x fa-sync-alt fa-spin"></i>
 			</div>
-			<!-- /.card-body -->
 		</div>`,
     data() {
         return {
+			loading: false,
             // variable to control the layout
 			message: '',
 			password_type: 'password',
@@ -59,6 +62,7 @@ app.component('login', {
     methods: {
 		// request the login to the backend
 		authentication() {
+			this.loading = true 
 			// get all data from the form 
 			const requestOptions = {
 				method: 'POST',
@@ -96,6 +100,7 @@ app.component('login', {
 						default:
 							break;
 					}
+					this.loading = false
 				})
 				// report an error if there is
 				.catch(error => {

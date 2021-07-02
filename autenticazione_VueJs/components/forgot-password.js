@@ -34,11 +34,14 @@ app.component('forgot-password', {
                 <p class="mt-3 mb-1">
                     <a href="#" @click.prevent="login_clicked">Accedi</a>
                 </p>
+            </div><!-- /.card-body -->
+            <div class="overlay dark" v-show="loading">
+                <i class="fas fa-2x fa-sync-alt fa-spin"></i>
             </div>
-            <!-- /.login-card-body -->
         </div>`,
     data() {
         return {
+            loading: false,
             message: null,
             email: null
         }
@@ -46,6 +49,7 @@ app.component('forgot-password', {
     methods: {
         // request the forgot password to the backend
         forgot_password_clicked() {
+            this.loading = true
             // get all data from the form 
             const requestOptions = {
                 method: 'POST',
@@ -78,7 +82,8 @@ app.component('forgot-password', {
                             this.email = null
                         default:
                             break;
-                    }
+                        }
+                    this.loading = false
                 })
                 // report an error if there is
                 .catch(error => {

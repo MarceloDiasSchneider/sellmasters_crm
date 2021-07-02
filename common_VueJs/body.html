@@ -1,7 +1,13 @@
-<body class="control-sidebar-slide-open layout-fixed sidebar-collapse">
+<body class="control-sidebar-slide-open layout-fixed sidebar-open">
 	<div id="app">
 		<navbar></navbar>
-		<sidebar :nome="nome" :page_data="page_data" :menu_pages="menu_pages"></sidebar>
-		<content_wrapper :codice_sessione="codice_sessione" @page="set_page_active"></content_wrapper>
+		<sidebar 
+			:nome="nome"
+			:page_data="page_data"
+			:menu_pages="menu_pages"></sidebar>
+		<content_wrapper 
+			:codice_sessione="codice_sessione"
+			:access_token="access_token"
+			@page="set_page_active"></content_wrapper>
 		<footer_bottom></footer_bottom>
 	</div>

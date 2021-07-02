@@ -3,6 +3,7 @@ const app = Vue.createApp({
         return {
             // variable from session
             codice_sessione: null,
+            access_token: '20|haE3Fr76QxhTsn71QFSVli7AwpNGVrilaa2HGMQ7',
             id_utente: null,
             nome: null,
             permissione: null,

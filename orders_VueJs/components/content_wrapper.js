@@ -2,7 +2,10 @@ app.component('content_wrapper', {
 	props: {
 		codice_sessione: {
 			type: String
-		}
+		},
+        access_token: {
+            access_token: String,
+        },
 	},
     template:
         /*html*/
@@ -28,7 +31,7 @@ app.component('content_wrapper', {
                 <!-- Main content -->
                 <section class="content">
                     <div class="container-fluid">
-                        <orders></orders>
+                        <orders :access_token="access_token"></orders>
                     </div><!-- /.container-fluid -->
                 </section>
             </div>

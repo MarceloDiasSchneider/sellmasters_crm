@@ -12,15 +12,17 @@ app.component('content_wrapper', {
                 <section class="content-header">
                     <div class="container-fluid">
                         <div class="row">
-                            <button type="button" class="btn btn-app" @click="reset_form" data-toggle="modal" data-target="#modal-xl">
-                                <i class="fas fa-plus-circle text-success"></i>Nuovo
-                            </button>
-                            <button type="button" class="btn btn-app" @click="edit" data-toggle="modal" data-target="#modal-xl" :class="[ selected_row ? '' : 'disabled' ]" :disabled=" !selected_row ">
-                                <i class="fas fa-edit text-warning"></i>Modificare
-                            </button>
-                            <button type="button" class="btn btn-app" @click="block" :class="[ selected_row ? '' : 'disabled' ]" :disabled=" !selected_row ">
-                                <i class="fas fa-ban text-danger"></i>Blocca
-                            </button>
+                            <div class="col-12">
+                                <button type="button" class="btn btn-app" @click="reset_form" data-toggle="modal" data-target="#modal-xl">
+                                    <i class="fas fa-plus-circle text-success"></i>Nuovo
+                                </button>
+                                <button type="button" class="btn btn-app" @click="edit" data-toggle="modal" data-target="#modal-xl" :class="[ selected_row ? '' : 'disabled' ]" :disabled=" !selected_row ">
+                                    <i class="fas fa-edit text-warning"></i>Modificare
+                                </button>
+                                <button type="button" class="btn btn-app" @click="block" :class="[ selected_row ? '' : 'disabled' ]" :disabled=" !selected_row ">
+                                    <i class="fas fa-ban text-danger"></i>Blocca
+                                </button>
+                            </div>
                         </div>
                     </div><!-- /.container-fluid -->
                 </section>

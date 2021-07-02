@@ -15,26 +15,13 @@ if (isset($_SERVER['REQUEST_METHOD'])) {
     exit;
 }
 
-// set the data to variables
-$merchant_id = $requestBody['merchant_id'];
-$startDate = $requestBody['startDate'];
-$endDate = $requestBody['endDate'];
-$url = 'http://51.91.97.200/sellmaster/api_sellmasters/ordini_mondotop.php';
-
 class ordersManipulatorClass
 {
-    public $url;
+    public $endpoint;
+    public $access_token;
+    public $merchant_id;
     public $startDate;
     public $endDate;
-    public $merchant_id;
-
-    function __construct($url, $merchant_id, $startDate, $endDate)
-    {
-        $this->url = $url;
-        $this->merchant_id  = $merchant_id;
-        $this->startDate  = $startDate;
-        $this->endDate = $endDate;
-    }
 
     // get all orders
     public function get_orders()
@@ -42,7 +29,7 @@ class ordersManipulatorClass
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $this->url . '?data_inizio=' . $this->startDate . '&data_fine=' . $this->endDate,
+            CURLOPT_URL => $this->endpoint . 'start/' . $this->startDate . '/end/' . $this->endDate .'/merchant/' . $this->merchant_id,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -50,12 +37,22 @@ class ordersManipulatorClass
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Bearer ' . $this->access_token,
+            ),
         ));
 
         $response = curl_exec($curl);
-
+        $response = json_decode($response, true);
         curl_close($curl);
-        return json_decode($response, true);
+
+        // if no ordes was found return a empty response
+        if (!(is_array($response) || is_object($response))) {
+            echo json_encode(array());
+            exit;
+        }
+
+        return $response;
     }
 
     // check if dati_finanziari is equal a refund
@@ -75,7 +72,6 @@ class ordersManipulatorClass
         }
         return $ordersRefund;
     }
-
     // set the formation foreach market_status 
     public function market_status_formation($orders)
     {
@@ -97,6 +93,7 @@ class ordersManipulatorClass
                     $order['market_status'] = '<span class="bg-danger py-1 px-3 rounded">' . $order['market_status'] . '</span>';
                     break;
                 default:
+                    $order['market_status'] = '<span class="bg-maroon py-1 px-3 rounded">' . 'Without status' . '</span>';
                     break;
             }
             $ordersFormated[] = $order;
@@ -128,7 +125,6 @@ class ordersManipulatorClass
         }
         return $currencyUpdated;
     }
-
     // format the array to show all dati_finaziari
     public function format_dati_finanziare($orders)
     {
@@ -155,14 +151,118 @@ class ordersManipulatorClass
         }
         return $dati_finanziari_formated;
     }
+    // format the financial_issue to display in a column
+    public function financial_issue($orders)
+    {
+        // echo '<pre>';
+        // print_r($orders[0]);
+        // echo '<hr>';
+        // print_r($orders[55]['financial_issue']);
+        // echo '</pre>';
+        // exit;
+        foreach ($orders as $key => $order) {
+            $financial_issue_html = '';
+            if ($order['financial_issue'] !== null) {
+                // decoding the financial issue 
+                $financial_issue = json_decode($order['financial_issue'], true);
+                #PostedDate
+                $financial_issue_html .= $this->formatAsHTML('PostedDate', $financial_issue['PostedDate'], 'info');   
+                # OrderFeeList -> sempre vuoto
+                $financial_issue_html .= $this->formatAsHTML('OrderFeeList', '', 'secondary');
+                #AmazonOrderId
+                $financial_issue_html .= $this->formatAsHTML('AmazonOrderId', $financial_issue['AmazonOrderId'], 'info');
+                # MarketplaceName
+                $financial_issue_html .= $this->formatAsHTML('MarketplaceName', $financial_issue['MarketplaceName'], 'info');
+                # OrderChargeList -> sempre vuoto
+                $financial_issue_html .= $this->formatAsHTML('OrderChargeList', '', 'secondary');
+                # ShipmentFeeList -> sempre vuoto
+                $financial_issue_html .= $this->formatAsHTML('ShipmentFeeList', '', 'secondary');
+                # SellerSKU
+                if(isset($financial_issue['ShipmentItemList']['ShipmentItem']['SellerSKU']))
+                $SellerSKU = $financial_issue['ShipmentItemList']['ShipmentItem']['SellerSKU'];
+                $financial_issue_html .= $this->formatAsHTML('SellerSKU', $SellerSKU, 'info');
+                # FeeComponent
+                if(isset($financial_issue['ShipmentItemList']['ShipmentItem']['ItemFeeList']['FeeComponent'])){
+                    $FeeComponent = $financial_issue['ShipmentItemList']['ShipmentItem']['ItemFeeList']['FeeComponent'];
+                    foreach ($FeeComponent as $key => $value) {
+                        $CurrencyCode_CurrencyAmount = $value['FeeAmount']['CurrencyCode'] . ': ' . $value['FeeAmount']['CurrencyAmount'];
+                        $financial_issue_html .= $this->formatAsHTML($value['FeeType'], $CurrencyCode_CurrencyAmount, 'lightblue');
+                    }
+                    
+                }
+                # OrderItemId
+                if(isset($financial_issue['ShipmentItemList']['ShipmentItem']['OrderItemId'])) {
+                    $OrderItemId = $financial_issue['ShipmentItemList']['ShipmentItem']['OrderItemId'];
+                    $financial_issue_html .= $this->formatAsHTML('OrderItemId', $OrderItemId, 'info');
+                }
+                # PromotionList
+                if (isset($financial_issue['ShipmentItemList']['ShipmentItem']['PromotionList']['Promotion'])) {
+                    $Promotion = $financial_issue['ShipmentItemList']['ShipmentItem']['PromotionList']['Promotion'];
+                    foreach ($Promotion as $key => $value) {
+                        $financial_issue_html .= $this->formatAsHTML('PromotionId', $value['PromotionId'], 'navy');
+                        $CurrencyCode_CurrencyAmount = $value['PromotionAmount']['CurrencyCode'] . ': ' . $value['PromotionAmount']['CurrencyAmount'];
+                        $financial_issue_html .= $this->formatAsHTML($value['PromotionType'], $CurrencyCode_CurrencyAmount, 'navy');
+                    }
+                }
+                # ChargeComponent
+                if (isset($financial_issue['ShipmentItemList']['ShipmentItem']['ItemChargeList']['ChargeComponent'])) {
+                    $ChargeComponent = $financial_issue['ShipmentItemList']['ShipmentItem']['ItemChargeList']['ChargeComponent'];
+                    foreach ($ChargeComponent as $key => $value) {
+                        $CurrencyCode_CurrencyAmount = $value['ChargeAmount']['CurrencyCode'] . ': ' . $value['ChargeAmount']['CurrencyAmount'];
+                        $financial_issue_html .= $this->formatAsHTML($value['ChargeType'], $CurrencyCode_CurrencyAmount, 'lightblue');
+                    }
+                }
+                # QuantityShipped
+                if(isset($financial_issue['ShipmentItemList']['ShipmentItem']['QuantityShipped']))
+                $QuantityShipped = $financial_issue['ShipmentItemList']['ShipmentItem']['QuantityShipped'];
+                $financial_issue_html .= $this->formatAsHTML('QuantityShipped', $QuantityShipped, 'info');
+                # ItemTaxWithheldList -> sempre vuoto
+                $financial_issue_html .= $this->formatAsHTML('ItemTaxWithheldList', '', 'secondary');
+                # ItemFeeAdjustmentList -> sempre vuoto
+                $financial_issue_html .= $this->formatAsHTML('ItemFeeAdjustmentList', '', 'secondary');
+                # PromotionAdjustmentList -> sempre vuoto
+                $financial_issue_html .= $this->formatAsHTML('PromotionAdjustmentList', '', 'secondary');
+                # ItemChargeAdjustmentList -> sempre vouto
+                $financial_issue_html .= $this->formatAsHTML('ItemChargeAdjustmentList', '', 'secondary');
+                # DirectPaymentList -> sempre vouto
+                $financial_issue_html .= $this->formatAsHTML('DirectPaymentList', '', 'secondary');
+                # OrderFeeAdjustmentList -> sempre vouto
+                $financial_issue_html .= $this->formatAsHTML('OrderFeeAdjustmentList', '', 'secondary');
+                # OrderChargeAdjustmentList -> sempre vouto
+                $financial_issue_html .= $this->formatAsHTML('OrderChargeAdjustmentList', '', 'secondary');
+                # ShipmentFeeAdjustmentList -> sempre vouto
+                $financial_issue_html .= $this->formatAsHTML('ShipmentFeeAdjustmentList', '', 'secondary');
+                # ShipmentItemAdjustmentList -> sempre vouto
+                $financial_issue_html .= $this->formatAsHTML('ShipmentItemAdjustmentList', '', 'secondary');
+
+                $order['financial_issue_html'] = $financial_issue_html;
+            } else {
+                $order['financial_issue_html'] = $this->formatAsHTML('No data', '', 'gray');
+            }
+            $orders_financial_issue[] = $order;
+        }
+        return $orders_financial_issue;
+    }
+
+    public function formatAsHTML($key, $value, $bg_color)
+    {
+        return '<span class="bg-' . $bg_color . ' py-1 px-3 rounded">' . $key . ': ' . $value . '</span><br>';
+    }
 }
 
-$order = new ordersManipulatorClass($url, $merchant_id, $startDate, $endDate);
-$orders = $order->get_orders();
-$ordersRefund = $order->dati_finanziari_refund($orders);
-$ordersFormated = $order->market_status_formation($ordersRefund);
-$totalOrder = $order->total_order($ordersFormated);
-$currencyUpdated = $order->currency_convert($totalOrder);
-$dati_finanziari_formated = $order->format_dati_finanziare($currencyUpdated);
+$order = new ordersManipulatorClass();
+$order->endpoint = 'http://51.38.232.192/api/orders/';
+$order->access_token = $requestBody['access_token'];
+$order->merchant_id = $requestBody['merchant_id'];
+$order->startDate = $requestBody['startDate'];
+$order->endDate = $requestBody['endDate'];
 
-echo json_encode($dati_finanziari_formated);
+$orders = $order->get_orders();
+$orders = $order->financial_issue($orders);
+// $orders = $order->dati_finanziari_refund($orders);
+$orders = $order->market_status_formation($orders);
+$orders = $order->total_order($orders);
+$orders = $order->currency_convert($orders);
+// $orders = $order->format_dati_finanziare($orders);
+
+echo json_encode($orders);

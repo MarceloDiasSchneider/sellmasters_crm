@@ -97,7 +97,6 @@ app.component('orders', {
             let yyyy = today.getFullYear();
 
             today = `${yyyy}-${mm}-${dd}`;
-            today = `2021-06-02`;
 
             this.endDate = today
             // X days ago
@@ -108,7 +107,6 @@ app.component('orders', {
             yyyy = xDaysAgo.getFullYear();
 
             xDaysAgo = `${yyyy}-${mm}-${dd}`;
-            xDaysAgo = `2021-06-01`;
 
             this.startDate = xDaysAgo
         },
@@ -155,8 +153,8 @@ app.component('orders', {
             let self = this
             // formatting function for row child details 
             function format ( data ) {
-                financial_issue = null
-                console.log(data.financial_issue);
+                // financial_issue = null
+                // console.log(data.financial_issue);
                 // if (data.financial_issue){
                 //     financial_issue = '<table cellpadding="3" cellspacing="0" border="0" style="padding-left:50px;">'+
                 //         '<tr>'+

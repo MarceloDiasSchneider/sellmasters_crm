@@ -125,11 +125,7 @@ switch ($requestBody['action']) {
                 $fa_lock = $value['attivo'] ? 'fas fa-lock-open' : 'fas fa-lock';
                 $title = $value['attivo'] ? 'disabilitare' : 'attivare';
                 foreach ($value as $k => $v) {
-                    if ($k == 'id') { // Use the id to set action as update or able and disable
-                        $info['azione'] = "
-                            <span class='update' id='mc_$v'><i class='fas fa-edit' title='modificare'></i></span> 
-                            <span class='able_disable' id='mc_$v'><i class='$fa_lock' title='$title'></i></span>";
-                    } else if ($k == 'attivo') { // Convert number attivo to Sì or No
+                    if ($k == 'attivo') { // Convert number attivo to Sì or No
                         if ($v == 1) {
                             $info[$k] = 'Sì';
                         } else {
@@ -220,7 +216,7 @@ switch ($requestBody['action']) {
         $allMerchant = $merchants->get_merchants_active();
         break;
 
-        default:
+    default:
         # code...
         break;
 }

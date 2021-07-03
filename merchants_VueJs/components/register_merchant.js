@@ -2,23 +2,26 @@ app.component('register_merchant', {
     props: {
         codice_sessione: {
             type: String
+        },
+        selected_row: {
+            type: String
         }
     },
     template:
         /*html*/
-        `<div class="row">
-            <div class="col-md-12">
-                <div class="card card-primary">
-                    <div class="card-header">
-                        <h3 class="card-title">Nuovo commerciante</h3>
+        `<div class="modal fade" id="modal-xl">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary">
+                        <h3 class="modal-title">Nuovo commerciante</h3>
                         <div class="card-tools">
-                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                <i class="fas fa-minus"></i>
+                            <button type="button" class="btn btn-tool" data-toggle="modal" data-target="#modal-xl">
+                                <i class="fas fa-times"></i>
                             </button>
                         </div>
                     </div>
                     <!-- /.card-header -->
-                    <div class="card-body">
+                    <div class="modal-body">
                         <!-- form start -->
                         <form action='#' id='merchant' name='merchant' method='post' @submit.prevent="insert_or_update_merchant">
                             <div class="row">
@@ -115,17 +118,8 @@ app.component('register_merchant', {
                                     </div>
                                 </div>
                             </div>
-                            <input type="hidden" id="attivo" name="attivo" v-model="attivo">
-                            <input v-if="merchant_primary_id" type="hidden" id="id_merchant" name="id_merchant" :value="merchant_primary_id">
-                            <input type="hidden" id="codiceSessione" name="codiceSessione" :value="codice_sessione">
-
                             <div class="float-right ml-1 mt-1">
-                                <button v-if="merchant_primary_id" type="submit" id="insert" class="btn btn-primary">Aggiorna</button>
-                                <button v-else type="submit" id="update" class="btn btn-primary">Registra</button>
-                            </div>
-                            
-                            <div class="float-right ml-1 mt-1">
-                                <button type="submit" id="reset_form" class="btn btn-primary" :class=" [merchant_primary_id ? '' : 'd-none']" @click.prevent="reset_form">Indietro a nuovo utente</button>
+                                <button type="submit" id="button" class="btn btn-primary">{{ button }}</button>
                             </div>
                         </form>
                         <!-- /.form -->
@@ -218,14 +212,18 @@ app.component('register_merchant', {
                             case 201:
                                 // show a success message. ex: merchant inserted
                                 toastr.success(data.message)
-                                this.$emit('refresh_datatables')
+                                this.emit_refresh_datatables()                                
+                                this.emit_selected_row(null)
                                 this.reset_form()
+                                this.hide_modal()
                                 break;
                             case 200:
                                 // show a success message. ex: merchant updated
                                 toastr.success(data.message)
-                                this.$emit('refresh_datatables')
+                                this.emit_refresh_datatables()
+                                this.emit_selected_row(null)
                                 this.reset_form()
+                                this.hide_modal()
                                 break;
                             default:
                                 break;
@@ -239,18 +237,18 @@ app.component('register_merchant', {
                     });
             } else {
                 // create a report to each field that must to be completed
-                alert('compila tutti i campi')
+                alert('compila nome e merchant id')
             }
         },
         // get the merchants data to update
-        get_merchant_data(merchant_primary_id) {
+        get_merchant_data() {
             this.loading = true
             // set options to send with the post request
             const requestOptions = {
                 method: 'POST',
                 mode: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 'action': 'get_merchant_data', 'id': merchant_primary_id })
+                body: JSON.stringify({ 'action': 'get_merchant_data', 'id': this.selected_row })
             };
             fetch('model.php', requestOptions)
                 // process the backend response
@@ -270,7 +268,6 @@ app.component('register_merchant', {
                             // reporting a success message
                             toastr.success(data.message)
                             // set the value to the inputs
-                            this.merchant_primary_id = merchant_primary_id
                             if (data.merchant.nome != undefined) { this.nome = data.merchant.nome } else { this.nome = null }
                             if (data.merchant.nome != undefined) { this.nome = data.merchant.nome } else { this.nome = null }
                             if (data.merchant.nome_sociale != undefined) { this.nome_sociale = data.merchant.nome_sociale } else { this.nome_sociale = null }
@@ -286,6 +283,7 @@ app.component('register_merchant', {
                             if (data.merchant.cap != undefined) { this.cap = data.merchant.cap } else { this.cap = null }
                             if (data.merchant.stato != undefined) { this.stato = data.merchant.stato } else { this.stato = null }
                             if (data.merchant.provincia != undefined) { this.provincia = data.merchant.provincia } else { this.provincia = null }
+                            this.show_modal()
                             break;
                         default:
                             break;
@@ -316,5 +314,28 @@ app.component('register_merchant', {
             this.provincia = null
             this.merchant_primary_id = null 
         },
+        emit_refresh_datatables() {
+            this.$emit('refresh_datatables')
+        },
+        emit_selected_row(data){
+            this.$emit('set_selected_row', data)
+        },
+        show_modal(){
+            $('#modal-xl').modal('show')
+        },
+        hide_modal(){
+            $('#modal-xl').modal('hide')
+        },
+    },
+    computed: {
+        button(){
+            if (this.merchant_primary_id) {return 'Aggiorna'}
+            return 'Registra'
+        }
+    },
+    watch: { 
+        selected_row: function(newVal) { 
+            this.merchant_primary_id = newVal
+        }
     }
 })

@@ -233,7 +233,7 @@ app.component('register_user', {
             }
         },
         // get the user data to update
-        get_user_data(user_id) {
+        get_user_data() {
             this.loading = true
             // set options to send with the post request
             const requestOptions = {

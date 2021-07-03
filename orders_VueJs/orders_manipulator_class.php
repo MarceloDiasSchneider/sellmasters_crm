@@ -46,8 +46,11 @@ class ordersManipulatorClass
         $response = json_decode($response, true);
         curl_close($curl);
 
-        // if no ordes was found return a empty response
-        if (!(is_array($response) || is_object($response))) {
+        // if no order was found return a empty response to avoid error on datatables
+        if (!(is_array($response) || is_object($response ))) {
+            echo json_encode(array());
+            exit;
+        } elseif (!count($response)){
             echo json_encode(array());
             exit;
         }
@@ -154,12 +157,6 @@ class ordersManipulatorClass
     // format the financial_issue to display in a column
     public function financial_issue($orders)
     {
-        // echo '<pre>';
-        // print_r($orders[0]);
-        // echo '<hr>';
-        // print_r($orders[55]['financial_issue']);
-        // echo '</pre>';
-        // exit;
         foreach ($orders as $key => $order) {
             $financial_issue_html = '';
             if ($order['financial_issue'] !== null) {
@@ -185,10 +182,11 @@ class ordersManipulatorClass
                 if(isset($financial_issue['ShipmentItemList']['ShipmentItem']['ItemFeeList']['FeeComponent'])){
                     $FeeComponent = $financial_issue['ShipmentItemList']['ShipmentItem']['ItemFeeList']['FeeComponent'];
                     foreach ($FeeComponent as $key => $value) {
-                        $CurrencyCode_CurrencyAmount = $value['FeeAmount']['CurrencyCode'] . ': ' . $value['FeeAmount']['CurrencyAmount'];
-                        $financial_issue_html .= $this->formatAsHTML($value['FeeType'], $CurrencyCode_CurrencyAmount, 'lightblue');
+                        if (isset($value['FeeAmount']['CurrencyCode']) && isset($value['FeeAmount']['CurrencyAmount']) && $value['FeeType']) {
+                            $CurrencyCode_CurrencyAmount = $value['FeeAmount']['CurrencyCode'] . ': ' . $value['FeeAmount']['CurrencyAmount'];
+                            $financial_issue_html .= $this->formatAsHTML($value['FeeType'], $CurrencyCode_CurrencyAmount, 'lightblue');
+                        }
                     }
-                    
                 }
                 # OrderItemId
                 if(isset($financial_issue['ShipmentItemList']['ShipmentItem']['OrderItemId'])) {
@@ -243,7 +241,7 @@ class ordersManipulatorClass
         }
         return $orders_financial_issue;
     }
-
+    // format values as HTML with classes to set a style
     public function formatAsHTML($key, $value, $bg_color)
     {
         return '<span class="bg-' . $bg_color . ' py-1 px-3 rounded">' . $key . ': ' . $value . '</span><br>';

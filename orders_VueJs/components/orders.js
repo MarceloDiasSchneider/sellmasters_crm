@@ -149,6 +149,7 @@ app.component('orders', {
         },
         // initiate the dataTables
         get_orders() {
+            this.loading = true
             this.datatables = true
             let self = this
             // formatting function for row child details 
@@ -204,14 +205,15 @@ app.component('orders', {
                 //     dataSrc: 'purchase_date',
                 // },
                 columns: [
-                    { 
-                        "title": "",
-                        "className": 'dtr-control',
-                        "orderable": false,
-                        "selected": false,
-                        "data": null,
-                        "defaultContent": "<i class='fas fa-plus-square'></i>"
-                    },
+                    // column add details in a sub row 
+                    // {   
+                    //     "title": "",
+                    //     "className": 'dtr-control',
+                    //     "orderable": false,
+                    //     "selected": false,
+                    //     "data": null,
+                    //     "defaultContent": "<i class='fas fa-plus-square'></i>"
+                    // },
                     { "title": "Order id", data: "order_id", "className": "select-on"},
                     { "title": "Merchant id", data: "merchant_id", "className": "select-on"},
                     { "title": "Purchase date", data: "purchase_date", "className": "select-on"},
@@ -253,6 +255,9 @@ app.component('orders', {
                     // { "title": "Financial issue", data: "financial_issue" },
                     { "title": "Financial issue", data: "financial_issue_html" },
                 ],
+                "initComplete": function(settings, json) {
+                    self.loading = false;
+                },
                 "order": [[ 3, "desc" ]],
                 "responsive": false,
                 "scrollX": true,
@@ -278,7 +283,11 @@ app.component('orders', {
         },
         // refresh the datatables
         refresh_datatables() {
-            $('#orders').DataTable().ajax.reload(null, false);
+            this.loading = true
+            let self = this
+            $('#orders').DataTable().ajax.reload(() => {
+                self.loading = false
+            }, false);
         },
     },
     mounted() {

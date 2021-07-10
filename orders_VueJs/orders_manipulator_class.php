@@ -163,36 +163,36 @@ class ordersManipulatorClass
                 // decoding the financial issue 
                 $financial_issue = json_decode($order['financial_issue'], true);
                 #PostedDate
-                $financial_issue_html .= $this->formatAsHTML('PostedDate', $financial_issue['PostedDate'], 'info');   
+                // $financial_issue_html .= $this->formatAsHTML('PostedDate', $financial_issue['PostedDate'], 'info');   
                 # OrderFeeList -> sempre vuoto
-                $financial_issue_html .= $this->formatAsHTML('OrderFeeList', '', 'secondary');
+                // $financial_issue_html .= $this->formatAsHTML('OrderFeeList', '', 'secondary');
                 #AmazonOrderId
-                $financial_issue_html .= $this->formatAsHTML('AmazonOrderId', $financial_issue['AmazonOrderId'], 'info');
+                // $financial_issue_html .= $this->formatAsHTML('AmazonOrderId', $financial_issue['AmazonOrderId'], 'info');
                 # MarketplaceName
-                $financial_issue_html .= $this->formatAsHTML('MarketplaceName', $financial_issue['MarketplaceName'], 'info');
+                // $financial_issue_html .= $this->formatAsHTML('MarketplaceName', $financial_issue['MarketplaceName'], 'info');
                 # OrderChargeList -> sempre vuoto
-                $financial_issue_html .= $this->formatAsHTML('OrderChargeList', '', 'secondary');
+                // $financial_issue_html .= $this->formatAsHTML('OrderChargeList', '', 'secondary');
                 # ShipmentFeeList -> sempre vuoto
-                $financial_issue_html .= $this->formatAsHTML('ShipmentFeeList', '', 'secondary');
+                // $financial_issue_html .= $this->formatAsHTML('ShipmentFeeList', '', 'secondary');
                 # SellerSKU
-                if(isset($financial_issue['ShipmentItemList']['ShipmentItem']['SellerSKU']))
-                $SellerSKU = $financial_issue['ShipmentItemList']['ShipmentItem']['SellerSKU'];
-                $financial_issue_html .= $this->formatAsHTML('SellerSKU', $SellerSKU, 'info');
+                // if(isset($financial_issue['ShipmentItemList']['ShipmentItem']['SellerSKU']))
+                // $SellerSKU = $financial_issue['ShipmentItemList']['ShipmentItem']['SellerSKU'];
+                // $financial_issue_html .= $this->formatAsHTML('SellerSKU', $SellerSKU, 'info');
                 # FeeComponent
                 if(isset($financial_issue['ShipmentItemList']['ShipmentItem']['ItemFeeList']['FeeComponent'])){
                     $FeeComponent = $financial_issue['ShipmentItemList']['ShipmentItem']['ItemFeeList']['FeeComponent'];
                     foreach ($FeeComponent as $key => $value) {
                         if (isset($value['FeeAmount']['CurrencyCode']) && isset($value['FeeAmount']['CurrencyAmount']) && $value['FeeType']) {
                             $CurrencyCode_CurrencyAmount = $value['FeeAmount']['CurrencyCode'] . ': ' . $value['FeeAmount']['CurrencyAmount'];
-                            $financial_issue_html .= $this->formatAsHTML($value['FeeType'], $CurrencyCode_CurrencyAmount, 'lightblue');
+                            $financial_issue_html .= $this->formatAsHTML($value['FeeType'], $CurrencyCode_CurrencyAmount, 'info');
                         }
                     }
                 }
                 # OrderItemId
-                if(isset($financial_issue['ShipmentItemList']['ShipmentItem']['OrderItemId'])) {
-                    $OrderItemId = $financial_issue['ShipmentItemList']['ShipmentItem']['OrderItemId'];
-                    $financial_issue_html .= $this->formatAsHTML('OrderItemId', $OrderItemId, 'info');
-                }
+                // if(isset($financial_issue['ShipmentItemList']['ShipmentItem']['OrderItemId'])) {
+                //     $OrderItemId = $financial_issue['ShipmentItemList']['ShipmentItem']['OrderItemId'];
+                //     $financial_issue_html .= $this->formatAsHTML('OrderItemId', $OrderItemId, 'info');
+                // }
                 # PromotionList
                 if (isset($financial_issue['ShipmentItemList']['ShipmentItem']['PromotionList']['Promotion'])) {
                     $Promotion = $financial_issue['ShipmentItemList']['ShipmentItem']['PromotionList']['Promotion'];
@@ -211,27 +211,27 @@ class ordersManipulatorClass
                     }
                 }
                 # QuantityShipped
-                if(isset($financial_issue['ShipmentItemList']['ShipmentItem']['QuantityShipped']))
-                $QuantityShipped = $financial_issue['ShipmentItemList']['ShipmentItem']['QuantityShipped'];
-                $financial_issue_html .= $this->formatAsHTML('QuantityShipped', $QuantityShipped, 'info');
+                // if(isset($financial_issue['ShipmentItemList']['ShipmentItem']['QuantityShipped']))
+                // $QuantityShipped = $financial_issue['ShipmentItemList']['ShipmentItem']['QuantityShipped'];
+                // $financial_issue_html .= $this->formatAsHTML('QuantityShipped', $QuantityShipped, 'info');
                 # ItemTaxWithheldList -> sempre vuoto
-                $financial_issue_html .= $this->formatAsHTML('ItemTaxWithheldList', '', 'secondary');
+                // $financial_issue_html .= $this->formatAsHTML('ItemTaxWithheldList', '', 'secondary');
                 # ItemFeeAdjustmentList -> sempre vuoto
-                $financial_issue_html .= $this->formatAsHTML('ItemFeeAdjustmentList', '', 'secondary');
+                // $financial_issue_html .= $this->formatAsHTML('ItemFeeAdjustmentList', '', 'secondary');
                 # PromotionAdjustmentList -> sempre vuoto
-                $financial_issue_html .= $this->formatAsHTML('PromotionAdjustmentList', '', 'secondary');
+                // $financial_issue_html .= $this->formatAsHTML('PromotionAdjustmentList', '', 'secondary');
                 # ItemChargeAdjustmentList -> sempre vouto
-                $financial_issue_html .= $this->formatAsHTML('ItemChargeAdjustmentList', '', 'secondary');
+                // $financial_issue_html .= $this->formatAsHTML('ItemChargeAdjustmentList', '', 'secondary');
                 # DirectPaymentList -> sempre vouto
-                $financial_issue_html .= $this->formatAsHTML('DirectPaymentList', '', 'secondary');
+                // $financial_issue_html .= $this->formatAsHTML('DirectPaymentList', '', 'secondary');
                 # OrderFeeAdjustmentList -> sempre vouto
-                $financial_issue_html .= $this->formatAsHTML('OrderFeeAdjustmentList', '', 'secondary');
+                // $financial_issue_html .= $this->formatAsHTML('OrderFeeAdjustmentList', '', 'secondary');
                 # OrderChargeAdjustmentList -> sempre vouto
-                $financial_issue_html .= $this->formatAsHTML('OrderChargeAdjustmentList', '', 'secondary');
+                // $financial_issue_html .= $this->formatAsHTML('OrderChargeAdjustmentList', '', 'secondary');
                 # ShipmentFeeAdjustmentList -> sempre vouto
-                $financial_issue_html .= $this->formatAsHTML('ShipmentFeeAdjustmentList', '', 'secondary');
+                // $financial_issue_html .= $this->formatAsHTML('ShipmentFeeAdjustmentList', '', 'secondary');
                 # ShipmentItemAdjustmentList -> sempre vouto
-                $financial_issue_html .= $this->formatAsHTML('ShipmentItemAdjustmentList', '', 'secondary');
+                // $financial_issue_html .= $this->formatAsHTML('ShipmentItemAdjustmentList', '', 'secondary');
 
                 $order['financial_issue_html'] = $financial_issue_html;
             } else {
@@ -240,6 +240,22 @@ class ordersManipulatorClass
             $orders_financial_issue[] = $order;
         }
         return $orders_financial_issue;
+    }
+    public function check_order_id_sku($orders)
+    {
+        $order_id_sku = [];
+        foreach ($orders as $key => $order) {
+            $order['order_id_sku'] = $order['order_id'] . $order['sku']; 
+            $order_id_sku[] = $order;
+        }
+        $order_id_sku_maped = array_column($order_id_sku, 'order_id_sku');
+        $order_count = [];
+        foreach ($order_id_sku as $key => $order) {
+            $order['order_id_sku_count'] = array_count_values($order_id_sku_maped)[$order['order_id_sku']]; 
+            $order_count[] = $order;
+        }
+            
+        return $order_count;
     }
     // format values as HTML with classes to set a style
     public function formatAsHTML($key, $value, $bg_color)
@@ -262,5 +278,6 @@ $orders = $order->market_status_formation($orders);
 $orders = $order->total_order($orders);
 $orders = $order->currency_convert($orders);
 // $orders = $order->format_dati_finanziare($orders);
+$orders = $order->check_order_id_sku($orders);
 
 echo json_encode($orders);

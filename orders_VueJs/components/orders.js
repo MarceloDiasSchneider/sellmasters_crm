@@ -193,7 +193,8 @@ app.component('orders', {
                     dataSrc: ""
                 },
                 searchPanes: {
-                    cascadePanes: true
+                    // cascadePanes: true,
+                    columns: [1],
                 },
                 "pageLength": 10,
                 select: {
@@ -214,6 +215,8 @@ app.component('orders', {
                     //     "data": null,
                     //     "defaultContent": "<i class='fas fa-plus-square'></i>"
                     // },
+                    { "title": "order_id_sku", data: "order_id_sku", "className": "select-on"},
+                    { "title": "order_id_sku_count", data: "order_id_sku_count", "className": "select-on"},
                     { "title": "Order id", data: "order_id", "className": "select-on"},
                     { "title": "Merchant id", data: "merchant_id", "className": "select-on"},
                     { "title": "Purchase date", data: "purchase_date", "className": "select-on"},

@@ -17,8 +17,11 @@ app.component('content_wrapper', {
                                 <button type="button" class="btn btn-app" @click="new_product" data-toggle="modal" data-target="#modal-create-product">
                                     <i class="fas fa-plus-circle text-success"></i>Nuovo
                                 </button>
-                                <button type="button" class="btn btn-app" @click="import_products" data-toggle="modal" data-target="#modal-import-products">
+                                <button type="button" class="btn btn-app" data-toggle="modal" data-target="#modal-import-products">
                                     <i class="fas fa-upload text-info"></i>Import
+                                </button>
+                                <button type="button" class="btn btn-app" data-toggle="modal" data-target="#modal-update-quantity">
+                                    <i class="fas fa-boxes text-purple"></i>Update stock
                                 </button>
                             </div>
                         </div>
@@ -42,7 +45,6 @@ app.component('content_wrapper', {
                             :consumer_key="consumer_key"
                             :consumer_secret="consumer_secret"
                             :api_version="api_version">
-                            @refresh_table="refresh_table">
                         </create_product>
                         <import_products
                             ref="import_products"
@@ -52,6 +54,14 @@ app.component('content_wrapper', {
                             :consumer_secret="consumer_secret"
                             :api_version="api_version">
                         </import_products>
+                        <update_quantity
+                            ref="update_quantity"
+                            :codice_sessione="codice_sessione"
+                            :api_url="api_url"
+                            :consumer_key="consumer_key"
+                            :consumer_secret="consumer_secret"
+                            :api_version="api_version">
+                        </update_quantity>
                     </div><!-- /.container-fluid -->
                 </section>
             </div>
@@ -60,10 +70,10 @@ app.component('content_wrapper', {
         <!-- /.content-wrapper -->`,
     data() {
         return {
-            // api_url: 'http://localhost/wp-woo-commerce',
+            // api_url: 'http://localhost/wp-woo-commerce/wp-json/',
             // consumer_key: 'ck_2b58d19c44085a335db8e129c8a83fdf6f1dfbcc',
             // consumer_secret: 'cs_b537d3f8d0b45392c81beb5e5130880472c6f7e1',
-            // api_version: 'wc/v3',
+            // api_version: 'wc/v3/',
             api_url: 'https://armarketvirtual.it/prova/wp-json/',
             consumer_key: 'ck_a7d325a0c7a877d9f71bbf0ad5d9dbbe2768287a',
             consumer_secret: 'cs_8f9ac7a92288eeeb49e5997d8b54754600b58c9f',
@@ -77,9 +87,6 @@ app.component('content_wrapper', {
         },
         new_product() {
             this.$refs.create_product.reset_form()
-        },
-        import_products() {
-            // alert('import')
         },
         refresh_table() {
             this.$refs.get_products.get_products()

@@ -32,9 +32,11 @@ $woocommerceApi->api_version = $requestBody['api_version'];
 
 switch ($requestBody['action']) {
     case 'get_products':
-        // set attribute 
+        // set curl attribute 
         $woocommerceApi->resource = 'products';
         $woocommerceApi->method = 'GET';
+        $parameters = ['per_page' => 100, 'status' => 'publish'];
+        $woocommerceApi->postFields = json_encode($parameters);
         // retrieve the products
         $products = $woocommerceApi->woocommerceApi();
         $products = json_decode($products, true);
@@ -48,54 +50,54 @@ switch ($requestBody['action']) {
 
         break;
     case 'create_product':
-        try {
-            // set attributes
+        $product_error = [];
+        $product_success = [];
+        foreach ($requestBody['product'] as $product) {
+            // set curl attributes
             $woocommerceApi->resource = 'products/categories';
             $woocommerceApi->method = 'GET';
             // retrieve existing product categories
             $categories = $woocommerceApi->woocommerceApi();
             $categories = json_decode($categories);
-            if (isset($categories->message)) {
-                throw new reportException($categories->message, 400);
-            }
             // check if the category already exist, and get it id
-            $category = array_search($requestBody['product']['category'], array_column($categories, 'name', 'id'));
+            if (!isset($categories->message)) {
+                $category = array_search($product['category'], array_column($categories, 'name', 'id'));
+            }
             if (!$category) {
                 // if category not exist, create it
-                // set attributes
-                $category = [
-                    'name' => $requestBody['product']['category']
+                // set curl attributes
+                $category_to_create = [
+                    'name' => $product['category']
                 ];
-                $woocommerceApi->postFields = json_encode($category);
+                $woocommerceApi->postFields = json_encode($category_to_create);
                 $woocommerceApi->resource = 'products/categories';
                 $woocommerceApi->method = 'POST';
                 // post the new category
                 $new_category = $woocommerceApi->woocommerceApi();
                 $new_category = json_decode($new_category);
-                if (isset($new_category->message)) {
-                    throw new reportException($new_category->message, 400);
+                if (!isset($new_category->message)) {
+                    // get the created category's id 
+                    $category = $new_category->id;
                 }
-                // get the created category's id 
-                $category = $new_category->id;
             }
             // prepare the options to create the product
             $product_to_create = [];
-            $product_to_create["sku"] = $requestBody['product']['sku'];
-            $product_to_create["name"] = $requestBody['product']['name'];
-            // isset($requestBody['product']['description']) ? $product_to_create["description"] = $requestBody['product']['description'] : '';
+            $product_to_create["sku"] = $product['sku'];
+            $product_to_create["name"] = $product['name'];
+            isset($product['description']) ? $product_to_create["description"] = $product['description'] : '';
             $product_to_create["categories"][] = ['id' => $category];
-            $product_to_create["regular_price"] = '"'.$requestBody['product']['regular_price'].'"';
+            $product_to_create["regular_price"] = '"'.$product['regular_price'].'"';
             $product_to_create["manage_stock"] = true;
-            $product_to_create["stock_quantity"] = $requestBody['product']['stock_quantity'];
-            $product_to_create["status"] = $requestBody['product']['status'];
+            $product_to_create["stock_quantity"] = $product['stock_quantity'];
+            $product_to_create["status"] = $product['status'];
             $product_to_create["images"] = [
                 [
-                    "src" => '"'.$requestBody['product']['url_image'].'"',
-                    'name' => $requestBody['product']['name'],
-                    'alt' => $requestBody['product']['name'],
+                    "src" => '"'.$product['url_image'].'"',
+                    'name' => $product['name'],
+                    'alt' => $product['name'],
                 ]
             ];
-            // set attributes
+            // set curl attributes
             $woocommerceApi->postFields = json_encode($product_to_create);
             $woocommerceApi->resource = 'products';
             $woocommerceApi->method = 'POST';
@@ -104,15 +106,75 @@ switch ($requestBody['action']) {
             $new_product = json_decode($new_product);
             // check if a message error exist
             if (isset($new_product->message)) {
-                throw new reportException($new_product->message, 400);
+                $product['error_message'] = $new_product->message;
+                $product_error[] = $product;
+            } else {
+                $product_success[] = $new_product;
             }
-        } catch (reportException $e) {
-            $e->reportError();
         }
-        $data['data'] = $new_product;
+
+        $data['data']['product_success'] = $product_success;
+        $data['data']['product_error'] = $product_error;
         $data['code'] = 201;
         $data['state'] = 'Created';
         $data['message'] = 'New product created';
+        
+        echo json_encode($data);
+        break;
+    case 'update_stock_quantity':
+        // prepare the sku to find the product's id
+        $stock = $requestBody['stock'];
+        $skuToUpdate = '';
+        foreach ($stock as $key => $sku) {
+            ($key !== 0) ? $skuToUpdate .= ',' : '' ;
+            $skuToUpdate .= $sku['sku'];
+        }
+        $stock = array_column($stock, 'stock_quantity', 'sku');
+        // set curl attribute 
+        $woocommerceApi->resource = 'products';
+        $woocommerceApi->method = 'GET';
+        $woocommerceApi->postFields = json_encode([
+            'per_page' => 100,
+            'sku' => $skuToUpdate,
+        ]);
+        # $woocommerceApi->postFields = '{"per_page": 100, "sku": "' . $skuToUpdate . '"}';
+        // retrieve the products that match with the skus
+        $products = $woocommerceApi->woocommerceApi();
+        $products = json_decode($products, true);
+        if (!isset($products->message) || !$products == null) {
+            $products = array_column($products, 'id', 'sku');
+        }
+        // set curl attribute 
+        $woocommerceApi->resource = 'products/batch';
+        $woocommerceApi->method = 'POST';
+        $stock_success = [];
+        $stock_error = [];
+        foreach ($stock as $sku => $quantity) {
+            if (isset($products[$sku])) {
+                $batchToUpdate['update'][] = [
+                    'id' => $products[$sku],
+                    'stock_quantity' => $quantity
+                ];
+                $stock_success[] = ['sku' => $sku];
+            } else {
+                $stock_error[] = ['sku' => $sku, 'error' => 'sku not found'];
+            }
+        }
+        $woocommerceApi->postFields = json_encode($batchToUpdate);
+        
+        // send a batch of products to update the stock quantity 
+        $products_stock_updated = $woocommerceApi->woocommerceApi();
+        if (isset($products->message) ) {
+            $data['error'] = $products->message;
+        } else {
+            $data['data']['stock_success'] = $stock_success;
+            $data['data']['stock_error'] = $stock_error;
+        }
+        
+        // return a response
+        $data['code'] = 200;
+        $data['state'] = 'Ok';
+        $data['message'] = 'Stock updated';
         
         echo json_encode($data);
         break;

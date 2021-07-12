@@ -1,4 +1,4 @@
-app.component('import_products', {
+app.component('update_quantity', {
     props: {
         codice_sessione: {
             type: String
@@ -22,17 +22,17 @@ app.component('import_products', {
     },
     template:
     /*html*/
-        `<div class="modal fade" id="modal-import-products">
+        `<div class="modal fade" id="modal-update-quantity">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header bg-primary">
-                    <h3 class="card-title">Import products</h3>
-                    <button type="button" class="btn btn-tool" data-toggle="modal" data-target="#modal-import-products" @click="reset">
+                    <h3 class="card-title">Update stock</h3>
+                    <button type="button" class="btn btn-tool" data-toggle="modal" data-target="#modal-update-quantity" @click="reset">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form action="#" method="POST" id="import_products" name="import_products" @submit.prevent="split_products_before_import">
+                    <form action="#" method="POST" id="update_quantity" name="update_quantity" @submit.prevent="split_stock_before_update">
                         <div class="row">
                             <div class="col-md-8">
                                 <div class="form-group">
@@ -46,7 +46,7 @@ app.component('import_products', {
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-12" v-show="products.length">
+                        <div class="col-md-12" v-show="stock.length">
                             <div class="card card-secondary">
                                 <div class="card-header">
                                     <h3 class="card-title">Preview</h3>
@@ -65,23 +65,13 @@ app.component('import_products', {
                                                     <thead>
                                                         <tr>
                                                             <th>SKU</th>
-                                                            <th>Url image</th>
-                                                            <th>Name</th>
-                                                            <th>Category</th>
-                                                            <th>Regular price</th>
                                                             <th>Stock quantity</th>
-                                                            <th>Status</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr v-for="product in products">
-                                                            <td>{{ product.sku }}</td>
-                                                            <td>{{ product.url_image }}</td>
-                                                            <td>{{ product.name }}</td>
-                                                            <td>{{ product.category }}</td>
-                                                            <td>{{ product.regular_price }}</td>
-                                                            <td>{{ product.stock_quantity }}</td>
-                                                            <td>{{ product.status }}</td>
+                                                        <tr v-for="stock in stock">
+                                                            <td>{{ stock.sku }}</td>
+                                                            <td>{{ stock.stock_quantity }}</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -95,15 +85,15 @@ app.component('import_products', {
                             <div class="col-12">
                                 <div class="float-right ml-1 mt-1">
                                     {{ report_error }}
-                                    <button type="submit" id="button" class="btn btn-primary">Import products</button>
+                                    <button type="submit" id="button" class="btn btn-primary">Update stock</button>
                                 </div>
                             </div>
                         </div>
-                        <div class="row mt-5" v-show="importing">
+                        <div class="row mt-5" v-show="updating">
                             <div class="col-12">
-                                <p>Importing {{ import_completed + ' / ' + productToImport }}</p>
+                                <p>Updating {{ update_completed + ' / ' + stockToUpdate }}</p>
                                 <div class="progress mb-3">
-                                    <div class="progress-bar bg-success" role="progressbar" :aria-valuenow="import_completed" aria-valuemin="0" :aria-valuemax="productToImport" :style="'width: ' + completed + '%'">
+                                    <div class="progress-bar bg-success" role="progressbar" :aria-valuenow="update_completed" aria-valuemin="0" :aria-valuemax="stockToUpdate" :style="'width: ' + completed + '%'">
                                     <span class="sr-only">40% Complete (success)</span>
                                     </div>
                                 </div>
@@ -111,7 +101,7 @@ app.component('import_products', {
                             <div class="col-md-6">
                                 <div class="card card-success">
                                     <div class="card-header">
-                                        <h3 class="card-title">Success {{ products_success_imported.length ? products_success_imported.length : '' }}</h3>
+                                        <h3 class="card-title">Success {{ stock_success_updated.length ? stock_success_updated.length : '' }}</h3>
                         
                                         <div class="card-tools">
                                             <button type="button" class="btn btn-tool" data-card-widget="maximize">
@@ -120,9 +110,8 @@ app.component('import_products', {
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <p v-for="product in products_success_imported">
-                                            {{ 'sku: '+ product.sku }}<br>
-                                            {{ 'name: ' + product.name }}
+                                        <p v-for="stock in stock_success_updated">
+                                            {{ 'sku: '+ stock.sku }}<br>
                                         </p>
                                     </div>
                                 </div>
@@ -130,7 +119,7 @@ app.component('import_products', {
                             <div class="col-md-6">
                                 <div class="card card-danger">
                                     <div class="card-header">
-                                        <h3 class="card-title">Error {{ products_error_imported.length ? products_error_imported.length : '' }}</h3>
+                                        <h3 class="card-title">Error {{ stock_error_updated.length ? stock_error_updated.length : '' }}</h3>
                     
                                         <div class="card-tools">
                                             <button type="button" class="btn btn-tool" data-card-widget="maximize">
@@ -139,10 +128,8 @@ app.component('import_products', {
                                         </div>
                                     </div>
                                     <div class="card-body">
-                                        <p v-for="product in products_error_imported">
-                                            {{ 'sku: '+ product.sku }}<br>
-                                            {{ 'name: ' + product.name }}<br>   
-                                            {{ 'error: ' + product.error_message }}
+                                        <p v-for="stock in stock_error_updated">
+                                            {{ 'sku: '+ stock.sku }}<br>
                                         </p>
                                     </div>
                                 </div>
@@ -150,7 +137,7 @@ app.component('import_products', {
                         </div>
                     </form>
                 </div><!-- /.modal-body -->
-                <div class="overlay" v-show="loading">
+                <div class="overlay" v-show="false">
                     <i class="fas fa-2x fa-sync fa-spin"></i>
                 </div>
             </div><!-- /.modal-content -->
@@ -159,35 +146,34 @@ app.component('import_products', {
     data() {
         return {
             loading: false,
-            importing: false,
+            updating: false,
             file: null,
-            splice: 5,
+            splice: 100,
             report_error: null,
-            import_completed: 0,
-            productToImport: 0,
-            products: [],
-            products_success_imported: [],
-            products_error_imported: [],
+            update_completed: 0,
+            stockToUpdate: 0,
+            stock: [],
+            stock_success_updated: [],
+            stock_error_updated: [],
         }
     },
     methods: {
-        import_products(product) {
+        update_quantity(stock) {
             this.loading = true
             const requestOptions = {
                 method: 'POST',
                 mode: 'same-origin',
                 headers: { 'content-type': 'application/json' },
                 body: JSON.stringify({
-                    'action': 'create_product',
+                    'action': 'update_stock_quantity',
                     'codice_sessione': this.codice_sessione,
                     'api_url': this.api_url,
                     'consumer_key': this.consumer_key,
                     'consumer_secret': this.consumer_secret,
                     'api_version': this.api_version,
-                    'product': product
+                    'stock': stock
                 })
             }
-            console.log(product);
             fetch('model.php', requestOptions)
                 // process the backend response
                 .then(async response => {
@@ -206,19 +192,19 @@ app.component('import_products', {
                         case 400:
                             // repoting a bad request
                             toastr.error(data.message)
-                            this.import_completed += product.length
+                            this.update_completed += stock.length
                             break;
-                        case 201:
+                        case 200:
                             // reporting a success message
                             toastr.success(data.message)
-                            data.data.product_success.forEach(product => {
-                                this.products_success_imported.push(product)
+                            data.data.stock_success.forEach(stock => {
+                                this.stock_success_updated.push(stock)
                             });
-                            data.data.product_error.forEach(product => {
-                                this.products_error_imported.push(product)
+                            data.data.stock_error.forEach(stock => {
+                                this.stock_error_updated.push(stock)
                             });
-                            this.import_completed += product.length
-                            if (this.import_completed == this.productToImport) {
+                            this.update_completed += stock.length
+                            if (this.update_completed == this.stockToUpdate) {
                                 this.loading = false
                             }
                             break;
@@ -236,13 +222,13 @@ app.component('import_products', {
             this.file = this.$refs.file.files[0]
             const reader = new FileReader();
             reader.onload = function(e) {
-                this.import_completed = 0
+                this.update_completed = 0
                 const text = e.target.result
                 const data = self.csvToArray(text)
-                self.products = []
-                self.products = data
-                if (!self.products.length) {
-                    self.report_error = '1 - There is no products to import' 
+                self.stock = []
+                self.stock = data
+                if (!self.stock.length) {
+                    self.report_error = '1 - There is no quantities to update' 
                 } else {
                     self.report_error = null
                 }
@@ -277,43 +263,43 @@ app.component('import_products', {
             // return the array
             return arr;
         },
-        split_products_before_import(){
-            this.importing = true
-            if (!this.products.length) {
-                this.report_error = '2 - There is no products to import'
+        split_stock_before_update(){
+            this.updating = true
+            if (!this.stock.length) {
+                this.report_error = '2 - There is no quantities to update'
             } else {
-                this.productToImport = this.products.length
-                this.import_completed = 0
-                this.products_success_imported = []
-                this.products_error_imported = []
-                let products = this.products;
-                while(products.length) {
-                    this.import_products( products.splice(0,this.splice) )
+                this.stockToUpdate = this.stock.length
+                this.update_completed = 0
+                this.stock_success_updated = []
+                this.stock_error_updated = []
+                let stock = this.stock;
+                while(stock.length) {
+                    this.update_quantity( stock.splice(0,this.splice) )
                 }
             }
         },
         reset() {
             this.loading = false
-            this.importing = false
+            this.updating = false
             this.file = null
             this.report_error = null
-            this.import_completed = 0
-            this.productToImport = 0
-            this.products = []
-            this.products_success_imported = []
-            this.products_error_imported = []
+            this.update_completed = 0
+            this.stockToUpdate = 0
+            this.stock = []
+            this.stock_success_updated = []
+            this.stock_error_updated = []
             this.$refs.file.value = null;
         },
         show_modal() {
-            $('#modal-import-products').modal('show')
+            $('#modal-update-quantity').modal('show')
         },
         hide_modal() {
-            $('#modal-import-products').modal('hide')
+            $('#modal-update-quantity').modal('hide')
         },
     },
     computed: {
         completed() {
-            return this.import_completed * 100 / this.productToImport
+            return this.update_completed * 100 / this.stockToUpdate
         },
     }
 })

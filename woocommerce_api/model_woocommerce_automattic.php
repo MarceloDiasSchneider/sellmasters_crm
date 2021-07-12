@@ -44,8 +44,17 @@ switch ($requestBody['action']) {
                 'query_string_auth' => true 
             ]
         );
+
+        $data = array(
+            // 'status' => 'publish',
+            'per_page' => 100,
+            'orderby' => 'date',
+            'order' => 'asc',
+            'category' => '88',
+            // 'featured' => 1
+        );
         // call method get to retrieve all products 
-        $products['data'] = $woocommerceApi->get('products');
+        $products['data'] = $woocommerceApi->get('products', $data);
          
         $products['code'] = 200;
         $products['state'] = 'Ok';

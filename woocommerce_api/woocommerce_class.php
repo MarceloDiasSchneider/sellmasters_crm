@@ -30,16 +30,12 @@ class woocommerceApiClass
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => $this->method,
             // CURLOPT_USERPWD => $this->consumer_key . ":" . $this->consumer_secret,
+            CURLOPT_POSTFIELDS => $this->postFields,
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json',
                 'Authorization: Basic Y2tfYTdkMzI1YTBjN2E4NzdkOWY3MWJiZjBhZDVkOWRiYmUyNzY4Mjg3YTpjc184ZjlhYzdhOTIyODhlZWViNDllNTk5N2Q4YjU0NzU0NjAwYjU4Yzlm',
             ),
-            CURLOPT_POSTFIELDS =>'{"name":"CAPPELLI"}',
         );
-        if( $this->method == 'POST' || $this->method == 'PUT') {
-            $options[CURLOPT_POSTFIELDS] = $this->postFields;
-            
-        }
         curl_setopt_array($curl, $options);
         $response = curl_exec($curl);
         curl_close($curl);

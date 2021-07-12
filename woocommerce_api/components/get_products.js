@@ -37,19 +37,25 @@ app.component('get_products', {
                 <table class="table table-hover text-nowrap">
                     <thead>
                         <tr>
+                            <th>Count</th>
                             <th>Id</th>
+                            <th>SKU</th>
                             <th>Products</th>
                             <th>Price</th>
+                            <th>Stock</th>
                             <th>Date created</th>
                             <th>Date update</th>
                             <th>active</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="product in products">
+                        <tr v-for="product, key in products">
+                            <td>{{ key + 1 }}</td>
                             <td>{{ product.id }}</td>
+                            <td>{{ product.sku }}</td>
                             <td>{{ product.name }}</td>
                             <td>{{ product.price }}</td>
+                            <td>{{ product.stock_quantity }}</td>
                             <td>{{ product.date_created }}</td>
                             <td>{{ product.date_modified }}</td>
                             <td>{{ product.status }}</td>

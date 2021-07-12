@@ -117,7 +117,7 @@ app.component('create_product', {
     methods: {
         create_product() {
             this.loading = true
-            let product = {
+            let product = [{
                 'sku': this.sku,
                 'name': this.name,
                 'description': this.description,
@@ -126,7 +126,7 @@ app.component('create_product', {
                 'stock_quantity': this.stock_quantity,
                 'url_image': this.url_image,
                 'status': this.status,
-            }
+            }]
             const requestOptions = {
                 method: 'POST',
                 mode: 'same-origin',
@@ -159,6 +159,7 @@ app.component('create_product', {
                         case 201:
                             // reporting a success message
                             toastr.success(data.message)
+                            
                             this.refresh_table()
                             this.hide_modal()
                             break;

@@ -35,7 +35,7 @@ switch ($requestBody['action']) {
         // set curl attribute 
         $woocommerceApi->resource = 'products';
         $woocommerceApi->method = 'GET';
-        $parameters = ['per_page' => 100, 'status' => 'publish'];
+        $parameters = ['per_page' => 100];
         $woocommerceApi->postFields = json_encode($parameters);
         // retrieve the products
         $products = $woocommerceApi->woocommerceApi();

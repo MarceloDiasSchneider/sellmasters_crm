@@ -1,19 +1,19 @@
 <style>
-table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
-  width: 100%;
-}
+    table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    }
 
-td, th {
-  border: 1px solid #dddddd;
-  text-align: left;
-  padding: 8px;
-}
+    td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+    }
 
-tr:nth-child(even) {
-  background-color: #dddddd;
-}
+    tr:nth-child(even) {
+    background-color: #dddddd;
+    }
 </style>
 <?php
 
@@ -45,10 +45,6 @@ class readFtpFile
         // handle a temp file
         $handle = fopen('php://temp', 'r+');
         $success = ftp_fget($conn_id, $handle, '/ArticoliGrandeA.csv', FTP_BINARY, 0);
-        // donwload the file from the ftp
-        # $success = ftp_get($conn_id, 'ArticoliGrandeA.csv', '/ArticoliGrandeA.csv', FTP_BINARY, 0);
-        # echo 'donwload';        
-        # exit;
         if (!$success) {
             echo "<p>Failed to recover file</p>";
             exit;
@@ -154,7 +150,6 @@ class woocommerceApiClass
             if (count($products)) {
                 foreach ($products as $key => $product) {
                     $all_products[] = $product;
-                    $page = null;
                 }
             } else {
                 $page = null;
@@ -267,4 +262,4 @@ foreach ($products_updated as $key => $value) {
 }
 echo '</table><hr>';
 
-$file->donwload_ftp_file();
+# $file->donwload_ftp_file();

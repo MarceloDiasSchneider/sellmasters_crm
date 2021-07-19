@@ -34,7 +34,7 @@ class prestashopApiClass
         $this->method = 'GET';
         $this->merchant_id = 'A1DKBEUHRWP6D7'; // id merchant on amazon
         $this->marketplace = 'Prestashop';
-        $this->date = date("Y-m-d");
+        $this->date = date('d.m.Y',strtotime("-1 days"));
     }
 
     public function resquest_prestashop_api()

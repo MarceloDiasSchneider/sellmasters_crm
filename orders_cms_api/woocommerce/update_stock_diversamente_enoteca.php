@@ -104,6 +104,7 @@ class woocommerceApiClass
         $this->consumer_key = 'ck_c47874c9eb1afcc09d44907db9778d95e609907e';
         $this->consumer_secret = 'cs_3a5abbc9081d996fe321c0189be07ba33aa9ae63';
         $this->api_version = 'wc/v3/';
+        echo 'Runing at ' . date('d-m-Y',strtotime("-1 days")) . '<br>';
     }
     
     public function woocommerceApiConection()

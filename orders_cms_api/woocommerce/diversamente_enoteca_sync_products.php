@@ -331,7 +331,7 @@ $products_woocommerce = $woocommerceApi->retrieveAllProducts();
 // echo '<pre>';
 // print_r($products_woocommerce);
 // echo '</pre>';
-#### $products_updated = $woocommerceApi->update_products_stock($products_woocommerce, $products_file_ftp);
+$products_updated = $woocommerceApi->update_products_stock($products_woocommerce, $products_file_ftp);
 // echo count($products_updated) . ' products updated';
 // echo '<pre>';
 // print_r($products_updated);
@@ -359,30 +359,27 @@ foreach ($create_new_product as $key => $value) {
     echo '</tr>';
 }
 echo '</table><hr>';
-
-####
 // showing relevants data from products updated
-// echo '<hr><p>data from the updeted products</p>';
-// echo '<table>';
-//     echo '<tr>';
-//         echo '<th>index</th>';
-//         echo '<th>id</th>';
-//         echo '<th>name</th>';
-//         echo '<th>sku</th>';
-//         echo '<th>stock_quantity</th>';
-//         echo '<th>manage_stock</th>';
-//     echo '</tr>';
-// foreach ($products_updated as $key => $value) {
-//     echo '<tr>';
-//         echo '<th>'. $key . '</th>';
-//         echo '<th>'. $value['id'] . '</th>';
-//         echo '<th>'. $value['name'] . '</th>';
-//         echo '<th>'. $value['sku'] . '</th>';
-//         echo '<th>'. $value['stock_quantity'] . '</th>';
-//         echo '<th>'. $value['manage_stock'] . '</th>';
-//     echo '</tr>';
-// }
-// echo '</table><hr>';
-####
+echo '<hr><p>data from the updeted products</p>';
+echo '<table>';
+    echo '<tr>';
+        echo '<th>index</th>';
+        echo '<th>id</th>';
+        echo '<th>name</th>';
+        echo '<th>sku</th>';
+        echo '<th>stock_quantity</th>';
+        echo '<th>manage_stock</th>';
+    echo '</tr>';
+foreach ($products_updated as $key => $value) {
+    echo '<tr>';
+        echo '<th>'. $key . '</th>';
+        echo '<th>'. $value['id'] . '</th>';
+        echo '<th>'. $value['name'] . '</th>';
+        echo '<th>'. $value['sku'] . '</th>';
+        echo '<th>'. $value['stock_quantity'] . '</th>';
+        echo '<th>'. $value['manage_stock'] . '</th>';
+    echo '</tr>';
+}
+echo '</table><hr>';
 # $file->donwload_ftp_file();
 echo 'finished at ' . date('d-m-Y h:i:sa') . '<br>';

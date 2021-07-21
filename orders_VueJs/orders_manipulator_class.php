@@ -241,22 +241,6 @@ class ordersManipulatorClass
         }
         return $orders_financial_issue;
     }
-    public function check_order_id_sku($orders)
-    {
-        $order_id_sku = [];
-        foreach ($orders as $key => $order) {
-            $order['order_id_sku'] = $order['order_id'] . $order['sku']; 
-            $order_id_sku[] = $order;
-        }
-        $order_id_sku_maped = array_column($order_id_sku, 'order_id_sku');
-        $order_count = [];
-        foreach ($order_id_sku as $key => $order) {
-            $order['order_id_sku_count'] = array_count_values($order_id_sku_maped)[$order['order_id_sku']]; 
-            $order_count[] = $order;
-        }
-            
-        return $order_count;
-    }
     // format values as HTML with classes to set a style
     public function formatAsHTML($key, $value, $bg_color)
     {
@@ -278,6 +262,5 @@ $orders = $order->market_status_formation($orders);
 $orders = $order->total_order($orders);
 $orders = $order->currency_convert($orders);
 // $orders = $order->format_dati_finanziare($orders);
-$orders = $order->check_order_id_sku($orders);
 
 echo json_encode($orders);

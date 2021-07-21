@@ -34,7 +34,7 @@ class shopifyApiClass
         $this->password = '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';
         $this->merchant_id = 'not defined'; // id merchant on amazon
         $this->marketplace = 'Shopify';
-        $this->date = date('d-m-Y',strtotime("-1 days"));
+        $this->date = date('Y-m-d',strtotime("-1 days"));
     }
 
     public function resquest_shopify_api()
@@ -71,11 +71,10 @@ class shopifyApiClass
             'status' => 'any',
             'limit' => 250,
             // 'page' => 1,
-            'created_at_min' => '2021-01-01',
-            'created_at_max' => '2021-08-01',
+            'created_at_min' => '2021-06-01',
+            'created_at_max' => '2021-07-01',
             // 'created_at_min' => $this->date,
         );
-        echo $this->date;
         $this->resource = 'orders.json';
         $this->parameter = http_build_query($params);
         $orders = $this->resquest_shopify_api();
@@ -97,15 +96,15 @@ class shopifyApiClass
         }
         // get orders according with the parameters
         $params = array(
+            'limit' => 250,
             'fields' => 'id,variants',
             'ids' => $product_ids,
         );
         $this->resource = 'products.json';
         $this->parameter = http_build_query($params);
         $products_data = $this->resquest_shopify_api();
-        $products_data = json_decode($products_data, true);
-
-        return $products_data;
+        
+        return json_decode($products_data, true);
     }
 
     public function merge_and_organize_data($orders, $products_data)
@@ -123,26 +122,37 @@ class shopifyApiClass
             if(!isset($order['shipping_address']['country_code'])){
                 $order['shipping_address']['country_code'] = 'not found';
             }
+            if(isset($order['refunds'][0]['created_at'])) {
+                $order['refund_created_at_formated'] = date('d-m-Y', strtotime($order['refunds'][0]['created_at']));
+            } else {
+                $order['refund_created_at_formated'] = null;
+            }
             // create a row foreach products
             foreach ($order['line_items'] as $key => $product) {
-                // find the barcode of each product;
+                // find the sku or barcode of each product;
                 $product_index = array_search($product['product_id'], $array_column_products );
                 $variant_index = array_search($product['variant_id'], array_column($products_data['products'][$product_index]['variants'], 'id'));
-                $product['barcode'] = $products_data['products'][$product_index]['variants'][$variant_index]['barcode'];
-                // if (isset($order[])) {
-                //     # code...
-                // }
-                // $data['payment_gateway_names'][0] . '||' . $data['gateway'];
-                
+                $product['sku_barcode'] = $products_data['products'][$product_index]['variants'][$variant_index]['barcode'];
+                // if barcode is null get the sku
+                if ($product['sku_barcode'] == null) {
+                    $product['sku_barcode'] = $products_data['products'][$product_index]['variants'][$variant_index]['sku'];
+                }
+                // set the product_fulfillment_status to not overwrite on merge
+                $product['product_fulfillment_status'] = $product['fulfillment_status'];
                 // setting values required to exporte
                 // sum all discount of this product
                 $product['discount_allocations_summed'] = 0;
                 foreach ($product['discount_allocations'] as $discount) {
                     $product['discount_allocations_summed'] += $discount['amount_set']['shop_money']['amount'];
                 }
-                $product['total'] = $product['price_set']['shop_money']['amount'] 
-                    - $product['discount_allocations_summed']
-                    + ($order['total_shipping_price_set']['shop_money']['amount'] / $order['products_rows']);
+                if ($order['financial_status'] == 'refunded' || $order['cancel_reason'] != null) {
+                    $product['total'] = 0;
+                } else {
+                    $product['total'] = $product['price_set']['shop_money']['amount']
+                        - $product['discount_allocations_summed']
+                        + ($order['total_shipping_price_set']['shop_money']['amount'] / $order['products_rows']);
+                }
+                $product['total_formated'] = number_format($product['total'], 2, ',', '');
                 switch ($order['subtotal_price_set']['shop_money']['currency_code']) {
                     case 'EUR':
                             $product['total_converted'] = $product['total'];
@@ -170,33 +180,52 @@ class shopifyApiClass
         // use array_map to retrieve only relevant data and organize it
         $products_rows = array_map(function($data) {
             return array(
-                'note' => '',
-                'feedback' => '',
+                // // model to match with paolo xlsx 
+                // 'note' => '',
+                // 'feedback' => '',
+                // 'paese' => $data['shipping_address']['country_code'],
+                // 'data' => $data['created_at_formated'],
+                // 'ordine_marketplace' => $data['ordine_marketplace'],
+                // 'nome_cliente' => $data['customer']['first_name'] . ' ' . $data['customer']['last_name'],
+                // 'total' => $data['total_formated'],
+                // 'sku' => $data['sku_barcode'],
+                // 'brand' => $data['vendor'],
+                // 'currency' => $data['subtotal_price_set']['shop_money']['currency_code'],
+                // 'merketplace' => $this->marketplace,
+                // 'total_converted' => $data['total_converted_fomated'],
+                // 'status_consegna' => $data['product_fulfillment_status'],
+                // 'status_finanziario' => $data['financial_status'],
+                // 'price bd' => '',
+                // '%' => '',
+                // 'fee_amazon' => '',
+                // 'fee_vendor' => $data['fee_vendor_formated'] ,
+                // 'spedizione_tatiffa_tnt_fedex' => '',
+                // 'spedizione_tariffa_sellmasters' => '',
+                // 'differenza' => '',
+                // 'saldo' => '',
+                // 'quantita' => $data['quantity'],
+                // 'payment ' => $data['gateway'],
+                // 'importo_corrispettivo' => '',
+                // 'importo_nac' => '',
+                // 'data_rimborso' => $data['refund_created_at_formated'],
+
+                // model to match with arnaldo's google sheet
                 'paese' => $data['shipping_address']['country_code'],
-                'data' => $data['created_at_formated'],
-                'ordine_marketplace' => $data['ordine_marketplace'],
-                'nome_cliente' => $data['customer']['first_name'] . ' ' . $data['customer']['last_name'],
-                'total' => $data['total'],
-                'sku' => $data['barcode'],
-                'brand' => $data['vendor'],
+                'data' => $data['created_at'],
+                'updated_at' => $data['updated_at'],
+                'purchase_order_number' => $data['ordine_marketplace'],
+                'buyer_name' => $data['customer']['first_name'] . ' ' . $data['customer']['last_name'],
+                'item_tax' => $data['price_set']['shop_money']['amount'],
+                'item_promotion_discount' => $data['discount_allocations_summed'],
+                'shipping_tax' => $data['total_shipping_price_set']['shop_money']['amount'],
+                'sku' => $data['sku_barcode'],
+                'note' => $data['vendor'],
                 'currency' => $data['subtotal_price_set']['shop_money']['currency_code'],
-                'merketplace' => $this->marketplace,
-                'total_converted' => $data['total_converted_fomated'],
-                'status_consegna' => '',
-                'price bd' => '',
-                '%' => '',
-                'fee_amazon' => '',
-                'fee_vendor' => $data['fee_vendor_formated'] ,
-                'spedizione_tatiffa_tnt_fedex' => '',
-                'spedizione_tariffa_sellmasters' => '',
-                'differenza' => '',
-                'saldo' => '',
-                'quantita' => $data['quantity'],
-                // 'payment' => $data['payment'],
-                'financial_status' => $data['financial_status'],
-                'importo_corrispettivo' => '',
-                'importo_nac' => '',
-                'data_rimborso' => '',
+                'marketplace' => $this->marketplace,
+                'item_status' => $data['product_fulfillment_status'],
+                'quantity_purchased' => $data['quantity'],
+                'order_status' => $data['fulfillment_status'],
+                'payment_method' => $data['gateway'],
             );
         }, $products_rows);
 
@@ -239,14 +268,14 @@ try {
         throw new reportException('No products data found');
     }
     // execute the method to merge all data and create a row for each product 
-    $data = $shopifyApi->merge_and_organize_data($orders, $products_data);
+    $products_rows = $shopifyApi->merge_and_organize_data($orders, $products_data);
     
     // execute the method export to cvs 
-    // $shopifyApi->export_as_cvs($data);
-
+    $shopifyApi->export_as_cvs($products_rows);
+    
     // return the orders data as product row in json format
-    $data = json_encode($data);
-    echo $data;
+    $data['data'] = $products_rows;
+    echo json_encode($data);
 } catch (reportException $e) {
     $e->reportError();
 }
